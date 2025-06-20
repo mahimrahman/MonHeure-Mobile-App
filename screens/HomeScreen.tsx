@@ -1,79 +1,156 @@
-import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import Modal from 'react-native-modal';
 import { Ionicons } from '@expo/vector-icons';
 
+const STORAGE_KEY = 'monheure_today_punch';
+
+function formatTime(dateString?: string) {
+  if (!dateString) return '--:--';
+  const d = new Date(dateString);
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
 export default function HomeScreen() {
+  const [punchIn, setPunchIn] = useState<string | undefined>();
+  const [punchOut, setPunchOut] = useState<string | undefined>();
+  const [isWorking, setIsWorking] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editType, setEditType] = useState<'in' | 'out'>();
+  const [editTime, setEditTime] = useState<Date>(new Date());
+  const [showPicker, setShowPicker] = useState(false);
+
+  // Load today's punch from storage
+  useEffect(() => {
+    (async () => {
+      const today = new Date().toISOString().slice(0, 10);
+      const data = await AsyncStorage.getItem(`${STORAGE_KEY}_${today}`);
+      if (data) {
+        const { punchIn, punchOut } = JSON.parse(data);
+        setPunchIn(punchIn);
+        setPunchOut(punchOut);
+        setIsWorking(!!punchIn && !punchOut);
+      }
+    })();
+  }, []);
+
+  // Save to storage
+  const savePunch = async (newPunchIn?: string, newPunchOut?: string) => {
+    const today = new Date().toISOString().slice(0, 10);
+    await AsyncStorage.setItem(
+      `${STORAGE_KEY}_${today}`,
+      JSON.stringify({ punchIn: newPunchIn, punchOut: newPunchOut })
+    );
+  };
+
+  // Punch in/out logic
+  const handlePunch = async () => {
+    if (!punchIn) {
+      // Punch in
+      const now = new Date().toISOString();
+      setPunchIn(now);
+      setIsWorking(true);
+      await savePunch(now, undefined);
+    } else if (!punchOut) {
+      // Punch out
+      const now = new Date().toISOString();
+      setPunchOut(now);
+      setIsWorking(false);
+      await savePunch(punchIn, now);
+    } else {
+      // Already punched in and out
+      Alert.alert('Already punched in and out for today. Edit times if needed.');
+    }
+  };
+
+  // Edge case: multiple punch-ins
+  const handleMultiplePunchIn = () => {
+    Alert.alert(
+      'Already punched in',
+      'You have already punched in today. If you missed a punch out, please punch out or edit the times.'
+    );
+  };
+
+  // Edit modal logic
+  const openEditModal = (type: 'in' | 'out') => {
+    setEditType(type);
+    setEditTime(type === 'in' && punchIn ? new Date(punchIn) : type === 'out' && punchOut ? new Date(punchOut) : new Date());
+    setShowEditModal(true);
+    setShowPicker(true);
+  };
+
+  const handleEditTime = async (_event: any, selectedDate?: Date) => {
+    setShowPicker(false);
+    if (selectedDate) {
+      if (editType === 'in') {
+        setPunchIn(selectedDate.toISOString());
+        await savePunch(selectedDate.toISOString(), punchOut);
+      } else if (editType === 'out') {
+        setPunchOut(selectedDate.toISOString());
+        await savePunch(punchIn, selectedDate.toISOString());
+      }
+    }
+    setShowEditModal(false);
+  };
+
+  // Reset for demo/testing
+  const resetToday = async () => {
+    const today = new Date().toISOString().slice(0, 10);
+    await AsyncStorage.removeItem(`${STORAGE_KEY}_${today}`);
+    setPunchIn(undefined);
+    setPunchOut(undefined);
+    setIsWorking(false);
+  };
+
   return (
-    <ScrollView className="flex-1 bg-gray-50">
-      <View className="p-4">
-        {/* Header */}
-        <View className="mb-6">
-          <Text className="text-2xl font-bold text-gray-800">Welcome to MonHeure</Text>
-          <Text className="text-gray-600 mt-1">Your time management companion</Text>
-        </View>
+    <View className="flex-1 bg-gray-50 justify-center items-center p-6">
+      <TouchableOpacity
+        className={`w-48 h-48 rounded-full justify-center items-center mb-8 ${isWorking ? 'bg-red-500' : 'bg-green-500'}`}
+        onPress={handlePunch}
+        activeOpacity={0.8}
+      >
+        <Ionicons name={isWorking ? 'log-out' : 'log-in'} size={64} color="white" />
+        <Text className="text-white text-2xl font-bold mt-4">
+          {isWorking ? 'Punch Out' : punchIn && punchOut ? 'Done' : 'Punch In'}
+        </Text>
+      </TouchableOpacity>
 
-        {/* Quick Actions */}
-        <View className="mb-6">
-          <Text className="text-lg font-semibold text-gray-800 mb-3">Quick Actions</Text>
-          <View className="flex-row flex-wrap gap-3">
-            <TouchableOpacity className="bg-blue-500 p-4 rounded-lg flex-1 min-w-[150px] items-center">
-              <Ionicons name="play" size={24} color="white" />
-              <Text className="text-white font-medium mt-2">Start Timer</Text>
-            </TouchableOpacity>
-            <TouchableOpacity className="bg-green-500 p-4 rounded-lg flex-1 min-w-[150px] items-center">
-              <Ionicons name="add" size={24} color="white" />
-              <Text className="text-white font-medium mt-2">New Task</Text>
-            </TouchableOpacity>
-          </View>
+      <View className="w-full max-w-xs bg-white rounded-lg shadow p-6 mb-4">
+        <Text className="text-lg font-semibold text-gray-800 mb-2">Today's Times</Text>
+        <View className="flex-row justify-between items-center mb-2">
+          <Text className="text-gray-600">Punch In:</Text>
+          <TouchableOpacity onPress={() => openEditModal('in')}>
+            <Text className="text-blue-500 text-lg font-mono">{formatTime(punchIn)}</Text>
+          </TouchableOpacity>
         </View>
-
-        {/* Today's Summary */}
-        <View className="bg-white p-4 rounded-lg shadow-sm mb-6">
-          <Text className="text-lg font-semibold text-gray-800 mb-3">Today's Summary</Text>
-          <View className="flex-row justify-between items-center">
-            <View>
-              <Text className="text-3xl font-bold text-blue-500">6h 23m</Text>
-              <Text className="text-gray-600">Total Time</Text>
-            </View>
-            <View>
-              <Text className="text-3xl font-bold text-green-500">8</Text>
-              <Text className="text-gray-600">Tasks Done</Text>
-            </View>
-            <View>
-              <Text className="text-3xl font-bold text-orange-500">85%</Text>
-              <Text className="text-gray-600">Efficiency</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Recent Activity */}
-        <View className="bg-white p-4 rounded-lg shadow-sm">
-          <Text className="text-lg font-semibold text-gray-800 mb-3">Recent Activity</Text>
-          <View className="space-y-3">
-            <View className="flex-row items-center">
-              <View className="w-2 h-2 bg-blue-500 rounded-full mr-3"></View>
-              <View className="flex-1">
-                <Text className="font-medium text-gray-800">Project Planning</Text>
-                <Text className="text-sm text-gray-600">2h 15m • 2 hours ago</Text>
-              </View>
-            </View>
-            <View className="flex-row items-center">
-              <View className="w-2 h-2 bg-green-500 rounded-full mr-3"></View>
-              <View className="flex-1">
-                <Text className="font-medium text-gray-800">Code Review</Text>
-                <Text className="text-sm text-gray-600">1h 45m • 4 hours ago</Text>
-              </View>
-            </View>
-            <View className="flex-row items-center">
-              <View className="w-2 h-2 bg-orange-500 rounded-full mr-3"></View>
-              <View className="flex-1">
-                <Text className="font-medium text-gray-800">Team Meeting</Text>
-                <Text className="text-sm text-gray-600">45m • 6 hours ago</Text>
-              </View>
-            </View>
-          </View>
+        <View className="flex-row justify-between items-center">
+          <Text className="text-gray-600">Punch Out:</Text>
+          <TouchableOpacity onPress={() => openEditModal('out')}>
+            <Text className="text-blue-500 text-lg font-mono">{formatTime(punchOut)}</Text>
+          </TouchableOpacity>
         </View>
       </View>
-    </ScrollView>
+
+      <TouchableOpacity onPress={resetToday} className="mt-2">
+        <Text className="text-xs text-gray-400">Reset Today (for testing)</Text>
+      </TouchableOpacity>
+
+      <Modal isVisible={showEditModal} onBackdropPress={() => setShowEditModal(false)}>
+        <View className="bg-white p-6 rounded-lg items-center">
+          <Text className="text-lg font-semibold mb-4">Edit {editType === 'in' ? 'Punch In' : 'Punch Out'} Time</Text>
+          {showPicker && (
+            <DateTimePicker
+              value={editTime}
+              mode="time"
+              is24Hour={true}
+              display="spinner"
+              onChange={handleEditTime}
+            />
+          )}
+        </View>
+      </Modal>
+    </View>
   );
 } 
