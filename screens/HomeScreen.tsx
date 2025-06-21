@@ -105,7 +105,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <View className="flex-1 bg-gray-50 justify-center items-center p-6">
+  <View className="flex-1 bg-gray-50 justify-center items-center p-6">
       <TouchableOpacity
         className={`w-48 h-48 rounded-full justify-center items-center mb-8 ${isWorking ? 'bg-red-500' : 'bg-green-500'}`}
         onPress={handlePunch}
