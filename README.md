@@ -7,9 +7,28 @@ A React Native mobile application built with Expo for efficient time tracking an
 - **Punch In/Out System**: Simple one-tap time tracking
 - **Daily Time Management**: Track work hours with visual indicators
 - **Time Editing**: Edit punch-in and punch-out times if needed
-- **Daily Reset**: Testing functionality to reset daily records
+- **Calendar-Based History**: Visual calendar with punch activity, day selection, and edit/delete support
+- **Custom Date Range Reports**: Select any two-week range, view all entries, and see total hours
+- **PDF Export & Sharing**: Generate professional PDF reports and share via email or other apps
 - **Persistent Storage**: Data saved locally using AsyncStorage
 - **Modern UI**: Clean, intuitive interface with Tailwind CSS styling
+
+## 🆕 Major Screens & Features
+
+### History Screen
+- **Calendar View**: Interactive calendar (using `react-native-calendars`) with dots for punch activity
+- **Day Details**: Tap a day to see punch-in/out times, total hours, and notes
+- **Edit/Delete**: Edit or delete entries with a modal
+- **Sample Data**: Load sample data for quick testing
+- **Pull to Refresh**: Swipe down to refresh
+
+### Report Screen
+- **Custom Date Range**: Select any two-week (or custom) range with a date picker
+- **Summary Dashboard**: See total days, records, hours, and average per day
+- **Scrollable Entries**: All punch-in/out entries grouped by day
+- **PDF Export**: Generate a professional PDF report (`react-native-html-to-pdf`)
+- **Share/Email**: Share the PDF via email or other apps (`react-native-share`)
+- **Quick Actions**: One-tap for common ranges (last 2 weeks, last month, today)
 
 ## 🛠 Tech Stack
 
@@ -19,13 +38,17 @@ A React Native mobile application built with Expo for efficient time tracking an
 - **React Navigation** for navigation
 - **Expo Vector Icons** for beautiful icons
 - **AsyncStorage** for local data persistence
-- **React Native Modal** for time editing
+- **react-native-calendars** for calendar UI
+- **react-native-html-to-pdf** for PDF export
+- **react-native-share** for sharing/export
+- **@react-native-community/datetimepicker** for date selection
 
 ## 📱 Screenshots
 
 The app features a clean, modern interface with:
 - Large punch button that changes color based on work status
 - Daily time display with editable punch times
+- Calendar-based history and reporting
 - Modal-based time picker for corrections
 - Responsive design that works on all screen sizes
 
@@ -68,14 +91,21 @@ MonHeure-Mobile-App/
 ├── screens/
 │   ├── HomeScreen.tsx      # Main punch in/out interface
 │   ├── DashboardScreen.tsx # Analytics dashboard
-│   ├── HistoryScreen.tsx   # Time history view
-│   ├── ReportScreen.tsx    # Report generation
+│   ├── HistoryScreen.tsx   # Calendar-based history view
+│   ├── ReportScreen.tsx    # Custom date range reporting & export
 │   └── SettingsScreen.tsx  # App settings
+├── components/
+│   ├── EditPunchModal.tsx  # Modal for editing punch records
+│   └── DateRangePicker.tsx # Date range picker for reports
 ├── types/
 │   ├── nativewind.d.ts     # NativeWind type definitions
 │   └── punch.ts           # Punch data types
 ├── utils/
-│   └── timeCalculations.ts # Time calculation utilities
+│   ├── timeCalculations.ts # Time calculation utilities
+│   ├── storage.ts         # AsyncStorage helpers
+│   ├── sampleData.ts      # Sample data generator
+│   ├── pdfGenerator.ts    # PDF report generator
+│   └── shareUtils.ts      # Sharing utilities
 ├── package.json           # Dependencies and scripts
 ├── tsconfig.json         # TypeScript configuration
 └── tailwind.config.js    # Tailwind CSS configuration
@@ -95,9 +125,18 @@ MonHeure-Mobile-App/
 - **Editable Times**: Tap on times to edit using a time picker
 - **Data Persistence**: All data saved locally
 
-### Testing Features
-- **Reset Function**: Clear today's data for testing
-- **Multiple Punch Handling**: Proper error handling for edge cases
+### Calendar-Based History
+- **Calendar UI**: See punch activity at a glance
+- **Day Details**: Tap a day for all entries
+- **Edit/Delete**: Manage entries with a modal
+- **Sample Data**: Load for quick testing
+
+### Custom Date Range Reports
+- **Date Picker**: Select any range (default: last 2 weeks)
+- **Summary**: Total days, records, hours, avg/day
+- **Scrollable List**: All entries grouped by day
+- **PDF Export**: Generate a professional report
+- **Share/Email**: Export via email or other apps
 
 ## 🎨 Styling
 
@@ -148,18 +187,19 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🆘 Support
 
 - **Issues**: Open an issue in the repository
-- **Documentation**: Check the code comments for implementation details
+- **Documentation**: See HISTORY_FEATURES.md and REPORT_FEATURES.md for details
 - **Expo Docs**: [expo.dev](https://expo.dev) for Expo-specific questions
 
 ## 🔮 Future Enhancements
 
 - [ ] Multi-user support
 - [ ] Cloud synchronization
-- [ ] Advanced reporting
-- [ ] Time analytics
-- [ ] Export functionality
+- [ ] Advanced reporting (CSV, Excel, analytics)
+- [ ] Time analytics and charts
+- [ ] Export functionality (CSV, PDF, Excel)
 - [ ] Dark mode support
 - [ ] Offline capabilities
+- [ ] Report history and management
 
 ---
 
