@@ -30,6 +30,14 @@ A React Native mobile application built with Expo for efficient time tracking an
 - **Share/Email**: Share the PDF via email or other apps (`react-native-share`)
 - **Quick Actions**: One-tap for common ranges (last 2 weeks, last month, today)
 
+### Settings Screen
+- **Default Punch Times**: Set default punch-in and punch-out times (with time pickers)
+- **Dashboard View Preference**: Choose default dashboard view (weekly/monthly/yearly)
+- **Theme Toggle**: Switch between dark and light mode (persisted)
+- **Punch Out Reminder**: Enable/disable local notification at 6:00 PM (uses Expo Notifications)
+- **Clear All Data**: Permanently delete all stored data (with confirmation modal)
+- **All preferences are saved with AsyncStorage and persist across app restarts**
+
 ## 🛠 Tech Stack
 
 - **React Native** with **Expo SDK 50**
@@ -42,6 +50,7 @@ A React Native mobile application built with Expo for efficient time tracking an
 - **react-native-html-to-pdf** for PDF export
 - **react-native-share** for sharing/export
 - **@react-native-community/datetimepicker** for date selection
+- **expo-notifications** for local reminders
 
 ## 📱 Screenshots
 
@@ -93,7 +102,7 @@ MonHeure-Mobile-App/
 │   ├── DashboardScreen.tsx # Analytics dashboard
 │   ├── HistoryScreen.tsx   # Calendar-based history view
 │   ├── ReportScreen.tsx    # Custom date range reporting & export
-│   └── SettingsScreen.tsx  # App settings
+│   └── SettingsScreen.tsx  # Preferences, theme, notifications, data management
 ├── components/
 │   ├── EditPunchModal.tsx  # Modal for editing punch records
 │   └── DateRangePicker.tsx # Date range picker for reports
@@ -137,6 +146,14 @@ MonHeure-Mobile-App/
 - **Scrollable List**: All entries grouped by day
 - **PDF Export**: Generate a professional report
 - **Share/Email**: Export via email or other apps
+
+### Settings & Preferences
+- **Default Punch Times**: Set default punch-in/out times (time pickers)
+- **Dashboard View**: Choose default dashboard view (weekly/monthly/yearly)
+- **Theme**: Toggle dark/light mode (persisted)
+- **Punch Out Reminder**: Enable/disable 6PM local notification
+- **Clear All Data**: Delete all stored data (with confirmation)
+- **All settings are saved with AsyncStorage and persist across app restarts**
 
 ## 🎨 Styling
 
