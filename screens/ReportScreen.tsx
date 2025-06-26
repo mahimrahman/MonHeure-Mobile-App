@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { PunchRecord } from '../types/punch';
-import { storage } from '../utils/storage';
+import { fetchEntriesForRange } from '../utils/database';
 import DateRangePicker from '../components/DateRangePicker';
 import { generatePDFReport } from '../utils/pdfGenerator';
 import { shareReport, shareReportAsEmail } from '../utils/shareUtils';
@@ -57,7 +57,9 @@ export default function ReportScreen() {
 
   const loadPunchData = async () => {
     try {
-      const data = await storage.getAllPunchRecords();
+      const startDateStr = startDate.toISOString().split('T')[0];
+      const endDateStr = endDate.toISOString().split('T')[0];
+      const data = await fetchEntriesForRange(startDateStr, endDateStr);
       setPunchRecords(data);
     } catch (error) {
       console.error('Error loading punch data:', error);
@@ -72,13 +74,10 @@ export default function ReportScreen() {
   }, []);
 
   const filterRecords = () => {
-    const startDateStr = startDate.toISOString().split('T')[0];
-    const endDateStr = endDate.toISOString().split('T')[0];
-
-    const filtered = punchRecords.filter(record => {
-      return record.date >= startDateStr && record.date <= endDateStr;
-    });
-
+    // Since we're now fetching directly from database for the range,
+    // we can just use the punchRecords directly
+    const filtered = [...punchRecords];
+    
     // Sort by date (newest first)
     filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     setFilteredRecords(filtered);

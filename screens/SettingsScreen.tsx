@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
+import { clearAllData } from '../utils/database';
 
 const DASHBOARD_VIEWS = ['Weekly', 'Monthly', 'Yearly'];
 
@@ -130,14 +131,22 @@ export default function SettingsScreen() {
   // Clear all data
   const handleClearAllData = async () => {
     setShowClearModal(false);
-    await AsyncStorage.clear();
-    Alert.alert('Data Cleared', 'All stored data has been removed.');
-    // Optionally, reset state to defaults
-    setDefaultPunchIn('09:00');
-    setDefaultPunchOut('18:00');
-    setDashboardView('Weekly');
-    setDarkTheme(false);
-    setNotificationsEnabled(false);
+    try {
+      // Clear SQLite database
+      await clearAllData();
+      // Clear AsyncStorage settings
+      await AsyncStorage.clear();
+      Alert.alert('Data Cleared', 'All stored data has been removed.');
+      // Optionally, reset state to defaults
+      setDefaultPunchIn('09:00');
+      setDefaultPunchOut('18:00');
+      setDashboardView('Weekly');
+      setDarkTheme(false);
+      setNotificationsEnabled(false);
+    } catch (error) {
+      console.error('Error clearing data:', error);
+      Alert.alert('Error', 'Failed to clear all data');
+    }
   };
 
   // Helper to parse time string to Date

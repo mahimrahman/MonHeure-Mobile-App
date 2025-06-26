@@ -4,8 +4,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Modal from 'react-native-modal';
 import { Ionicons } from '@expo/vector-icons';
-
-const STORAGE_KEY = 'monheure_today_punch';
+import { 
+  fetchEntriesForDay, 
+  addPunchEntry, 
+  updatePunchEntry,
+  getPunchEntry 
+} from '../utils/database';
+import { PunchRecord } from '../types/punch';
 
 function formatTime(dateString?: string) {
   if (!dateString) return '--:--';
@@ -21,47 +26,70 @@ export default function HomeScreen() {
   const [editType, setEditType] = useState<'in' | 'out'>();
   const [editTime, setEditTime] = useState<Date>(new Date());
   const [showPicker, setShowPicker] = useState(false);
+  const [currentRecordId, setCurrentRecordId] = useState<number | null>(null);
 
-  // Load today's punch from storage
+  // Load today's punch from database
   useEffect(() => {
-    (async () => {
-      const today = new Date().toISOString().slice(0, 10);
-      const data = await AsyncStorage.getItem(`${STORAGE_KEY}_${today}`);
-      if (data) {
-        const { punchIn, punchOut } = JSON.parse(data);
-        setPunchIn(punchIn);
-        setPunchOut(punchOut);
-        setIsWorking(!!punchIn && !punchOut);
-      }
-    })();
+    loadTodayPunch();
   }, []);
 
-  // Save to storage
-  const savePunch = async (newPunchIn?: string, newPunchOut?: string) => {
-    const today = new Date().toISOString().slice(0, 10);
-    await AsyncStorage.setItem(
-      `${STORAGE_KEY}_${today}`,
-      JSON.stringify({ punchIn: newPunchIn, punchOut: newPunchOut })
-    );
+  const loadTodayPunch = async () => {
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const records = await fetchEntriesForDay(today);
+      
+      if (records.length > 0) {
+        const record = records[0]; // Get the first record for today
+        setPunchIn(record.punchIn);
+        setPunchOut(record.punchOut);
+        setIsWorking(!!record.punchIn && !record.punchOut);
+        setCurrentRecordId(parseInt(record.id));
+      } else {
+        setPunchIn(undefined);
+        setPunchOut(undefined);
+        setIsWorking(false);
+        setCurrentRecordId(null);
+      }
+    } catch (error) {
+      console.error('Error loading today\'s punch:', error);
+    }
   };
 
   // Punch in/out logic
   const handlePunch = async () => {
-    if (!punchIn) {
-      // Punch in
-      const now = new Date().toISOString();
-      setPunchIn(now);
-      setIsWorking(true);
-      await savePunch(now, undefined);
-    } else if (!punchOut) {
-      // Punch out
-      const now = new Date().toISOString();
-      setPunchOut(now);
-      setIsWorking(false);
-      await savePunch(punchIn, now);
-    } else {
-      // Already punched in and out
-      Alert.alert('Already punched in and out for today. Edit times if needed.');
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      
+      if (!punchIn) {
+        // Punch in
+        const now = new Date().toISOString();
+        const newRecord: Omit<PunchRecord, 'id'> = {
+          date: today,
+          punchIn: now,
+          punchOut: undefined,
+        };
+        
+        const recordId = await addPunchEntry(newRecord);
+        setPunchIn(now);
+        setIsWorking(true);
+        setCurrentRecordId(recordId);
+      } else if (!punchOut) {
+        // Punch out
+        const now = new Date().toISOString();
+        
+        if (currentRecordId) {
+          await updatePunchEntry(currentRecordId, { punchOut: now });
+        }
+        
+        setPunchOut(now);
+        setIsWorking(false);
+      } else {
+        // Already punched in and out
+        Alert.alert('Already punched in and out for today. Edit times if needed.');
+      }
+    } catch (error) {
+      console.error('Error handling punch:', error);
+      Alert.alert('Error', 'Failed to save punch record');
     }
   };
 
@@ -83,13 +111,19 @@ export default function HomeScreen() {
 
   const handleEditTime = async (_event: any, selectedDate?: Date) => {
     setShowPicker(false);
-    if (selectedDate) {
-      if (editType === 'in') {
-        setPunchIn(selectedDate.toISOString());
-        await savePunch(selectedDate.toISOString(), punchOut);
-      } else if (editType === 'out') {
-        setPunchOut(selectedDate.toISOString());
-        await savePunch(punchIn, selectedDate.toISOString());
+    if (selectedDate && currentRecordId) {
+      try {
+        if (editType === 'in') {
+          await updatePunchEntry(currentRecordId, { punchIn: selectedDate.toISOString() });
+          setPunchIn(selectedDate.toISOString());
+        } else if (editType === 'out') {
+          await updatePunchEntry(currentRecordId, { punchOut: selectedDate.toISOString() });
+          setPunchOut(selectedDate.toISOString());
+          setIsWorking(false);
+        }
+      } catch (error) {
+        console.error('Error updating punch time:', error);
+        Alert.alert('Error', 'Failed to update punch time');
       }
     }
     setShowEditModal(false);
@@ -97,11 +131,18 @@ export default function HomeScreen() {
 
   // Reset for demo/testing
   const resetToday = async () => {
-    const today = new Date().toISOString().slice(0, 10);
-    await AsyncStorage.removeItem(`${STORAGE_KEY}_${today}`);
-    setPunchIn(undefined);
-    setPunchOut(undefined);
-    setIsWorking(false);
+    try {
+      if (currentRecordId) {
+        await updatePunchEntry(currentRecordId, { punchIn: undefined, punchOut: undefined });
+      }
+      setPunchIn(undefined);
+      setPunchOut(undefined);
+      setIsWorking(false);
+      setCurrentRecordId(null);
+    } catch (error) {
+      console.error('Error resetting today:', error);
+      Alert.alert('Error', 'Failed to reset today\'s data');
+    }
   };
 
   return (

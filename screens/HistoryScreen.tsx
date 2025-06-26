@@ -10,9 +10,14 @@ import {
 import { Calendar, DateData } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
 import { PunchRecord } from '../types/punch';
-import { storage } from '../utils/storage';
+import { 
+  fetchAllEntries, 
+  fetchEntriesForDay, 
+  updatePunchEntry, 
+  deletePunchEntry 
+} from '../utils/database';
 import EditPunchModal from '../components/EditPunchModal';
-import { addSampleDataToStorage } from '../utils/sampleData';
+import { generateSampleData } from '../utils/sampleData';
 
 interface MarkedDates {
   [date: string]: {
@@ -59,7 +64,7 @@ export default function HistoryScreen() {
 
   const loadPunchData = async () => {
     try {
-      const data = await storage.getAllPunchRecords();
+      const data = await fetchAllEntries();
       setPunchRecords(data);
     } catch (error) {
       console.error('Error loading punch data:', error);
@@ -84,7 +89,7 @@ export default function HistoryScreen() {
 
   const handleSaveRecord = async (updatedRecord: PunchRecord) => {
     try {
-      await storage.updatePunchRecord(updatedRecord.id, updatedRecord);
+      await updatePunchEntry(parseInt(updatedRecord.id), updatedRecord);
       await loadPunchData();
       Alert.alert('Success', 'Punch record updated successfully');
     } catch (error) {
@@ -95,7 +100,7 @@ export default function HistoryScreen() {
 
   const handleDeleteRecord = async (recordId: string) => {
     try {
-      await storage.deletePunchRecord(recordId);
+      await deletePunchEntry(parseInt(recordId));
       await loadPunchData();
       Alert.alert('Success', 'Punch record deleted successfully');
     } catch (error) {
@@ -106,7 +111,7 @@ export default function HistoryScreen() {
 
   const handleLoadSampleData = async () => {
     try {
-      await addSampleDataToStorage();
+      await generateSampleData();
       await loadPunchData();
       Alert.alert('Success', 'Sample data loaded successfully');
     } catch (error) {

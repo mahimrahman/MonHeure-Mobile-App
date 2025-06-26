@@ -10,7 +10,7 @@ A React Native mobile application built with Expo for efficient time tracking an
 - **Calendar-Based History**: Visual calendar with punch activity, day selection, and edit/delete support
 - **Custom Date Range Reports**: Select any two-week range, view all entries, and see total hours
 - **PDF Export & Sharing**: Generate professional PDF reports and share via email or other apps
-- **Persistent Storage**: Data saved locally using AsyncStorage
+- **SQLite Database**: Robust local database storage with full CRUD operations
 - **Modern UI**: Clean, intuitive interface with Tailwind CSS styling
 
 ## 🆕 Major Screens & Features
@@ -45,12 +45,14 @@ A React Native mobile application built with Expo for efficient time tracking an
 - **NativeWind** (Tailwind CSS for React Native)
 - **React Navigation** for navigation
 - **Expo Vector Icons** for beautiful icons
-- **AsyncStorage** for local data persistence
+- **SQLite** (expo-sqlite) for robust local database storage
+- **AsyncStorage** for settings and preferences
 - **react-native-calendars** for calendar UI
 - **react-native-html-to-pdf** for PDF export
 - **react-native-share** for sharing/export
 - **@react-native-community/datetimepicker** for date selection
 - **expo-notifications** for local reminders
+- **react-native-modal** for modal dialogs
 
 ## 📱 Screenshots
 
