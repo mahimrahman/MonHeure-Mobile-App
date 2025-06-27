@@ -1,67 +1,68 @@
 # MonHeure - Time Tracking Mobile App
 
-A React Native mobile application built with Expo for efficient time tracking and punch-in/punch-out management.
+A React Native mobile application built with Expo for efficient time tracking and punch-in/punch-out management with comprehensive reporting and data management features.
 
 ## 🚀 Features
 
-- **Punch In/Out System**: Simple one-tap time tracking
-- **Daily Time Management**: Track work hours with visual indicators
-- **Time Editing**: Edit punch-in and punch-out times if needed
-- **Calendar-Based History**: Visual calendar with punch activity, day selection, and edit/delete support
-- **Custom Date Range Reports**: Select any two-week range, view all entries, and see total hours
-- **PDF Export & Sharing**: Generate professional PDF reports and share via email or other apps
-- **SQLite Database**: Robust local database storage with full CRUD operations
-- **Modern UI**: Clean, intuitive interface with Tailwind CSS styling
+### Core Time Tracking
+- **Punch In/Out System**: Simple one-tap time tracking with visual status indicators
+- **Daily Time Management**: Track work hours with real-time calculations
+- **Time Editing**: Edit punch-in and punch-out times with validation
+- **Notes Support**: Add notes to punch records for better tracking
 
-## 🆕 Major Screens & Features
+### Advanced History & Calendar
+- **Interactive Calendar View**: Visual calendar with activity indicators using `react-native-calendars`
+- **Day Details**: Tap any date to see punch-in/out times, total hours, and notes
+- **Full CRUD Operations**: Create, read, update, and delete punch records
+- **Visual Status Indicators**: 
+  - Green dots: Completed days (punch-in + punch-out)
+  - Yellow dots: In-progress days (punch-in only)
+  - Blue highlight: Currently selected date
 
-### History Screen
-- **Calendar View**: Interactive calendar (using `react-native-calendars`) with dots for punch activity
-- **Day Details**: Tap a day to see punch-in/out times, total hours, and notes
-- **Edit/Delete**: Edit or delete entries with a modal
-- **Sample Data**: Load sample data for quick testing
-- **Pull to Refresh**: Swipe down to refresh
-
-### Report Screen
-- **Custom Date Range**: Select any two-week (or custom) range with a date picker
-- **Summary Dashboard**: See total days, records, hours, and average per day
-- **Scrollable Entries**: All punch-in/out entries grouped by day
-- **PDF Export**: Generate a professional PDF report (`react-native-html-to-pdf`)
-- **Share/Email**: Share the PDF via email or other apps (`react-native-share`)
+### Comprehensive Reporting
+- **Custom Date Range Reports**: Select any date range with interactive date picker
+- **Summary Dashboard**: Total days, records, hours, and average per day
+- **Detailed Records**: All punch-in/out entries grouped by day with notes
+- **PDF Export**: Generate professional PDF reports with `react-native-html-to-pdf`
+- **Share & Email**: Share reports via email or other apps with `react-native-share`
 - **Quick Actions**: One-tap for common ranges (last 2 weeks, last month, today)
 
-### Settings Screen
-- **Default Punch Times**: Set default punch-in and punch-out times (with time pickers)
-- **Dashboard View Preference**: Choose default dashboard view (weekly/monthly/yearly)
+### Data Management
+- **SQLite Database**: Robust local database storage with full CRUD operations
+- **Sample Data Generation**: Load sample data for testing and demonstration
+- **Data Export**: Export all data with comprehensive reporting
+- **Data Integrity**: Proper validation and error handling
+
+### Settings & Preferences
 - **Theme Toggle**: Switch between dark and light mode (persisted)
-- **Punch Out Reminder**: Enable/disable local notification at 6:00 PM (uses Expo Notifications)
-- **Clear All Data**: Permanently delete all stored data (with confirmation modal)
-- **All preferences are saved with AsyncStorage and persist across app restarts**
+- **Clear All Data**: Permanently delete all stored data with confirmation
+- **Pull to Refresh**: Swipe down to refresh data across all screens
+- **Responsive Design**: Works seamlessly on all screen sizes
 
 ## 🛠 Tech Stack
 
 - **React Native** with **Expo SDK 50**
 - **TypeScript** for type safety
-- **NativeWind** (Tailwind CSS for React Native)
-- **React Navigation** for navigation
+- **NativeWind** (Tailwind CSS for React Native) for styling
+- **React Navigation** for bottom tab navigation
 - **Expo Vector Icons** for beautiful icons
 - **SQLite** (expo-sqlite) for robust local database storage
 - **AsyncStorage** for settings and preferences
-- **react-native-calendars** for calendar UI
-- **react-native-html-to-pdf** for PDF export
-- **react-native-share** for sharing/export
-- **@react-native-community/datetimepicker** for date selection
-- **expo-notifications** for local reminders
+- **react-native-calendars** for interactive calendar UI
+- **react-native-html-to-pdf** for professional PDF export
+- **react-native-share** for cross-platform sharing
+- **@react-native-community/datetimepicker** for date/time selection
 - **react-native-modal** for modal dialogs
 
-## 📱 Screenshots
+## 📱 Screenshots & UI Features
 
 The app features a clean, modern interface with:
-- Large punch button that changes color based on work status
-- Daily time display with editable punch times
-- Calendar-based history and reporting
-- Modal-based time picker for corrections
-- Responsive design that works on all screen sizes
+- **Large punch button** that changes color based on work status (green for punch-in, red for punch-out)
+- **Daily time display** with editable punch times and real-time calculations
+- **Interactive calendar** with visual activity indicators and day selection
+- **Modal-based time picker** for corrections with 24-hour format validation
+- **Professional PDF reports** with company branding and complete data export
+- **Responsive design** that works seamlessly on all screen sizes
 
 ## 🚦 Quick Start
 
@@ -100,84 +101,90 @@ The app features a clean, modern interface with:
 ```
 MonHeure-Mobile-App/
 ├── screens/
-│   ├── HomeScreen.tsx      # Main punch in/out interface
-│   ├── DashboardScreen.tsx # Analytics dashboard
-│   ├── HistoryScreen.tsx   # Calendar-based history view
-│   ├── ReportScreen.tsx    # Custom date range reporting & export
-│   └── SettingsScreen.tsx  # Preferences, theme, notifications, data management
+│   ├── HomeScreen.tsx      # Main punch in/out interface with daily overview
+│   ├── DashboardScreen.tsx # Analytics dashboard with productivity insights
+│   ├── HistoryScreen.tsx   # Calendar-based history with full CRUD operations
+│   ├── ReportScreen.tsx    # Custom date range reporting & PDF export
+│   └── SettingsScreen.tsx  # Preferences, theme, data management
 ├── components/
-│   ├── EditPunchModal.tsx  # Modal for editing punch records
-│   └── DateRangePicker.tsx # Date range picker for reports
+│   ├── EditPunchModal.tsx  # Modal for editing punch records with validation
+│   └── DateRangePicker.tsx # Interactive date range picker for reports
 ├── types/
 │   ├── nativewind.d.ts     # NativeWind type definitions
-│   └── punch.ts           # Punch data types
+│   └── punch.ts           # Punch data types and interfaces
 ├── utils/
+│   ├── database.ts        # SQLite database operations and CRUD functions
 │   ├── timeCalculations.ts # Time calculation utilities
-│   ├── storage.ts         # AsyncStorage helpers
-│   ├── sampleData.ts      # Sample data generator
-│   ├── pdfGenerator.ts    # PDF report generator
-│   └── shareUtils.ts      # Sharing utilities
-├── package.json           # Dependencies and scripts
-├── tsconfig.json         # TypeScript configuration
-└── tailwind.config.js    # Tailwind CSS configuration
+│   ├── storage.ts         # AsyncStorage helpers for settings
+│   ├── sampleData.ts      # Sample data generator for testing
+│   ├── pdfGenerator.ts    # Professional PDF report generator
+│   └── shareUtils.ts      # Cross-platform sharing utilities
+├── MonHeure/              # Expo app directory
+│   ├── App.tsx           # Main app component with navigation
+│   ├── package.json      # Expo-specific dependencies
+│   └── app.json         # Expo configuration
+├── package.json          # Root dependencies and scripts
+├── tsconfig.json        # TypeScript configuration
+└── tailwind.config.js   # Tailwind CSS configuration
 ```
 
 ## 🎯 Core Functionality
 
 ### Punch In/Out System
-- **Green Button**: Punch in (start work)
-- **Red Button**: Punch out (end work)
-- **Visual Feedback**: Button color and icon change based on status
-- **One Tap**: Simple, quick time tracking
-
-### Time Management
-- **Daily Tracking**: Separate records for each day
-- **Time Display**: Formatted punch-in and punch-out times
-- **Editable Times**: Tap on times to edit using a time picker
-- **Data Persistence**: All data saved locally
+- **Visual Status**: Button color and icon change based on work status
+- **One Tap Operation**: Simple, quick time tracking
+- **Real-time Updates**: Immediate visual feedback and data persistence
+- **Validation**: Ensures punch-out time is after punch-in time
 
 ### Calendar-Based History
-- **Calendar UI**: See punch activity at a glance
-- **Day Details**: Tap a day for all entries
-- **Edit/Delete**: Manage entries with a modal
-- **Sample Data**: Load for quick testing
+- **Interactive Calendar**: See punch activity at a glance with color-coded dots
+- **Day Details**: Tap any date for comprehensive punch record view
+- **Edit/Delete**: Full CRUD operations with modal-based editing
+- **Sample Data**: Load 30 days of sample data for testing and demonstration
 
 ### Custom Date Range Reports
-- **Date Picker**: Select any range (default: last 2 weeks)
-- **Summary**: Total days, records, hours, avg/day
-- **Scrollable List**: All entries grouped by day
-- **PDF Export**: Generate a professional report
-- **Share/Email**: Export via email or other apps
+- **Flexible Date Selection**: Choose any date range with interactive picker
+- **Comprehensive Summary**: Total days, records, hours, and average calculations
+- **Detailed Records**: All entries grouped by day with complete information
+- **Professional PDF Export**: Beautiful, formatted reports with company branding
+- **Multiple Share Options**: Email, messaging, or save to device
 
-### Settings & Preferences
-- **Default Punch Times**: Set default punch-in/out times (time pickers)
-- **Dashboard View**: Choose default dashboard view (weekly/monthly/yearly)
-- **Theme**: Toggle dark/light mode (persisted)
-- **Punch Out Reminder**: Enable/disable 6PM local notification
-- **Clear All Data**: Delete all stored data (with confirmation)
-- **All settings are saved with AsyncStorage and persist across app restarts**
+### Data Management
+- **SQLite Database**: Robust, performant local storage with full CRUD operations
+- **Data Integrity**: Proper validation, error handling, and transaction support
+- **Sample Data**: Generate realistic sample data for testing and demonstration
+- **Export Capabilities**: Complete data export with professional formatting
 
-## 🎨 Styling
+## 🎨 Styling & UI
 
 The app uses **NativeWind** (Tailwind CSS for React Native) for consistent styling:
-- Responsive design
-- Modern color scheme
-- Clean typography
-- Smooth animations and transitions
+- **Responsive Design**: Adapts to all screen sizes and orientations
+- **Modern Color Scheme**: Professional color palette with status indicators
+- **Clean Typography**: Readable fonts with proper hierarchy
+- **Smooth Animations**: Subtle transitions and loading states
+- **Accessibility**: Proper contrast ratios and touch targets
 
 ## 🔧 Development
 
 ### Adding New Features
 1. Create new screen components in `screens/`
-2. Add navigation routes in `App.tsx`
-3. Style using Tailwind classes
+2. Add navigation routes in `MonHeure/App.tsx`
+3. Style using Tailwind classes via NativeWind
 4. Add types in `types/` directory
+5. Implement database operations in `utils/database.ts`
 
 ### Code Style
-- TypeScript for type safety
-- Functional components with hooks
-- Tailwind CSS for styling
-- Async/await for data operations
+- **TypeScript** for type safety and better development experience
+- **Functional Components** with React hooks for state management
+- **Tailwind CSS** for consistent, maintainable styling
+- **Async/await** for database and storage operations
+- **Error Handling** with proper user feedback
+
+### Database Operations
+- **SQLite Integration**: All punch data stored in local SQLite database
+- **CRUD Operations**: Full create, read, update, delete functionality
+- **Query Optimization**: Efficient queries with proper indexing
+- **Transaction Support**: Data integrity with transaction handling
 
 ## 📦 Building for Production
 
@@ -191,6 +198,25 @@ expo build:android
 expo build:ios
 ```
 
+### Web Version
+```bash
+expo start --web
+```
+
+## 📊 Database Schema
+
+The app uses SQLite with the following schema:
+
+```sql
+CREATE TABLE PunchLog (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  date TEXT NOT NULL,
+  punchIn TEXT,
+  punchOut TEXT,
+  notes TEXT
+);
+```
+
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -201,24 +227,20 @@ expo build:ios
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## 🆘 Support
 
-- **Issues**: Open an issue in the repository
-- **Documentation**: See HISTORY_FEATURES.md and REPORT_FEATURES.md for details
-- **Expo Docs**: [expo.dev](https://expo.dev) for Expo-specific questions
+For support and questions, please open an issue in the repository.
 
-## 🔮 Future Enhancements
+## 🔄 Recent Updates
 
-- [ ] Multi-user support
-- [ ] Cloud synchronization
-- [ ] Advanced reporting (CSV, Excel, analytics)
-- [ ] Time analytics and charts
-- [ ] Export functionality (CSV, PDF, Excel)
-- [ ] Dark mode support
-- [ ] Offline capabilities
-- [ ] Report history and management
+- **SQLite Integration**: Migrated from AsyncStorage to SQLite for better performance
+- **Calendar View**: Added interactive calendar with visual activity indicators
+- **PDF Export**: Professional PDF report generation with company branding
+- **Enhanced UI**: Improved design with better visual feedback and animations
+- **Data Validation**: Added comprehensive validation for all user inputs
+- **Sample Data**: Built-in sample data generator for testing and demonstration
 
 ---
 
