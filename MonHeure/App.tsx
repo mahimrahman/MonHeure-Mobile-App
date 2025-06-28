@@ -4,14 +4,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, ActivityIndicator } from 'react-native';
-import { initDatabase } from './utils/database';
+import { initDatabase } from '../utils/database';
 
 // Import screens
-import HomeScreen from './screens/HomeScreen';
-import DashboardScreen from './screens/DashboardScreen';
-import ReportScreen from './screens/ReportScreen';
-import HistoryScreen from './screens/HistoryScreen';
-import SettingsScreen from './screens/SettingsScreen';
+import HomeScreen from '../screens/HomeScreen';
+import DashboardScreen from '../screens/DashboardScreen';
+import ReportScreen from '../screens/ReportScreen';
+import HistoryScreen from '../screens/HistoryScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 
 const Tab = createBottomTabNavigator();
 

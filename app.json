@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    "expo-router",
+    "expo-sqlite"
+  ],
+  "web": {
+    "favicon": "./assets/favicon.png"
+  },
+  "sdkVersion": "53.0.0"
+}
