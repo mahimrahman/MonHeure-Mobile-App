@@ -3,10 +3,15 @@ import { View, Text, ScrollView, Dimensions, RefreshControl } from 'react-native
 import { LineChart, BarChart } from 'react-native-chart-kit';
 import { Ionicons } from '@expo/vector-icons';
 import { getTimeStats, generateWeeklyChartData, TimeStats, ChartData } from '../utils/timeCalculations';
+import { usePunchStatus, useTodayData, usePunchActions } from '../utils/punchStore';
 
 const { width } = Dimensions.get('window');
 
 export default function DashboardScreen() {
+  const { isPunchedIn, currentPunchInTime, isLoading } = usePunchStatus();
+  const { todayEntries, totalHoursToday } = useTodayData();
+  const { refreshTodayData } = usePunchActions();
+  
   const [timeStats, setTimeStats] = useState<{
     thisWeek: TimeStats;
     lastTwoWeeks: TimeStats;
@@ -39,7 +44,10 @@ export default function DashboardScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadData();
+    await Promise.all([
+      loadData(),
+      refreshTodayData()
+    ]);
     setRefreshing(false);
   };
 
@@ -47,6 +55,12 @@ export default function DashboardScreen() {
     const wholeHours = Math.floor(hours);
     const minutes = Math.round((hours - wholeHours) * 60);
     return `${wholeHours}h ${minutes}m`;
+  };
+
+  const formatTime = (dateString?: string) => {
+    if (!dateString) return '--:--';
+    const d = new Date(dateString);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   const StatCard = ({ title, hours, days, average }: { title: string; hours: number; days: number; average: number }) => (
@@ -57,7 +71,7 @@ export default function DashboardScreen() {
     </View>
   );
 
-  if (loading) {
+  if (loading || isLoading) {
     return (
       <View className="flex-1 bg-gray-50 justify-center items-center">
         <Text className="text-gray-600">Loading dashboard...</Text>
@@ -77,6 +91,29 @@ export default function DashboardScreen() {
         <View className="mb-6">
           <Text className="text-2xl font-bold text-gray-800">Dashboard</Text>
           <Text className="text-gray-600 mt-1">Your time tracking analytics</Text>
+        </View>
+
+        {/* Current Status Card */}
+        <View className="bg-white p-4 rounded-lg shadow-sm mb-6">
+          <Text className="text-lg font-semibold text-gray-800 mb-3">Current Status</Text>
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center">
+              <View className={`w-3 h-3 rounded-full mr-3 ${isPunchedIn ? 'bg-red-500' : 'bg-green-500'}`} />
+              <Text className="text-gray-800 font-medium">
+                {isPunchedIn ? 'Currently Working' : 'Not Working'}
+              </Text>
+            </View>
+            {isPunchedIn && currentPunchInTime && (
+              <Text className="text-sm text-gray-600">
+                Since {formatTime(currentPunchInTime)}
+              </Text>
+            )}
+          </View>
+          {totalHoursToday > 0 && (
+            <View className="mt-2 pt-2 border-t border-gray-200">
+              <Text className="text-sm text-gray-600">Today's Hours: <Text className="font-semibold text-green-600">{totalHoursToday.toFixed(2)}h</Text></Text>
+            </View>
+          )}
         </View>
 
         {/* Time Stats Cards */}

@@ -2,40 +2,41 @@ import React, { useEffect, useState } from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { View, Text, ActivityIndicator } from 'react-native';
-import { initDatabase } from '../utils/database';
+import { usePunchStore } from '../utils/punchStore';
 
 export default function TabLayout() {
-  const [isDatabaseReady, setIsDatabaseReady] = useState(false);
+  const [isAppReady, setIsAppReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const initializeStore = usePunchStore(state => state.initializeStore);
 
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        await initDatabase();
-        setIsDatabaseReady(true);
+        await initializeStore();
+        setIsAppReady(true);
       } catch (err) {
-        console.error('Failed to initialize database:', err);
-        setError('Failed to initialize database');
+        console.error('Failed to initialize app:', err);
+        setError('Failed to initialize app');
       }
     };
 
     initializeApp();
-  }, []);
+  }, [initializeStore]);
 
   if (error) {
     return (
       <View className="flex-1 justify-center items-center bg-red-50">
-        <Text className="text-red-600 text-lg font-semibold mb-2">Database Error</Text>
+        <Text className="text-red-600 text-lg font-semibold mb-2">Initialization Error</Text>
         <Text className="text-red-500 text-center px-4">{error}</Text>
       </View>
     );
   }
 
-  if (!isDatabaseReady) {
+  if (!isAppReady) {
     return (
       <View className="flex-1 justify-center items-center bg-blue-50">
         <ActivityIndicator size="large" color="#3b82f6" />
-        <Text className="text-blue-600 mt-4 text-lg">Initializing Database...</Text>
+        <Text className="text-blue-600 mt-4 text-lg">Initializing App...</Text>
       </View>
     );
   }

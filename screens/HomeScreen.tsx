@@ -1,16 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Modal from 'react-native-modal';
 import { Ionicons } from '@expo/vector-icons';
-import { 
-  fetchEntriesForDay, 
-  addPunchEntry, 
-  updatePunchEntry,
-  getPunchEntry 
-} from '../utils/database';
-import { PunchRecord } from '../types/punch';
+import { usePunchStatus, useTodayData, usePunchActions } from '../utils/punchStore';
 
 function formatTime(dateString?: string) {
   if (!dateString) return '--:--';
@@ -19,73 +12,31 @@ function formatTime(dateString?: string) {
 }
 
 export default function HomeScreen() {
-  const [punchIn, setPunchIn] = useState<string | undefined>();
-  const [punchOut, setPunchOut] = useState<string | undefined>();
-  const [isWorking, setIsWorking] = useState(false);
+  const { isPunchedIn, currentPunchInTime, isLoading } = usePunchStatus();
+  const { todayEntries, totalHoursToday } = useTodayData();
+  const { punchIn, punchOut, updateCurrentPunch } = usePunchActions();
+  
   const [showEditModal, setShowEditModal] = useState(false);
   const [editType, setEditType] = useState<'in' | 'out'>();
   const [editTime, setEditTime] = useState<Date>(new Date());
   const [showPicker, setShowPicker] = useState(false);
-  const [currentRecordId, setCurrentRecordId] = useState<number | null>(null);
 
-  // Load today's punch from database
-  useEffect(() => {
-    loadTodayPunch();
-  }, []);
-
-  const loadTodayPunch = async () => {
-    try {
-      const today = new Date().toISOString().slice(0, 10);
-      const records = await fetchEntriesForDay(today);
-      
-      if (records.length > 0) {
-        const record = records[0]; // Get the first record for today
-        setPunchIn(record.punchIn);
-        setPunchOut(record.punchOut);
-        setIsWorking(!!record.punchIn && !record.punchOut);
-        setCurrentRecordId(parseInt(record.id));
-      } else {
-        setPunchIn(undefined);
-        setPunchOut(undefined);
-        setIsWorking(false);
-        setCurrentRecordId(null);
-      }
-    } catch (error) {
-      console.error('Error loading today\'s punch:', error);
-    }
-  };
+  // Get today's punch data from store
+  const todayPunch = todayEntries.find(entry => 
+    entry.punchIn && entry.date === new Date().toISOString().split('T')[0]
+  );
 
   // Punch in/out logic
   const handlePunch = async () => {
     try {
-      const today = new Date().toISOString().slice(0, 10);
-      
-      if (!punchIn) {
+      if (!isPunchedIn) {
         // Punch in
-        const now = new Date().toISOString();
-        const newRecord: Omit<PunchRecord, 'id'> = {
-          date: today,
-          punchIn: now,
-          punchOut: undefined,
-        };
-        
-        const recordId = await addPunchEntry(newRecord);
-        setPunchIn(now);
-        setIsWorking(true);
-        setCurrentRecordId(recordId);
-      } else if (!punchOut) {
-        // Punch out
-        const now = new Date().toISOString();
-        
-        if (currentRecordId) {
-          await updatePunchEntry(currentRecordId, { punchOut: now });
-        }
-        
-        setPunchOut(now);
-        setIsWorking(false);
+        await punchIn();
+        Alert.alert('Success', 'Punched in successfully!');
       } else {
-        // Already punched in and out
-        Alert.alert('Already punched in and out for today. Edit times if needed.');
+        // Punch out
+        await punchOut();
+        Alert.alert('Success', 'Punched out successfully!');
       }
     } catch (error) {
       console.error('Error handling punch:', error);
@@ -93,34 +44,29 @@ export default function HomeScreen() {
     }
   };
 
-  // Edge case: multiple punch-ins
-  const handleMultiplePunchIn = () => {
-    Alert.alert(
-      'Already punched in',
-      'You have already punched in today. If you missed a punch out, please punch out or edit the times.'
-    );
-  };
-
   // Edit modal logic
   const openEditModal = (type: 'in' | 'out') => {
     setEditType(type);
-    setEditTime(type === 'in' && punchIn ? new Date(punchIn) : type === 'out' && punchOut ? new Date(punchOut) : new Date());
+    const currentTime = type === 'in' && todayPunch?.punchIn 
+      ? new Date(todayPunch.punchIn) 
+      : type === 'out' && todayPunch?.punchOut 
+        ? new Date(todayPunch.punchOut) 
+        : new Date();
+    setEditTime(currentTime);
     setShowEditModal(true);
     setShowPicker(true);
   };
 
   const handleEditTime = async (_event: any, selectedDate?: Date) => {
     setShowPicker(false);
-    if (selectedDate && currentRecordId) {
+    if (selectedDate && todayPunch) {
       try {
-        if (editType === 'in') {
-          await updatePunchEntry(currentRecordId, { punchIn: selectedDate.toISOString() });
-          setPunchIn(selectedDate.toISOString());
-        } else if (editType === 'out') {
-          await updatePunchEntry(currentRecordId, { punchOut: selectedDate.toISOString() });
-          setPunchOut(selectedDate.toISOString());
-          setIsWorking(false);
-        }
+        const updates = editType === 'in' 
+          ? { punchIn: selectedDate.toISOString() }
+          : { punchOut: selectedDate.toISOString() };
+        
+        await updateCurrentPunch(updates);
+        Alert.alert('Success', `${editType === 'in' ? 'Punch In' : 'Punch Out'} time updated!`);
       } catch (error) {
         console.error('Error updating punch time:', error);
         Alert.alert('Error', 'Failed to update punch time');
@@ -132,29 +78,38 @@ export default function HomeScreen() {
   // Reset for demo/testing
   const resetToday = async () => {
     try {
-      if (currentRecordId) {
-        await updatePunchEntry(currentRecordId, { punchIn: undefined, punchOut: undefined });
+      if (todayPunch) {
+        await updateCurrentPunch({ 
+          punchIn: undefined, 
+          punchOut: undefined 
+        });
+        Alert.alert('Success', 'Today\'s data reset successfully!');
       }
-      setPunchIn(undefined);
-      setPunchOut(undefined);
-      setIsWorking(false);
-      setCurrentRecordId(null);
     } catch (error) {
       console.error('Error resetting today:', error);
       Alert.alert('Error', 'Failed to reset today\'s data');
     }
   };
 
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-gray-50 justify-center items-center">
+        <Text className="text-gray-600 text-lg">Loading...</Text>
+      </View>
+    );
+  }
+
   return (
-  <View className="flex-1 bg-gray-50 justify-center items-center p-6">
+    <View className="flex-1 bg-gray-50 justify-center items-center p-6">
       <TouchableOpacity
-        className={`w-48 h-48 rounded-full justify-center items-center mb-8 ${isWorking ? 'bg-red-500' : 'bg-green-500'}`}
+        className={`w-48 h-48 rounded-full justify-center items-center mb-8 ${isPunchedIn ? 'bg-red-500' : 'bg-green-500'}`}
         onPress={handlePunch}
         activeOpacity={0.8}
+        disabled={isLoading}
       >
-        <Ionicons name={isWorking ? 'log-out' : 'log-in'} size={64} color="white" />
+        <Ionicons name={isPunchedIn ? 'log-out' : 'log-in'} size={64} color="white" />
         <Text className="text-white text-2xl font-bold mt-4">
-          {isWorking ? 'Punch Out' : punchIn && punchOut ? 'Done' : 'Punch In'}
+          {isPunchedIn ? 'Punch Out' : todayPunch?.punchOut ? 'Done' : 'Punch In'}
         </Text>
       </TouchableOpacity>
 
@@ -163,15 +118,27 @@ export default function HomeScreen() {
         <View className="flex-row justify-between items-center mb-2">
           <Text className="text-gray-600">Punch In:</Text>
           <TouchableOpacity onPress={() => openEditModal('in')}>
-            <Text className="text-blue-500 text-lg font-mono">{formatTime(punchIn)}</Text>
+            <Text className="text-blue-500 text-lg font-mono">
+              {formatTime(todayPunch?.punchIn)}
+            </Text>
           </TouchableOpacity>
         </View>
-        <View className="flex-row justify-between items-center">
+        <View className="flex-row justify-between items-center mb-2">
           <Text className="text-gray-600">Punch Out:</Text>
           <TouchableOpacity onPress={() => openEditModal('out')}>
-            <Text className="text-blue-500 text-lg font-mono">{formatTime(punchOut)}</Text>
+            <Text className="text-blue-500 text-lg font-mono">
+              {formatTime(todayPunch?.punchOut)}
+            </Text>
           </TouchableOpacity>
         </View>
+        {totalHoursToday > 0 && (
+          <View className="flex-row justify-between items-center pt-2 border-t border-gray-200">
+            <Text className="text-gray-600">Total Hours:</Text>
+            <Text className="text-green-600 text-lg font-semibold">
+              {totalHoursToday.toFixed(2)}h
+            </Text>
+          </View>
+        )}
       </View>
 
       <TouchableOpacity onPress={resetToday} className="mt-2">
@@ -180,7 +147,9 @@ export default function HomeScreen() {
 
       <Modal isVisible={showEditModal} onBackdropPress={() => setShowEditModal(false)}>
         <View className="bg-white p-6 rounded-lg items-center">
-          <Text className="text-lg font-semibold mb-4">Edit {editType === 'in' ? 'Punch In' : 'Punch Out'} Time</Text>
+          <Text className="text-lg font-semibold mb-4">
+            Edit {editType === 'in' ? 'Punch In' : 'Punch Out'} Time
+          </Text>
           {showPicker && (
             <DateTimePicker
               value={editTime}

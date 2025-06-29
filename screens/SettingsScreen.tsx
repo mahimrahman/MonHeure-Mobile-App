@@ -14,10 +14,13 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
 import { clearAllData } from '../utils/database';
+import { usePunchStore } from '../utils/punchStore';
 
 const DASHBOARD_VIEWS = ['Weekly', 'Monthly', 'Yearly'];
 
 export default function SettingsScreen() {
+  const resetState = usePunchStore(state => state.resetState);
+  
   // Default punch times
   const [defaultPunchIn, setDefaultPunchIn] = useState('09:00');
   const [defaultPunchOut, setDefaultPunchOut] = useState('18:00');
@@ -136,6 +139,8 @@ export default function SettingsScreen() {
       await clearAllData();
       // Clear AsyncStorage settings
       await AsyncStorage.clear();
+      // Reset Zustand store state
+      resetState();
       Alert.alert('Data Cleared', 'All stored data has been removed.');
       // Optionally, reset state to defaults
       setDefaultPunchIn('09:00');
@@ -147,6 +152,25 @@ export default function SettingsScreen() {
       console.error('Error clearing data:', error);
       Alert.alert('Error', 'Failed to clear all data');
     }
+  };
+
+  // Reset Zustand store only
+  const handleResetStore = () => {
+    Alert.alert(
+      'Reset Store State',
+      'This will reset the current punch state and today\'s data. Continue?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: () => {
+            resetState();
+            Alert.alert('Success', 'Store state has been reset');
+          }
+        }
+      ]
+    );
   };
 
   // Helper to parse time string to Date
@@ -264,6 +288,16 @@ export default function SettingsScreen() {
           <View className="p-4 border-b border-gray-100">
             <Text className={darkTheme ? 'text-lg font-semibold text-white' : 'text-lg font-semibold text-gray-800'}>Danger Zone</Text>
           </View>
+          <TouchableOpacity
+            className="p-4 flex-row items-center justify-between border-b border-gray-100"
+            onPress={handleResetStore}
+          >
+            <View className="flex-row items-center">
+              <Ionicons name="refresh-circle" size={20} color="#f59e0b" />
+              <Text className={darkTheme ? 'ml-3 text-yellow-400' : 'ml-3 text-yellow-600'}>Reset Store State</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+          </TouchableOpacity>
           <TouchableOpacity
             className="p-4 flex-row items-center justify-between"
             onPress={() => setShowClearModal(true)}

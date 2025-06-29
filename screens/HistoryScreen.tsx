@@ -18,6 +18,7 @@ import {
 } from '../utils/database';
 import EditPunchModal from '../components/EditPunchModal';
 import { generateSampleData } from '../utils/sampleData';
+import { usePunchActions } from '../utils/punchStore';
 
 interface MarkedDates {
   [date: string]: {
@@ -29,6 +30,7 @@ interface MarkedDates {
 }
 
 export default function HistoryScreen() {
+  const { refreshTodayData } = usePunchActions();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [punchRecords, setPunchRecords] = useState<PunchRecord[]>([]);
   const [markedDates, setMarkedDates] = useState<MarkedDates>({});
@@ -74,9 +76,12 @@ export default function HistoryScreen() {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await loadPunchData();
+    await Promise.all([
+      loadPunchData(),
+      refreshTodayData()
+    ]);
     setRefreshing(false);
-  }, []);
+  }, [refreshTodayData]);
 
   const handleDateSelect = (day: DateData) => {
     setSelectedDate(day.dateString);
@@ -90,7 +95,10 @@ export default function HistoryScreen() {
   const handleSaveRecord = async (updatedRecord: PunchRecord) => {
     try {
       await updatePunchEntry(parseInt(updatedRecord.id), updatedRecord);
-      await loadPunchData();
+      await Promise.all([
+        loadPunchData(),
+        refreshTodayData()
+      ]);
       Alert.alert('Success', 'Punch record updated successfully');
     } catch (error) {
       console.error('Error updating record:', error);
@@ -101,7 +109,10 @@ export default function HistoryScreen() {
   const handleDeleteRecord = async (recordId: string) => {
     try {
       await deletePunchEntry(parseInt(recordId));
-      await loadPunchData();
+      await Promise.all([
+        loadPunchData(),
+        refreshTodayData()
+      ]);
       Alert.alert('Success', 'Punch record deleted successfully');
     } catch (error) {
       console.error('Error deleting record:', error);
@@ -112,7 +123,10 @@ export default function HistoryScreen() {
   const handleLoadSampleData = async () => {
     try {
       await generateSampleData();
-      await loadPunchData();
+      await Promise.all([
+        loadPunchData(),
+        refreshTodayData()
+      ]);
       Alert.alert('Success', 'Sample data loaded successfully');
     } catch (error) {
       console.error('Error loading sample data:', error);
