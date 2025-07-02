@@ -9,6 +9,12 @@ import {
 } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring,
+  withTiming
+} from 'react-native-reanimated';
 import { PunchRecord } from '../types/punch';
 import { 
   fetchAllEntries, 
@@ -39,9 +45,19 @@ export default function HistoryScreen() {
   const [editingRecord, setEditingRecord] = useState<PunchRecord | undefined>();
   const [refreshing, setRefreshing] = useState(false);
 
+  // Animation values
+  const cardOpacity = useSharedValue(0);
+  const cardTranslateY = useSharedValue(30);
+
   // Load punch data on component mount
   useEffect(() => {
     loadPunchData();
+  }, []);
+
+  // Start animations on mount
+  useEffect(() => {
+    cardOpacity.value = withTiming(1, { duration: 600 });
+    cardTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
   }, []);
 
   // Update selected date records when selectedDate or punchRecords change
@@ -57,7 +73,7 @@ export default function HistoryScreen() {
       if (record.punchIn || record.punchOut) {
         marked[record.date] = {
           marked: true,
-          dotColor: record.punchOut ? '#10b981' : '#f59e0b',
+          dotColor: record.punchOut ? '#22c55e' : '#f59e0b',
         };
       }
     });
@@ -99,10 +115,10 @@ export default function HistoryScreen() {
         loadPunchData(),
         refreshTodayData()
       ]);
-      Alert.alert('Success', 'Punch record updated successfully');
+      Alert.alert('✅ Success', 'Punch record updated successfully');
     } catch (error) {
       console.error('Error updating record:', error);
-      Alert.alert('Error', 'Failed to update punch record');
+      Alert.alert('❌ Error', 'Failed to update punch record');
     }
   };
 
@@ -113,10 +129,10 @@ export default function HistoryScreen() {
         loadPunchData(),
         refreshTodayData()
       ]);
-      Alert.alert('Success', 'Punch record deleted successfully');
+      Alert.alert('✅ Success', 'Punch record deleted successfully');
     } catch (error) {
       console.error('Error deleting record:', error);
-      Alert.alert('Error', 'Failed to delete punch record');
+      Alert.alert('❌ Error', 'Failed to delete punch record');
     }
   };
 
@@ -127,10 +143,10 @@ export default function HistoryScreen() {
         loadPunchData(),
         refreshTodayData()
       ]);
-      Alert.alert('Success', 'Sample data loaded successfully');
+      Alert.alert('✅ Success', 'Sample data loaded successfully');
     } catch (error) {
       console.error('Error loading sample data:', error);
-      Alert.alert('Error', 'Failed to load sample data');
+      Alert.alert('❌ Error', 'Failed to load sample data');
     }
   };
 
@@ -151,7 +167,7 @@ export default function HistoryScreen() {
   };
 
   const getStatusColor = (record: PunchRecord) => {
-    if (record.punchIn && record.punchOut) return '#10b981'; // Completed
+    if (record.punchIn && record.punchOut) return '#22c55e'; // Completed
     if (record.punchIn && !record.punchOut) return '#f59e0b'; // In progress
     return '#6b7280'; // No data
   };
@@ -163,11 +179,11 @@ export default function HistoryScreen() {
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-gradient-to-b from-blue-50 via-indigo-50 to-purple-50">
       {/* Header */}
-      <View className="bg-white p-4 border-b border-gray-200">
-        <Text className="text-2xl font-bold text-gray-800">History</Text>
-        <Text className="text-gray-600 mt-1">View and manage your punch records</Text>
+      <View className="bg-white pt-12 pb-6 px-6 border-b border-gray-100">
+        <Text className="text-3xl font-bold text-gray-800 mb-2">History</Text>
+        <Text className="text-gray-600 text-lg">View and manage your punch records</Text>
       </View>
 
       <ScrollView 
@@ -177,7 +193,13 @@ export default function HistoryScreen() {
         }
       >
         {/* Calendar */}
-        <View className="bg-white m-4 rounded-lg shadow-sm overflow-hidden">
+        <Animated.View 
+          style={useAnimatedStyle(() => ({
+            opacity: cardOpacity.value,
+            transform: [{ translateY: cardTranslateY.value }],
+          }))}
+          className="bg-white m-6 rounded-3xl shadow-xl overflow-hidden border border-gray-100"
+        >
           <Calendar
             onDayPress={handleDateSelect}
             markedDates={{
@@ -185,153 +207,149 @@ export default function HistoryScreen() {
               [selectedDate]: {
                 ...markedDates[selectedDate],
                 selected: true,
-                selectedColor: '#3b82f6',
+                selectedColor: '#0ea5e9',
               },
             }}
             theme={{
-              selectedDayBackgroundColor: '#3b82f6',
+              selectedDayBackgroundColor: '#0ea5e9',
               selectedDayTextColor: '#ffffff',
-              todayTextColor: '#3b82f6',
+              todayTextColor: '#0ea5e9',
               dayTextColor: '#374151',
               textDisabledColor: '#d1d5db',
-              dotColor: '#10b981',
+              dotColor: '#22c55e',
               selectedDotColor: '#ffffff',
-              arrowColor: '#3b82f6',
+              arrowColor: '#0ea5e9',
               monthTextColor: '#374151',
-              indicatorColor: '#3b82f6',
-              textDayFontWeight: '300',
+              indicatorColor: '#0ea5e9',
+              textDayFontWeight: '500',
               textMonthFontWeight: 'bold',
-              textDayHeaderFontWeight: '300',
+              textDayHeaderFontWeight: '600',
               textDayFontSize: 16,
-              textMonthFontSize: 16,
-              textDayHeaderFontSize: 13,
+              textMonthFontSize: 18,
+              textDayHeaderFontSize: 14,
             }}
           />
-        </View>
+        </Animated.View>
 
         {/* Selected Date Info */}
-        <View className="bg-white mx-4 rounded-lg shadow-sm p-4 mb-4">
-          <Text className="text-lg font-semibold text-gray-800 mb-2">
-            {new Date(selectedDate).toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </Text>
-          <Text className="text-gray-600">
-            {selectedDateRecords.length} punch record{selectedDateRecords.length !== 1 ? 's' : ''}
-          </Text>
-        </View>
+        <Animated.View 
+          style={useAnimatedStyle(() => ({
+            opacity: cardOpacity.value,
+            transform: [{ translateY: cardTranslateY.value }],
+          }))}
+          className="bg-white mx-6 rounded-3xl shadow-xl p-6 mb-6 border border-gray-100"
+        >
+          <View className="flex-row items-center mb-4">
+            <View className="w-3 h-3 rounded-full bg-blue-500 mr-3" />
+            <Text className="text-xl font-bold text-gray-800">
+              {new Date(selectedDate).toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </Text>
+          </View>
 
-        {/* Punch Records for Selected Date */}
-        <View className="mx-4 mb-4">
-          {selectedDateRecords.length === 0 ? (
-            <View className="bg-white rounded-lg shadow-sm p-8 items-center">
-              <Ionicons name="calendar-outline" size={48} color="#9ca3af" />
-              <Text className="text-gray-500 text-lg mt-4 text-center">
-                No punch records for this date
-              </Text>
-              <Text className="text-gray-400 text-sm mt-2 text-center">
-                Select another date or add a new punch record
-              </Text>
-            </View>
-          ) : (
-            <View className="space-y-3">
-              {selectedDateRecords.map((record) => (
-                <View key={record.id} className="bg-white rounded-lg shadow-sm p-4">
+          {selectedDateRecords.length > 0 ? (
+            <View className="space-y-4">
+              {selectedDateRecords.map((record, index) => (
+                <View key={record.id} className="bg-gray-50 rounded-2xl p-4">
                   <View className="flex-row items-center justify-between mb-3">
                     <View className="flex-row items-center">
                       <View 
-                        className="w-3 h-3 rounded-full mr-3"
+                        className="w-3 h-3 rounded-full mr-3" 
                         style={{ backgroundColor: getStatusColor(record) }}
                       />
                       <Text className="font-semibold text-gray-800">
-                        {getStatusText(record)}
+                        Record #{index + 1}
                       </Text>
                     </View>
-                    <TouchableOpacity
-                      onPress={() => handleEditRecord(record)}
-                      className="p-2"
-                    >
-                      <Ionicons name="pencil" size={20} color="#6b7280" />
-                    </TouchableOpacity>
+                    <Text className="text-sm font-medium" style={{ color: getStatusColor(record) }}>
+                      {getStatusText(record)}
+                    </Text>
                   </View>
-
+                  
                   <View className="space-y-2">
-                    <View className="flex-row justify-between">
+                    <View className="flex-row justify-between items-center">
                       <Text className="text-gray-600">Punch In:</Text>
-                      <Text className="font-medium text-gray-800">
+                      <Text className="font-mono font-semibold text-blue-600">
                         {formatTime(record.punchIn)}
                       </Text>
                     </View>
-                    <View className="flex-row justify-between">
+                    <View className="flex-row justify-between items-center">
                       <Text className="text-gray-600">Punch Out:</Text>
-                      <Text className="font-medium text-gray-800">
+                      <Text className="font-mono font-semibold text-red-600">
                         {formatTime(record.punchOut)}
                       </Text>
                     </View>
-                    <View className="flex-row justify-between">
-                      <Text className="text-gray-600">Total Hours:</Text>
-                      <Text className="font-medium text-gray-800">
-                        {formatDuration(record.totalHours)}
-                      </Text>
-                    </View>
-                    {record.notes && (
-                      <View className="mt-3 pt-3 border-t border-gray-100">
-                        <Text className="text-gray-600 text-sm mb-1">Notes:</Text>
-                        <Text className="text-gray-800">{record.notes}</Text>
+                    {record.totalHours && (
+                      <View className="flex-row justify-between items-center">
+                        <Text className="text-gray-600">Duration:</Text>
+                        <Text className="font-semibold text-green-600">
+                          {formatDuration(record.totalHours)}
+                        </Text>
                       </View>
                     )}
+                    {record.notes && (
+                      <View className="mt-2 pt-2 border-t border-gray-200">
+                        <Text className="text-gray-600 text-sm">Notes: {record.notes}</Text>
+                      </View>
+                    )}
+                  </View>
+                  
+                  <View className="flex-row justify-end space-x-2 mt-3">
+                    <TouchableOpacity
+                      onPress={() => handleEditRecord(record)}
+                      className="bg-blue-100 px-4 py-2 rounded-xl"
+                    >
+                      <Text className="text-blue-600 font-medium text-sm">Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleDeleteRecord(record.id)}
+                      className="bg-red-100 px-4 py-2 rounded-xl"
+                    >
+                      <Text className="text-red-600 font-medium text-sm">Delete</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               ))}
             </View>
+          ) : (
+            <View className="items-center py-8">
+              <Ionicons name="calendar-outline" size={48} color="#9ca3af" />
+              <Text className="text-gray-500 text-lg mt-2">No records for this date</Text>
+              <Text className="text-gray-400 text-sm mt-1">Punch in to start tracking</Text>
+            </View>
           )}
-        </View>
+        </Animated.View>
 
-        {/* Legend */}
-        <View className="bg-white mx-4 rounded-lg shadow-sm p-4 mb-4">
-          <Text className="text-lg font-semibold text-gray-800 mb-3">Legend</Text>
-          <View className="space-y-2">
-            <View className="flex-row items-center">
-              <View className="w-3 h-3 rounded-full mr-3 bg-green-500" />
-              <Text className="text-gray-700">Completed day</Text>
+        {/* Sample Data Button */}
+        <Animated.View 
+          style={useAnimatedStyle(() => ({
+            opacity: cardOpacity.value,
+            transform: [{ translateY: cardTranslateY.value }],
+          }))}
+          className="mx-6 mb-6"
+        >
+          <TouchableOpacity
+            onPress={handleLoadSampleData}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-4 shadow-lg"
+          >
+            <View className="flex-row items-center justify-center">
+              <Ionicons name="add-circle" size={24} color="white" />
+              <Text className="text-white font-semibold text-lg ml-2">Load Sample Data</Text>
             </View>
-            <View className="flex-row items-center">
-              <View className="w-3 h-3 rounded-full mr-3 bg-yellow-500" />
-              <Text className="text-gray-700">In progress day</Text>
-            </View>
-            <View className="flex-row items-center">
-              <View className="w-3 h-3 rounded-full mr-3 bg-blue-500" />
-              <Text className="text-gray-700">Selected date</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Sample Data Button (for testing) */}
-        {punchRecords.length === 0 && (
-          <View className="mx-4 mb-4">
-            <TouchableOpacity
-              onPress={handleLoadSampleData}
-              className="bg-blue-500 py-3 rounded-lg items-center"
-            >
-              <Text className="text-white font-semibold text-lg">Load Sample Data</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+          </TouchableOpacity>
+        </Animated.View>
       </ScrollView>
 
       {/* Edit Modal */}
       <EditPunchModal
-        visible={isEditModalVisible}
-        onClose={() => {
-          setIsEditModalVisible(false);
-          setEditingRecord(undefined);
-        }}
-        onSave={handleSaveRecord}
-        onDelete={handleDeleteRecord}
+        isVisible={isEditModalVisible}
         record={editingRecord}
+        onSave={handleSaveRecord}
+        onClose={() => setIsEditModalVisible(false)}
       />
     </View>
   );
