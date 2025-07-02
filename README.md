@@ -254,6 +254,13 @@ npx expo build:ios
 - Improved performance and reliability
 - Better integration with Zustand state management
 
+### Enhanced Features
+- **Calendar View**: Interactive calendar with visual activity indicators
+- **PDF Export**: Professional PDF report generation with company branding
+- **Enhanced UI**: Improved design with better visual feedback and animations
+- **Data Validation**: Added comprehensive validation for all user inputs
+- **Sample Data**: Built-in sample data generator for testing and demonstration
+
 ## 🐛 Known Issues
 
 - **Sharing Features**: Temporarily disabled due to native module linking issues in SDK 53
@@ -274,15 +281,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 🆘 Support
 
 For support and questions, please open an issue in the repository.
-
-## 🔄 Recent Updates
-
-- **SQLite Integration**: Migrated from AsyncStorage to SQLite for better performance
-- **Calendar View**: Added interactive calendar with visual activity indicators
-- **PDF Export**: Professional PDF report generation with company branding
-- **Enhanced UI**: Improved design with better visual feedback and animations
-- **Data Validation**: Added comprehensive validation for all user inputs
-- **Sample Data**: Built-in sample data generator for testing and demonstration
 
 ---
 
