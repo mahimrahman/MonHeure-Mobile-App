@@ -98,6 +98,99 @@ export const generateWeeklyChartData = async (): Promise<ChartData> => {
   };
 };
 
+// Generate chart data for the current month
+export const generateMonthlyChartData = async (): Promise<ChartData> => {
+  const now = new Date();
+  const startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  
+  const punchData = await getPunchDataForRange(startDate, endDate);
+  const labels: string[] = [];
+  const data: number[] = [];
+  
+  const currentDate = new Date(startDate);
+  while (currentDate <= endDate) {
+    const dateKey = currentDate.toISOString().slice(0, 10);
+    const dayData = punchData[dateKey];
+    
+    labels.push(currentDate.getDate().toString());
+    
+    if (dayData?.punchIn && dayData?.punchOut) {
+      data.push(calculateHours(dayData.punchIn, dayData.punchOut));
+    } else {
+      data.push(0);
+    }
+    
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  
+  return {
+    labels,
+    datasets: [{
+      data,
+      color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`,
+      strokeWidth: 2
+    }]
+  };
+};
+
+// Generate chart data for the current year (monthly view)
+export const generateYearlyChartData = async (): Promise<ChartData> => {
+  const now = new Date();
+  const startDate = new Date(now.getFullYear(), 0, 1);
+  const endDate = new Date(now.getFullYear(), 11, 31);
+  
+  const punchData = await getPunchDataForRange(startDate, endDate);
+  const labels: string[] = [];
+  const data: number[] = [];
+  
+  // Group by month
+  for (let month = 0; month < 12; month++) {
+    const monthStart = new Date(now.getFullYear(), month, 1);
+    const monthEnd = new Date(now.getFullYear(), month + 1, 0);
+    
+    labels.push(monthStart.toLocaleDateString('en-US', { month: 'short' }));
+    
+    let monthTotal = 0;
+    const currentDate = new Date(monthStart);
+    while (currentDate <= monthEnd) {
+      const dateKey = currentDate.toISOString().slice(0, 10);
+      const dayData = punchData[dateKey];
+      
+      if (dayData?.punchIn && dayData?.punchOut) {
+        monthTotal += calculateHours(dayData.punchIn, dayData.punchOut);
+      }
+      
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    data.push(Math.round(monthTotal * 100) / 100);
+  }
+  
+  return {
+    labels,
+    datasets: [{
+      data,
+      color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`,
+      strokeWidth: 2
+    }]
+  };
+};
+
+// Generate chart data based on view type
+export const generateChartData = async (viewType: 'week' | 'month' | 'year'): Promise<ChartData> => {
+  switch (viewType) {
+    case 'week':
+      return generateWeeklyChartData();
+    case 'month':
+      return generateMonthlyChartData();
+    case 'year':
+      return generateYearlyChartData();
+    default:
+      return generateWeeklyChartData();
+  }
+};
+
 // Get time stats for different periods
 export const getTimeStats = async (): Promise<{
   thisWeek: TimeStats;
