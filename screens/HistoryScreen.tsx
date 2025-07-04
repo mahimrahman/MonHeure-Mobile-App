@@ -6,15 +6,21 @@ import {
   TouchableOpacity,
   Alert,
   RefreshControl,
+  Dimensions,
 } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
   withSpring,
-  withTiming
+  withTiming,
+  withSequence,
+  Easing,
+  runOnJS
 } from 'react-native-reanimated';
+import Modal from 'react-native-modal';
 import { PunchRecord } from '../types/punch';
 import { 
   fetchAllEntries, 
@@ -25,6 +31,8 @@ import {
 import EditPunchModal from '../components/EditPunchModal';
 import { generateSampleData } from '../utils/sampleData';
 import { usePunchActions } from '../utils/punchStore';
+
+const { width, height } = Dimensions.get('window');
 
 interface MarkedDates {
   [date: string]: {
@@ -44,10 +52,14 @@ export default function HistoryScreen() {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingRecord, setEditingRecord] = useState<PunchRecord | undefined>();
   const [refreshing, setRefreshing] = useState(false);
+  const [isDayCardVisible, setIsDayCardVisible] = useState(false);
 
   // Animation values
   const cardOpacity = useSharedValue(0);
   const cardTranslateY = useSharedValue(30);
+  const dayCardOpacity = useSharedValue(0);
+  const dayCardTranslateY = useSharedValue(100);
+  const calendarScale = useSharedValue(1);
 
   // Load punch data on component mount
   useEffect(() => {
@@ -56,7 +68,7 @@ export default function HistoryScreen() {
 
   // Start animations on mount
   useEffect(() => {
-    cardOpacity.value = withTiming(1, { duration: 600 });
+    cardOpacity.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) });
     cardTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
   }, []);
 
@@ -101,6 +113,25 @@ export default function HistoryScreen() {
 
   const handleDateSelect = (day: DateData) => {
     setSelectedDate(day.dateString);
+    showDayCard();
+  };
+
+  const showDayCard = () => {
+    setIsDayCardVisible(true);
+    dayCardOpacity.value = withTiming(1, { duration: 300 });
+    dayCardTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
+    calendarScale.value = withSequence(
+      withSpring(0.98, { duration: 200 }),
+      withSpring(1, { duration: 200 })
+    );
+  };
+
+  const hideDayCard = () => {
+    dayCardOpacity.value = withTiming(0, { duration: 200 });
+    dayCardTranslateY.value = withSpring(100, { damping: 15, stiffness: 100 });
+    setTimeout(() => {
+      setIsDayCardVisible(false);
+    }, 200);
   };
 
   const handleEditRecord = (record: PunchRecord) => {
@@ -123,17 +154,30 @@ export default function HistoryScreen() {
   };
 
   const handleDeleteRecord = async (recordId: string) => {
-    try {
-      await deletePunchEntry(parseInt(recordId));
-      await Promise.all([
-        loadPunchData(),
-        refreshTodayData()
-      ]);
-      Alert.alert('✅ Success', 'Punch record deleted successfully');
-    } catch (error) {
-      console.error('Error deleting record:', error);
-      Alert.alert('❌ Error', 'Failed to delete punch record');
-    }
+    Alert.alert(
+      'Delete Record',
+      'Are you sure you want to delete this punch record?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deletePunchEntry(parseInt(recordId));
+              await Promise.all([
+                loadPunchData(),
+                refreshTodayData()
+              ]);
+              Alert.alert('✅ Success', 'Punch record deleted successfully');
+            } catch (error) {
+              console.error('Error deleting record:', error);
+              Alert.alert('❌ Error', 'Failed to delete punch record');
+            }
+          }
+        }
+      ]
+    );
   };
 
   const handleLoadSampleData = async () => {
@@ -166,6 +210,15 @@ export default function HistoryScreen() {
     return `${h}h ${m}m`;
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+
   const getStatusColor = (record: PunchRecord) => {
     if (record.punchIn && record.punchOut) return '#22c55e'; // Completed
     if (record.punchIn && !record.punchOut) return '#f59e0b'; // In progress
@@ -178,10 +231,30 @@ export default function HistoryScreen() {
     return 'No Data';
   };
 
+  const getStatusGradient = (record: PunchRecord) => {
+    if (record.punchIn && record.punchOut) return ['#dcfce7', '#bbf7d0']; // Green
+    if (record.punchIn && !record.punchOut) return ['#fef3c7', '#fde68a']; // Yellow
+    return ['#f3f4f6', '#e5e7eb']; // Gray
+  };
+
+  // Animated styles
+  const calendarAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: calendarScale.value }],
+    };
+  });
+
+  const dayCardAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: dayCardOpacity.value,
+      transform: [{ translateY: dayCardTranslateY.value }],
+    };
+  });
+
   return (
     <View className="flex-1 bg-gradient-to-b from-blue-50 via-indigo-50 to-purple-50">
       {/* Header */}
-      <View className="bg-white pt-12 pb-6 px-6 border-b border-gray-100">
+      <View className="bg-white pt-12 pb-6 px-6 border-b border-gray-100 shadow-sm">
         <Text className="text-3xl font-bold text-gray-800 mb-2">History</Text>
         <Text className="text-gray-600 text-lg">View and manage your punch records</Text>
       </View>
@@ -191,13 +264,14 @@ export default function HistoryScreen() {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        showsVerticalScrollIndicator={false}
       >
         {/* Calendar */}
         <Animated.View 
-          style={useAnimatedStyle(() => ({
+          style={[useAnimatedStyle(() => ({
             opacity: cardOpacity.value,
             transform: [{ translateY: cardTranslateY.value }],
-          }))}
+          })), calendarAnimatedStyle]}
           className="bg-white m-6 rounded-3xl shadow-xl overflow-hidden border border-gray-100"
         >
           <Calendar
@@ -207,121 +281,34 @@ export default function HistoryScreen() {
               [selectedDate]: {
                 ...markedDates[selectedDate],
                 selected: true,
-                selectedColor: '#0ea5e9',
+                selectedColor: '#3b82f6',
               },
             }}
             theme={{
-              selectedDayBackgroundColor: '#0ea5e9',
+              selectedDayBackgroundColor: '#3b82f6',
               selectedDayTextColor: '#ffffff',
-              todayTextColor: '#0ea5e9',
+              todayTextColor: '#3b82f6',
               dayTextColor: '#374151',
               textDisabledColor: '#d1d5db',
               dotColor: '#22c55e',
               selectedDotColor: '#ffffff',
-              arrowColor: '#0ea5e9',
+              arrowColor: '#3b82f6',
               monthTextColor: '#374151',
-              indicatorColor: '#0ea5e9',
-              textDayFontWeight: '500',
+              indicatorColor: '#3b82f6',
+              textDayFontWeight: '600',
               textMonthFontWeight: 'bold',
-              textDayHeaderFontWeight: '600',
+              textDayHeaderFontWeight: '700',
               textDayFontSize: 16,
-              textMonthFontSize: 18,
+              textMonthFontSize: 20,
               textDayHeaderFontSize: 14,
+              'stylesheet.calendar.header': {
+                dayHeader: {
+                  color: '#6b7280',
+                  fontWeight: '600',
+                },
+              },
             }}
           />
-        </Animated.View>
-
-        {/* Selected Date Info */}
-        <Animated.View 
-          style={useAnimatedStyle(() => ({
-            opacity: cardOpacity.value,
-            transform: [{ translateY: cardTranslateY.value }],
-          }))}
-          className="bg-white mx-6 rounded-3xl shadow-xl p-6 mb-6 border border-gray-100"
-        >
-          <View className="flex-row items-center mb-4">
-            <View className="w-3 h-3 rounded-full bg-blue-500 mr-3" />
-            <Text className="text-xl font-bold text-gray-800">
-              {new Date(selectedDate).toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}
-            </Text>
-          </View>
-
-          {selectedDateRecords.length > 0 ? (
-            <View className="space-y-4">
-              {selectedDateRecords.map((record, index) => (
-                <View key={record.id} className="bg-gray-50 rounded-2xl p-4">
-                  <View className="flex-row items-center justify-between mb-3">
-                    <View className="flex-row items-center">
-                      <View 
-                        className="w-3 h-3 rounded-full mr-3" 
-                        style={{ backgroundColor: getStatusColor(record) }}
-                      />
-                      <Text className="font-semibold text-gray-800">
-                        Record #{index + 1}
-                      </Text>
-                    </View>
-                    <Text className="text-sm font-medium" style={{ color: getStatusColor(record) }}>
-                      {getStatusText(record)}
-                    </Text>
-                  </View>
-                  
-                  <View className="space-y-2">
-                    <View className="flex-row justify-between items-center">
-                      <Text className="text-gray-600">Punch In:</Text>
-                      <Text className="font-mono font-semibold text-blue-600">
-                        {formatTime(record.punchIn)}
-                      </Text>
-                    </View>
-                    <View className="flex-row justify-between items-center">
-                      <Text className="text-gray-600">Punch Out:</Text>
-                      <Text className="font-mono font-semibold text-red-600">
-                        {formatTime(record.punchOut)}
-                      </Text>
-                    </View>
-                    {record.totalHours && (
-                      <View className="flex-row justify-between items-center">
-                        <Text className="text-gray-600">Duration:</Text>
-                        <Text className="font-semibold text-green-600">
-                          {formatDuration(record.totalHours)}
-                        </Text>
-                      </View>
-                    )}
-                    {record.notes && (
-                      <View className="mt-2 pt-2 border-t border-gray-200">
-                        <Text className="text-gray-600 text-sm">Notes: {record.notes}</Text>
-                      </View>
-                    )}
-                  </View>
-                  
-                  <View className="flex-row justify-end space-x-2 mt-3">
-                    <TouchableOpacity
-                      onPress={() => handleEditRecord(record)}
-                      className="bg-blue-100 px-4 py-2 rounded-xl"
-                    >
-                      <Text className="text-blue-600 font-medium text-sm">Edit</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => handleDeleteRecord(record.id)}
-                      className="bg-red-100 px-4 py-2 rounded-xl"
-                    >
-                      <Text className="text-red-600 font-medium text-sm">Delete</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <View className="items-center py-8">
-              <Ionicons name="calendar-outline" size={48} color="#9ca3af" />
-              <Text className="text-gray-500 text-lg mt-2">No records for this date</Text>
-              <Text className="text-gray-400 text-sm mt-1">Punch in to start tracking</Text>
-            </View>
-          )}
         </Animated.View>
 
         {/* Sample Data Button */}
@@ -335,6 +322,7 @@ export default function HistoryScreen() {
           <TouchableOpacity
             onPress={handleLoadSampleData}
             className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-4 shadow-lg"
+            activeOpacity={0.9}
           >
             <View className="flex-row items-center justify-center">
               <Ionicons name="add-circle" size={24} color="white" />
@@ -343,6 +331,154 @@ export default function HistoryScreen() {
           </TouchableOpacity>
         </Animated.View>
       </ScrollView>
+
+      {/* Day Card Modal */}
+      <Modal
+        isVisible={isDayCardVisible}
+        onBackdropPress={hideDayCard}
+        onSwipeComplete={hideDayCard}
+        swipeDirection={['down']}
+        backdropOpacity={0.5}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+        style={{ margin: 0, justifyContent: 'flex-end' }}
+      >
+        <Animated.View style={dayCardAnimatedStyle}>
+          <View className="bg-white rounded-t-3xl shadow-2xl border border-gray-100 max-h-[80%]">
+            {/* Handle */}
+            <View className="items-center pt-4 pb-2">
+              <View className="w-12 h-1 bg-gray-300 rounded-full" />
+            </View>
+
+            {/* Header */}
+            <View className="px-6 pb-4 border-b border-gray-100">
+              <View className="flex-row items-center justify-between">
+                <View className="flex-row items-center">
+                  <View className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mr-3" />
+                  <Text className="text-2xl font-bold text-gray-800">
+                    {formatDate(selectedDate)}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={hideDayCard}
+                  className="w-8 h-8 bg-gray-100 rounded-full justify-center items-center"
+                >
+                  <Ionicons name="close" size={20} color="#6b7280" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Content */}
+            <ScrollView className="px-6 py-4" showsVerticalScrollIndicator={false}>
+              {selectedDateRecords.length > 0 ? (
+                <View className="space-y-4">
+                  {selectedDateRecords.map((record, index) => (
+                    <View key={record.id} className="overflow-hidden rounded-2xl">
+                      <LinearGradient
+                        colors={getStatusGradient(record)}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        className="p-5 border border-gray-200"
+                      >
+                        <View className="flex-row items-center justify-between mb-4">
+                          <View className="flex-row items-center">
+                            <View className="w-10 h-10 bg-white/80 rounded-full justify-center items-center mr-3">
+                              <Ionicons 
+                                name={record.punchOut ? "checkmark-circle" : "time"} 
+                                size={20} 
+                                color={getStatusColor(record)} 
+                              />
+                            </View>
+                            <View>
+                              <Text className="font-bold text-gray-800 text-lg">
+                                Record #{index + 1}
+                              </Text>
+                              <Text className="text-sm font-medium" style={{ color: getStatusColor(record) }}>
+                                {getStatusText(record)}
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                        
+                        <View className="space-y-3">
+                          <View className="flex-row justify-between items-center p-3 bg-white/60 rounded-xl">
+                            <View className="flex-row items-center">
+                              <Ionicons name="log-in" size={16} color="#3b82f6" />
+                              <Text className="text-gray-700 font-medium ml-2">Punch In</Text>
+                            </View>
+                            <Text className="font-mono font-bold text-blue-600 text-lg">
+                              {formatTime(record.punchIn)}
+                            </Text>
+                          </View>
+                          
+                          <View className="flex-row justify-between items-center p-3 bg-white/60 rounded-xl">
+                            <View className="flex-row items-center">
+                              <Ionicons name="log-out" size={16} color="#ef4444" />
+                              <Text className="text-gray-700 font-medium ml-2">Punch Out</Text>
+                            </View>
+                            <Text className="font-mono font-bold text-red-600 text-lg">
+                              {formatTime(record.punchOut)}
+                            </Text>
+                          </View>
+                          
+                          {record.totalHours && (
+                            <View className="flex-row justify-between items-center p-3 bg-white/60 rounded-xl">
+                              <View className="flex-row items-center">
+                                <Ionicons name="time" size={16} color="#22c55e" />
+                                <Text className="text-gray-700 font-medium ml-2">Total Hours</Text>
+                              </View>
+                              <Text className="font-bold text-green-600 text-lg">
+                                {formatDuration(record.totalHours)}
+                              </Text>
+                            </View>
+                          )}
+                          
+                          {record.notes && (
+                            <View className="p-3 bg-white/60 rounded-xl">
+                              <View className="flex-row items-center mb-2">
+                                <Ionicons name="document-text" size={16} color="#6b7280" />
+                                <Text className="text-gray-700 font-medium ml-2">Notes</Text>
+                              </View>
+                              <Text className="text-gray-600 text-sm">{record.notes}</Text>
+                            </View>
+                          )}
+                        </View>
+                        
+                        <View className="flex-row justify-end space-x-3 mt-4">
+                          <TouchableOpacity
+                            onPress={() => handleEditRecord(record)}
+                            className="flex-row items-center bg-blue-500 px-4 py-3 rounded-xl shadow-sm"
+                            activeOpacity={0.8}
+                          >
+                            <Ionicons name="create" size={16} color="white" />
+                            <Text className="text-white font-semibold ml-2">Edit</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={() => handleDeleteRecord(record.id)}
+                            className="flex-row items-center bg-red-500 px-4 py-3 rounded-xl shadow-sm"
+                            activeOpacity={0.8}
+                          >
+                            <Ionicons name="trash" size={16} color="white" />
+                            <Text className="text-white font-semibold ml-2">Delete</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </LinearGradient>
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <View className="items-center py-12">
+                  <View className="w-20 h-20 bg-gray-100 rounded-full justify-center items-center mb-4">
+                    <Ionicons name="calendar-outline" size={32} color="#9ca3af" />
+                  </View>
+                  <Text className="text-gray-600 text-xl font-semibold mb-2">No records for this date</Text>
+                  <Text className="text-gray-400 text-center">Punch in to start tracking your time</Text>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        </Animated.View>
+      </Modal>
 
       {/* Edit Modal */}
       <EditPunchModal
