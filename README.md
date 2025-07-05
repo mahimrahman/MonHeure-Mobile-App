@@ -1,26 +1,38 @@
 # MonHeure - Time Tracking Mobile App
 
-A React Native mobile application built with Expo for efficient time tracking and punch-in/punch-out management with comprehensive reporting and data management features.
+A modern React Native mobile application built with Expo for efficient time tracking and punch-in/punch-out management with comprehensive reporting, analytics, and beautiful UI design.
 
 ## 🚀 Features
 
-### Core Time Tracking
-- **Punch In/Out System**: Simple one-tap time tracking with visual status indicators
-- **Daily Time Management**: Track work hours with real-time calculations
-- **Time Editing**: Edit punch-in and punch-out times with validation
-- **Notes Support**: Add notes to punch records for better tracking
-- **Global State Management**: Zustand-powered state management with persistence across sessions
+### 🎯 Core Time Tracking
+- **Large Circular Punch Button**: Vibrant gradient button (blue to purple) with smooth animations
+- **Real-time Status Display**: Shows current punch status with time information
+- **One-tap Operation**: Simple, intuitive time tracking with visual feedback
+- **Glow Effects**: Subtle animations and visual feedback on interactions
+- **Session Persistence**: State survives app restarts and crashes
 
-### Advanced History & Calendar
-- **Interactive Calendar View**: Visual calendar with activity indicators using `react-native-calendars`
-- **Day Details**: Tap any date to see punch-in/out times, total hours, and notes
+### 📊 Enhanced Dashboard & Analytics
+- **Horizontally Scrollable Stat Cards**: 
+  - "This Week" (Blue gradient)
+  - "Last 2 Weeks" (Teal gradient) 
+  - "This Month" (Orange gradient)
+  - "This Year" (Violet gradient)
+- **Interactive Charts**: Bar and line charts with `react-native-chart-kit`
+- **Time Period Toggle**: Switch between week/month/year views
+- **Productivity Insights**: Best day tracking, consistency metrics
+- **Smooth Animations**: Staggered entrance animations and transitions
+
+### 📅 Modern Calendar & History
+- **Interactive Calendar View**: Visual calendar with activity dots using `react-native-calendars`
+- **Slide-up Day Cards**: Tap any date to see detailed punch information
+- **Color-coded Status**: 
+  - 🟢 Green dots: Completed days (punch-in + punch-out)
+  - 🟡 Yellow dots: In-progress days (punch-in only)
 - **Full CRUD Operations**: Create, read, update, and delete punch records
-- **Visual Status Indicators**: 
-  - Green dots: Completed days (punch-in + punch-out)
-  - Yellow dots: In-progress days (punch-in only)
-  - Blue highlight: Currently selected date
+- **Swipe Gestures**: Swipe down to dismiss day cards
+- **Pastel Backgrounds**: Beautiful gradient backgrounds for different statuses
 
-### Comprehensive Reporting
+### 📈 Comprehensive Reporting
 - **Custom Date Range Reports**: Select any date range with interactive date picker
 - **Summary Dashboard**: Total days, records, hours, and average per day
 - **Detailed Records**: All punch-in/out entries grouped by day with notes
@@ -28,19 +40,21 @@ A React Native mobile application built with Expo for efficient time tracking an
 - **Share & Email**: Share reports via email or other apps with `react-native-share`
 - **Quick Actions**: One-tap for common ranges (last 2 weeks, last month, today)
 
-### Data Management
+### 🎨 Modern UI Design
+- **Gradient Backgrounds**: Beautiful color gradients throughout the app
+- **Rounded Corners**: Modern card design with proper border radius
+- **Soft Shadows**: Subtle shadows for depth and visual hierarchy
+- **Smooth Animations**: Spring-based animations with proper easing
+- **Touch-Friendly**: Large touch targets and generous spacing
+- **Responsive Design**: Works seamlessly on all screen sizes
+
+### 🔧 Advanced Features
+- **Global State Management**: Zustand-powered state management with persistence
 - **AsyncStorage Database**: Robust local database storage with full CRUD operations
 - **Sample Data Generation**: Load sample data for testing and demonstration
 - **Data Export**: Export all data with comprehensive reporting
 - **Data Integrity**: Proper validation and error handling
-- **State Persistence**: Automatic state restoration across app sessions
-
-### Settings & Preferences
-- **Theme Toggle**: Switch between dark and light mode (persisted)
-- **Clear All Data**: Permanently delete all stored data with confirmation
-- **Store State Management**: Reset Zustand store state independently
 - **Pull to Refresh**: Swipe down to refresh data across all screens
-- **Responsive Design**: Works seamlessly on all screen sizes
 
 ## 🛠 Tech Stack
 
@@ -53,22 +67,39 @@ A React Native mobile application built with Expo for efficient time tracking an
 - **Expo Vector Icons** for beautiful icons
 - **AsyncStorage** for robust local database storage and settings
 - **react-native-calendars** for interactive calendar UI
+- **react-native-chart-kit** for analytics and data visualization
 - **react-native-html-to-pdf** for professional PDF export
 - **react-native-share** for cross-platform sharing
 - **@react-native-community/datetimepicker** for date/time selection
 - **react-native-modal** for modal dialogs
-- **react-native-chart-kit** for analytics and charts
+- **expo-linear-gradient** for beautiful gradient effects
+- **react-native-reanimated** for smooth animations
 
 ## 📱 Screenshots & UI Features
 
-The app features a clean, modern interface with:
-- **Large punch button** that changes color based on work status (green for punch-in, red for punch-out)
-- **Daily time display** with editable punch times and real-time calculations
-- **Interactive calendar** with visual activity indicators and day selection
-- **Modal-based time picker** for corrections with 24-hour format validation
-- **Professional PDF reports** with company branding and complete data export
-- **Real-time status indicators** showing current punch state across all screens
-- **Responsive design** that works seamlessly on all screen sizes
+The app features a modern, intuitive interface with:
+
+### 🏠 Home Screen
+- **Large circular gradient button** (72x72) that toggles between "Punch In" and "Punch Out"
+- **Vibrant gradients**: Blue to purple for punch-in, red gradient for punch-out
+- **Status text**: Shows current punch status with time information
+- **Glow effects**: Subtle animations and visual feedback
+- **Calendar-style card**: Today's punches in a clean, organized layout
+- **Smooth animations**: Spring-based animations with proper easing
+
+### 📊 Dashboard Screen
+- **Horizontally scrollable stat cards** with gradient backgrounds and icons
+- **Interactive charts**: Bar and line charts with custom styling
+- **Time period toggle**: Switch between week/month/year views
+- **Productivity insights**: Enhanced metrics with visual indicators
+- **Quick actions**: Touchable cards with gradient backgrounds
+
+### 📅 History Screen
+- **Interactive calendar** with color-coded activity dots
+- **Slide-up day cards**: Modal interface with swipe-to-dismiss
+- **Pastel backgrounds**: Gradient backgrounds for different record statuses
+- **Edit/Delete buttons**: Icon-based buttons with proper styling
+- **Smooth transitions**: Spring animations for all interactions
 
 ## 🚦 Quick Start
 
@@ -114,9 +145,9 @@ MonHeure-Mobile-App/
 │   ├── report.tsx         # Report screen route
 │   └── settings.tsx       # Settings screen route
 ├── screens/
-│   ├── HomeScreen.tsx      # Main punch in/out interface with daily overview
-│   ├── DashboardScreen.tsx # Analytics dashboard with productivity insights
-│   ├── HistoryScreen.tsx   # Calendar-based history with full CRUD operations
+│   ├── HomeScreen.tsx      # Redesigned punch interface with gradient button
+│   ├── DashboardScreen.tsx # Enhanced analytics with charts and stat cards
+│   ├── HistoryScreen.tsx   # Modern calendar with slide-up day cards
 │   ├── ReportScreen.tsx    # Custom date range reporting & PDF export
 │   └── SettingsScreen.tsx  # Preferences, theme, data management
 ├── components/
@@ -128,11 +159,13 @@ MonHeure-Mobile-App/
 ├── utils/
 │   ├── database.ts        # AsyncStorage database operations and CRUD functions
 │   ├── punchStore.ts      # Zustand global state management store
-│   ├── timeCalculations.ts # Time calculation utilities
+│   ├── timeCalculations.ts # Enhanced time calculation utilities with chart data
 │   ├── storage.ts         # AsyncStorage helpers for settings
 │   ├── sampleData.ts      # Sample data generator for testing
 │   ├── pdfGenerator.ts    # Professional PDF report generator
-│   └── shareUtils.ts      # Cross-platform sharing utilities
+│   ├── shareUtils.ts      # Cross-platform sharing utilities
+│   ├── designSystem.ts    # Design system utilities
+│   └── punchStore.ts      # Enhanced state management
 ├── package.json          # Dependencies and scripts
 ├── tsconfig.json        # TypeScript configuration
 ├── tailwind.config.js   # Tailwind CSS configuration
@@ -147,19 +180,28 @@ MonHeure-Mobile-App/
 - **Database Sync**: Automatic synchronization between store and database
 - **Helper Hooks**: `usePunchStatus()`, `useTodayData()`, `usePunchActions()`
 
-### Punch In/Out System
+### Enhanced Punch In/Out System
+- **Large Gradient Button**: 72x72 circular button with vibrant gradients
 - **Visual Status**: Button color and icon change based on work status
+- **Status Text**: Real-time display of current punch status
+- **Glow Effects**: Subtle animations for visual feedback
 - **One Tap Operation**: Simple, quick time tracking
-- **Real-time Updates**: Immediate visual feedback and data persistence
-- **Validation**: Ensures punch-out time is after punch-in time
 - **Session Persistence**: State survives app restarts and crashes
 
-### Calendar-Based History
+### Modern Calendar-Based History
 - **Interactive Calendar**: See punch activity at a glance with color-coded dots
-- **Day Details**: Tap any date for comprehensive punch record view
-- **Edit/Delete**: Full CRUD operations with modal-based editing
-- **Sample Data**: Load 30 days of sample data for testing and demonstration
-- **Real-time Sync**: Updates automatically when punch state changes
+- **Slide-up Day Cards**: Tap any date for comprehensive punch record view
+- **Swipe Gestures**: Swipe down to dismiss day cards
+- **Pastel Backgrounds**: Beautiful gradient backgrounds for different statuses
+- **Edit/Delete**: Full CRUD operations with icon-based buttons
+- **Sample Data**: Load sample data for testing and demonstration
+
+### Advanced Dashboard & Analytics
+- **Stat Cards**: Horizontally scrollable cards with gradient backgrounds
+- **Interactive Charts**: Bar and line charts with custom styling
+- **Time Period Toggle**: Switch between week/month/year views
+- **Productivity Insights**: Enhanced metrics with visual indicators
+- **Smooth Animations**: Staggered entrance animations for all elements
 
 ### Custom Date Range Reports
 - **Flexible Date Selection**: Choose any date range with interactive picker
@@ -177,12 +219,14 @@ MonHeure-Mobile-App/
 
 ## 🎨 Styling & UI
 
-The app uses **NativeWind** (Tailwind CSS for React Native) for consistent styling:
+The app uses **NativeWind** (Tailwind CSS for React Native) with modern design principles:
+- **Gradient Backgrounds**: Beautiful color gradients throughout the app
+- **Rounded Corners**: Modern card design with proper border radius
+- **Soft Shadows**: Subtle shadows for depth and visual hierarchy
+- **Smooth Animations**: Spring-based animations with proper easing
 - **Responsive Design**: Adapts to all screen sizes and orientations
-- **Modern Color Scheme**: Professional color palette with status indicators
-- **Clean Typography**: Readable fonts with proper hierarchy
-- **Smooth Animations**: Subtle transitions and loading states
-- **Accessibility**: Proper contrast ratios and touch targets
+- **Touch-Friendly**: Large touch targets and generous spacing
+- **Accessibility**: Proper contrast ratios and visual feedback
 
 ## 🔧 Development
 
@@ -198,6 +242,18 @@ const { todayEntries, totalHoursToday } = useTodayData();
 const { punchIn, punchOut, updateCurrentPunch } = usePunchActions();
 ```
 
+### Animation System
+```typescript
+// Spring animations for smooth interactions
+const buttonScale = useSharedValue(1);
+const cardOpacity = useSharedValue(0);
+
+// Animated styles
+const buttonAnimatedStyle = useAnimatedStyle(() => ({
+  transform: [{ scale: buttonScale.value }],
+}));
+```
+
 ### Adding New Features
 1. Create new screen components in `screens/`
 2. Add navigation routes in `app/` directory (Expo Router)
@@ -205,12 +261,14 @@ const { punchIn, punchOut, updateCurrentPunch } = usePunchActions();
 4. Add types in `types/` directory
 5. Implement database operations in `utils/database.ts`
 6. Update Zustand store in `utils/punchStore.ts` if needed
+7. Add animations using react-native-reanimated
 
 ### Code Style
 - **TypeScript** for type safety and better development experience
 - **Functional Components** with React hooks for state management
 - **Zustand** for global state management with persistence
 - **Tailwind CSS** for consistent, maintainable styling
+- **React Native Reanimated** for smooth animations
 - **Async/await** for database and storage operations
 - **Error Handling** with proper user feedback
 
@@ -235,31 +293,32 @@ npx expo build:ios
 
 ## 🔄 Recent Updates
 
-### Expo SDK 53 Upgrade
-- Upgraded from Expo SDK 50 to SDK 53
-- Updated to React 19 and React Native 0.79.4
-- Migrated to Expo Router for file-based navigation
-- Updated all dependencies to latest compatible versions
+### 🎨 UI/UX Redesign (Latest)
+- **Home Screen**: Large circular gradient button with glow effects and status text
+- **Dashboard**: Horizontally scrollable stat cards with gradient backgrounds
+- **History Screen**: Slide-up day cards with pastel backgrounds and swipe gestures
+- **Enhanced Animations**: Spring-based animations throughout the app
+- **Modern Design**: Gradient backgrounds, rounded corners, and soft shadows
 
-### Zustand State Management
-- Implemented global state management with Zustand
-- Added persistence across app sessions
-- Real-time state synchronization across all screens
-- Automatic database synchronization
-- Helper hooks for common state access patterns
+### 📊 Enhanced Analytics
+- **Interactive Charts**: Bar and line charts with react-native-chart-kit
+- **Time Period Toggle**: Switch between week/month/year views
+- **Stat Cards**: Beautiful gradient cards with icons and metrics
+- **Productivity Insights**: Enhanced metrics with visual indicators
 
-### Database Migration
-- Migrated from SQLite to AsyncStorage for better compatibility
-- Maintained all CRUD operations and data integrity
-- Improved performance and reliability
-- Better integration with Zustand state management
+### 🛠 Technical Improvements
+- **Expo SDK 53**: Upgraded to latest Expo SDK with React 19
+- **React Native Reanimated**: Smooth animations throughout the app
+- **Expo Linear Gradient**: Beautiful gradient effects
+- **Enhanced State Management**: Improved Zustand store with better persistence
+- **Performance Optimization**: Better rendering and animation performance
 
-### Enhanced Features
+### 📱 Enhanced Features
 - **Calendar View**: Interactive calendar with visual activity indicators
 - **PDF Export**: Professional PDF report generation with company branding
-- **Enhanced UI**: Improved design with better visual feedback and animations
 - **Data Validation**: Added comprehensive validation for all user inputs
 - **Sample Data**: Built-in sample data generator for testing and demonstration
+- **Touch Interactions**: Improved touch feedback and gesture handling
 
 ## 🐛 Known Issues
 
@@ -284,4 +343,4 @@ For support and questions, please open an issue in the repository.
 
 ---
 
-**Built with ❤️ using React Native and Expo** 
+**Built with ❤️ using React Native, Expo, and modern design principles** 
