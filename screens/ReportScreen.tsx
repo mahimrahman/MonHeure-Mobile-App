@@ -7,19 +7,32 @@ import {
   Alert,
   RefreshControl,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring,
+  withTiming,
+  Easing
+} from 'react-native-reanimated';
 import { PunchRecord } from '../types/punch';
 import { fetchEntriesForRange } from '../utils/database';
 import DateRangePicker from '../components/DateRangePicker';
 import { generatePDFReport } from '../utils/pdfGenerator';
 import { shareReport, shareReportAsEmail } from '../utils/shareUtils';
 
+const { width } = Dimensions.get('window');
+
 interface ReportSummary {
   totalHours: number;
   totalDays: number;
   averageHoursPerDay: number;
   totalRecords: number;
+  weekendDays: number;
+  weekdays: number;
 }
 
 export default function ReportScreen() {
@@ -36,13 +49,27 @@ export default function ReportScreen() {
     totalDays: 0,
     averageHoursPerDay: 0,
     totalRecords: 0,
+    weekendDays: 0,
+    weekdays: 0,
   });
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+
+  // Animation values
+  const cardOpacity = useSharedValue(0);
+  const cardTranslateY = useSharedValue(30);
+  const buttonScale = useSharedValue(1);
 
   // Load punch data on component mount
   useEffect(() => {
     loadPunchData();
+  }, []);
+
+  // Start animations on mount
+  useEffect(() => {
+    cardOpacity.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) });
+    cardTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
   }, []);
 
   // Filter records when date range or punch records change
@@ -89,11 +116,27 @@ export default function ReportScreen() {
     const totalDays = uniqueDates.size;
     const averageHoursPerDay = totalDays > 0 ? totalHours / totalDays : 0;
 
+    // Calculate weekend vs weekday distribution
+    let weekendDays = 0;
+    let weekdays = 0;
+    
+    uniqueDates.forEach(dateStr => {
+      const date = new Date(dateStr);
+      const dayOfWeek = date.getDay();
+      if (dayOfWeek === 0 || dayOfWeek === 6) { // Sunday or Saturday
+        weekendDays++;
+      } else {
+        weekdays++;
+      }
+    });
+
     setSummary({
       totalHours,
       totalDays,
       averageHoursPerDay,
       totalRecords: filteredRecords.length,
+      weekendDays,
+      weekdays,
     });
   };
 
@@ -102,6 +145,13 @@ export default function ReportScreen() {
       Alert.alert('No Data', 'No punch records found for the selected date range');
       return;
     }
+
+    // Button animation
+    buttonScale.value = withSequence(
+      withSpring(0.95, { duration: 100 }),
+      withSpring(1.05, { duration: 100 }),
+      withSpring(1, { duration: 200 })
+    );
 
     setIsGeneratingPDF(true);
     try {
@@ -179,6 +229,36 @@ export default function ReportScreen() {
     });
   };
 
+  const isWeekend = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const dayOfWeek = date.getDay();
+    return dayOfWeek === 0 || dayOfWeek === 6; // Sunday or Saturday
+  };
+
+  const isHoliday = (dateStr: string) => {
+    // Simple holiday detection - you can expand this
+    const date = new Date(dateStr);
+    const month = date.getMonth();
+    const day = date.getDate();
+    
+    // Common holidays (simplified)
+    if (month === 0 && day === 1) return true; // New Year's Day
+    if (month === 6 && day === 4) return true; // Independence Day
+    if (month === 11 && day === 25) return true; // Christmas
+    
+    return false;
+  };
+
+  const getDayBackground = (dateStr: string) => {
+    if (isHoliday(dateStr)) {
+      return ['#fef3c7', '#fde68a']; // Yellow gradient for holidays
+    }
+    if (isWeekend(dateStr)) {
+      return ['#fce7f3', '#fbcfe8']; // Pink gradient for weekends
+    }
+    return ['#f0f9ff', '#e0f2fe']; // Blue gradient for weekdays
+  };
+
   const groupRecordsByDate = () => {
     const grouped: { [key: string]: PunchRecord[] } = {};
     
@@ -192,12 +272,26 @@ export default function ReportScreen() {
     return Object.entries(grouped).sort(([a], [b]) => new Date(b).getTime() - new Date(a).getTime());
   };
 
+  // Animated styles
+  const cardAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: cardOpacity.value,
+      transform: [{ translateY: cardTranslateY.value }],
+    };
+  });
+
+  const buttonAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: buttonScale.value }],
+    };
+  });
+
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-gradient-to-b from-blue-50 via-indigo-50 to-purple-50">
       {/* Header */}
-      <View className="bg-white p-4 border-b border-gray-200">
-        <Text className="text-2xl font-bold text-gray-800">Reports</Text>
-        <Text className="text-gray-600 mt-1">Generate and export your time tracking data</Text>
+      <View className="bg-white pt-12 pb-6 px-6 border-b border-gray-100 shadow-sm">
+        <Text className="text-3xl font-bold text-gray-800 mb-2">Reports</Text>
+        <Text className="text-gray-600 text-lg">Generate and export your time tracking data</Text>
       </View>
 
       <ScrollView 
@@ -205,159 +299,255 @@ export default function ReportScreen() {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
+        showsVerticalScrollIndicator={false}
       >
-        <View className="p-4 space-y-4">
-          {/* Date Range Picker */}
-          <DateRangePicker
-            startDate={startDate}
-            endDate={endDate}
-            onStartDateChange={setStartDate}
-            onEndDateChange={setEndDate}
-          />
+        <View className="p-6 space-y-6">
+          {/* Enhanced Date Range Picker */}
+          <Animated.View style={cardAnimatedStyle}>
+            <DateRangePicker
+              startDate={startDate}
+              endDate={endDate}
+              onStartDateChange={setStartDate}
+              onEndDateChange={setEndDate}
+            />
+          </Animated.View>
 
-          {/* Summary Cards */}
-          <View className="bg-white rounded-lg shadow-sm p-4">
-            <Text className="text-lg font-semibold text-gray-800 mb-4">Summary</Text>
-            <View className="grid grid-cols-2 gap-4">
-              <View className="bg-blue-50 p-4 rounded-lg">
-                <Text className="text-2xl font-bold text-blue-600">{summary.totalDays}</Text>
-                <Text className="text-sm text-blue-800">Days</Text>
+          {/* Enhanced Summary Cards */}
+          <Animated.View style={cardAnimatedStyle}>
+            <View className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+              <View className="flex-row items-center mb-6">
+                <View className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mr-3" />
+                <Text className="text-2xl font-bold text-gray-800">Summary</Text>
               </View>
-              <View className="bg-green-50 p-4 rounded-lg">
-                <Text className="text-2xl font-bold text-green-600">{summary.totalRecords}</Text>
-                <Text className="text-sm text-green-800">Records</Text>
+              
+              <View className="grid grid-cols-2 gap-4">
+                <View className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-2xl border border-blue-100">
+                  <Text className="text-3xl font-bold text-blue-600">{summary.totalDays}</Text>
+                  <Text className="text-sm text-blue-800 font-medium">Days</Text>
+                </View>
+                <View className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-2xl border border-green-100">
+                  <Text className="text-3xl font-bold text-green-600">{summary.totalRecords}</Text>
+                  <Text className="text-sm text-green-800 font-medium">Records</Text>
+                </View>
+                <View className="bg-gradient-to-r from-purple-50 to-violet-50 p-4 rounded-2xl border border-purple-100">
+                  <Text className="text-2xl font-bold text-purple-600">{formatDuration(summary.totalHours)}</Text>
+                  <Text className="text-sm text-purple-800 font-medium">Total Hours</Text>
+                </View>
+                <View className="bg-gradient-to-r from-orange-50 to-amber-50 p-4 rounded-2xl border border-orange-100">
+                  <Text className="text-2xl font-bold text-orange-600">{formatDuration(summary.averageHoursPerDay)}</Text>
+                  <Text className="text-sm text-orange-800 font-medium">Avg/Day</Text>
+                </View>
               </View>
-              <View className="bg-purple-50 p-4 rounded-lg">
-                <Text className="text-2xl font-bold text-purple-600">{formatDuration(summary.totalHours)}</Text>
-                <Text className="text-sm text-purple-800">Total Hours</Text>
-              </View>
-              <View className="bg-orange-50 p-4 rounded-lg">
-                <Text className="text-2xl font-bold text-orange-600">{formatDuration(summary.averageHoursPerDay)}</Text>
-                <Text className="text-sm text-orange-800">Avg/Day</Text>
+
+              {/* Day Distribution */}
+              <View className="mt-6 pt-6 border-t border-gray-200">
+                <Text className="text-lg font-semibold text-gray-800 mb-4">Day Distribution</Text>
+                <View className="flex-row space-x-4">
+                  <View className="flex-1 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-2xl border border-blue-100">
+                    <Text className="text-2xl font-bold text-blue-600">{summary.weekdays}</Text>
+                    <Text className="text-sm text-blue-800 font-medium">Weekdays</Text>
+                  </View>
+                  <View className="flex-1 bg-gradient-to-r from-pink-50 to-rose-50 p-4 rounded-2xl border border-pink-100">
+                    <Text className="text-2xl font-bold text-pink-600">{summary.weekendDays}</Text>
+                    <Text className="text-sm text-pink-800 font-medium">Weekends</Text>
+                  </View>
+                </View>
               </View>
             </View>
-          </View>
+          </Animated.View>
 
-          {/* Export Button */}
-          <TouchableOpacity
-            onPress={handleGeneratePDF}
-            disabled={isGeneratingPDF || filteredRecords.length === 0}
-            className={`flex-row items-center justify-center p-4 rounded-lg ${
-              isGeneratingPDF || filteredRecords.length === 0 
-                ? 'bg-gray-300' 
-                : 'bg-blue-500'
-            }`}
-          >
-            {isGeneratingPDF ? (
-              <ActivityIndicator color="white" size="small" />
-            ) : (
-              <Ionicons name="document-text" size={24} color="white" />
-            )}
-            <Text className="text-white font-semibold text-lg ml-2">
-              {isGeneratingPDF ? 'Generating PDF...' : 'Generate PDF Report'}
-            </Text>
-          </TouchableOpacity>
-
-          {/* Punch Records List */}
-          <View className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <View className="p-4 border-b border-gray-200">
-              <Text className="text-lg font-semibold text-gray-800">Punch Records</Text>
-              <Text className="text-sm text-gray-600 mt-1">
-                {filteredRecords.length} record{filteredRecords.length !== 1 ? 's' : ''} found
-              </Text>
-            </View>
-
-            {filteredRecords.length === 0 ? (
-              <View className="p-8 items-center">
-                <Ionicons name="document-outline" size={48} color="#9ca3af" />
-                <Text className="text-gray-500 text-lg mt-4 text-center">
-                  No punch records found
-                </Text>
-                <Text className="text-gray-400 text-sm mt-2 text-center">
-                  Try adjusting the date range or add some punch records
-                </Text>
-              </View>
-            ) : (
-              <ScrollView className="max-h-96">
-                {groupRecordsByDate().map(([date, records]) => (
-                  <View key={date} className="border-b border-gray-100 last:border-b-0">
-                    <View className="bg-gray-50 px-4 py-2">
-                      <Text className="font-semibold text-gray-800">{formatDate(date)}</Text>
+          {/* Prominent Generate PDF Button */}
+          <Animated.View style={[cardAnimatedStyle, buttonAnimatedStyle]}>
+            <TouchableOpacity
+              onPress={handleGeneratePDF}
+              disabled={isGeneratingPDF || filteredRecords.length === 0}
+              activeOpacity={0.9}
+              className="overflow-hidden rounded-3xl shadow-xl"
+            >
+              <LinearGradient
+                colors={isGeneratingPDF || filteredRecords.length === 0 
+                  ? ['#9ca3af', '#6b7280'] 
+                  : ['#3b82f6', '#8b5cf6', '#6366f1']
+                }
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                className="p-6"
+              >
+                <View className="flex-row items-center justify-center">
+                  {isGeneratingPDF ? (
+                    <ActivityIndicator color="white" size="large" />
+                  ) : (
+                    <View className="w-12 h-12 bg-white/20 rounded-full justify-center items-center mr-4">
+                      <Ionicons name="document-text" size={28} color="white" />
                     </View>
-                    {records.map((record, index) => (
-                      <View key={record.id} className="px-4 py-3">
+                  )}
+                  <View className="flex-1">
+                    <Text className="text-white font-bold text-xl text-center">
+                      {isGeneratingPDF ? 'Generating PDF...' : 'Generate PDF Report'}
+                    </Text>
+                    <Text className="text-white/80 text-sm text-center mt-1">
+                      {filteredRecords.length} record{filteredRecords.length !== 1 ? 's' : ''} • {formatDuration(summary.totalHours)}
+                    </Text>
+                  </View>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+
+          {/* Enhanced Punch Records List */}
+          <Animated.View style={cardAnimatedStyle}>
+            <View className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+              <View className="p-6 border-b border-gray-100">
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-row items-center">
+                    <View className="w-4 h-4 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 mr-3" />
+                    <Text className="text-2xl font-bold text-gray-800">Daily Records</Text>
+                  </View>
+                  <View className="bg-blue-100 px-3 py-1 rounded-full">
+                    <Text className="text-blue-700 font-medium text-sm">
+                      {filteredRecords.length} record{filteredRecords.length !== 1 ? 's' : ''}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
+              {filteredRecords.length === 0 ? (
+                <View className="p-12 items-center">
+                  <View className="w-20 h-20 bg-gray-100 rounded-full justify-center items-center mb-4">
+                    <Ionicons name="document-outline" size={32} color="#9ca3af" />
+                  </View>
+                  <Text className="text-gray-600 text-xl font-semibold mb-2 text-center">
+                    No punch records found
+                  </Text>
+                  <Text className="text-gray-400 text-center">
+                    Try adjusting the date range or add some punch records
+                  </Text>
+                </View>
+              ) : (
+                <ScrollView className="max-h-96">
+                  {groupRecordsByDate().map(([date, records]) => (
+                    <View key={date} className="overflow-hidden">
+                      <LinearGradient
+                        colors={getDayBackground(date)}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        className="px-6 py-4"
+                      >
                         <View className="flex-row items-center justify-between">
-                          <View className="flex-1">
-                            <View className="flex-row items-center space-x-4">
-                              <Text className="text-gray-600 min-w-[60px]">
-                                {formatTime(record.punchIn)}
-                              </Text>
-                              <Ionicons name="arrow-forward" size={16} color="#9ca3af" />
-                              <Text className="text-gray-600 min-w-[60px]">
-                                {formatTime(record.punchOut)}
-                              </Text>
-                            </View>
-                            {record.notes && (
-                              <Text className="text-sm text-gray-500 mt-1">{record.notes}</Text>
+                          <View className="flex-row items-center">
+                            <Text className="font-bold text-gray-800 text-lg">{formatDate(date)}</Text>
+                            {(isWeekend(date) || isHoliday(date)) && (
+                              <View className="ml-3 bg-white/60 px-2 py-1 rounded-full">
+                                <Text className="text-xs font-medium text-gray-700">
+                                  {isHoliday(date) ? 'Holiday' : 'Weekend'}
+                                </Text>
+                              </View>
                             )}
                           </View>
-                          <Text className="font-semibold text-green-600">
-                            {formatDuration(record.totalHours)}
+                          <Text className="font-bold text-gray-800">
+                            {formatDuration(records.reduce((sum, r) => sum + (r.totalHours || 0), 0))}
                           </Text>
                         </View>
-                      </View>
-                    ))}
-                  </View>
-                ))}
-              </ScrollView>
-            )}
-          </View>
+                      </LinearGradient>
+                      
+                      {records.map((record, index) => (
+                        <View key={record.id} className="px-6 py-4 border-b border-gray-100 last:border-b-0">
+                          <View className="flex-row items-center justify-between">
+                            <View className="flex-1">
+                              <View className="flex-row items-center space-x-4">
+                                <View className="flex-row items-center">
+                                  <Ionicons name="log-in" size={16} color="#3b82f6" />
+                                  <Text className="text-gray-700 font-mono ml-2">
+                                    {formatTime(record.punchIn)}
+                                  </Text>
+                                </View>
+                                <Ionicons name="arrow-forward" size={16} color="#9ca3af" />
+                                <View className="flex-row items-center">
+                                  <Ionicons name="log-out" size={16} color="#ef4444" />
+                                  <Text className="text-gray-700 font-mono ml-2">
+                                    {formatTime(record.punchOut)}
+                                  </Text>
+                                </View>
+                              </View>
+                              {record.notes && (
+                                <Text className="text-sm text-gray-500 mt-2 italic">"{record.notes}"</Text>
+                              )}
+                            </View>
+                            <View className="bg-green-100 px-3 py-2 rounded-xl">
+                              <Text className="font-bold text-green-700">
+                                {formatDuration(record.totalHours)}
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                      ))}
+                    </View>
+                  ))}
+                </ScrollView>
+              )}
+            </View>
+          </Animated.View>
 
           {/* Quick Actions */}
-          <View className="bg-white rounded-lg shadow-sm p-4">
-            <Text className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</Text>
-            <View className="space-y-3">
-              <TouchableOpacity 
-                onPress={() => {
-                  const today = new Date();
-                  const twoWeeksAgo = new Date();
-                  twoWeeksAgo.setDate(today.getDate() - 14);
-                  setStartDate(twoWeeksAgo);
-                  setEndDate(today);
-                }}
-                className="flex-row items-center p-3 bg-blue-50 rounded-lg"
-              >
-                <Ionicons name="calendar" size={20} color="#3b82f6" />
-                <Text className="text-blue-700 font-medium ml-3">Last 2 Weeks</Text>
-              </TouchableOpacity>
+          <Animated.View style={cardAnimatedStyle}>
+            <View className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+              <View className="flex-row items-center mb-6">
+                <View className="w-4 h-4 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 mr-3" />
+                <Text className="text-2xl font-bold text-gray-800">Quick Actions</Text>
+              </View>
               
-              <TouchableOpacity 
-                onPress={() => {
-                  const today = new Date();
-                  const lastMonth = new Date();
-                  lastMonth.setMonth(today.getMonth() - 1);
-                  setStartDate(lastMonth);
-                  setEndDate(today);
-                }}
-                className="flex-row items-center p-3 bg-green-50 rounded-lg"
-              >
-                <Ionicons name="calendar-outline" size={20} color="#10b981" />
-                <Text className="text-green-700 font-medium ml-3">Last Month</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                onPress={() => {
-                  const today = new Date();
-                  setStartDate(today);
-                  setEndDate(today);
-                }}
-                className="flex-row items-center p-3 bg-purple-50 rounded-lg"
-              >
-                <Ionicons name="today" size={20} color="#8b5cf6" />
-                <Text className="text-purple-700 font-medium ml-3">Today Only</Text>
-              </TouchableOpacity>
+              <View className="space-y-4">
+                <TouchableOpacity 
+                  onPress={() => {
+                    const today = new Date();
+                    const twoWeeksAgo = new Date();
+                    twoWeeksAgo.setDate(today.getDate() - 14);
+                    setStartDate(twoWeeksAgo);
+                    setEndDate(today);
+                  }}
+                  className="flex-row items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100"
+                  activeOpacity={0.8}
+                >
+                  <View className="w-10 h-10 bg-blue-500 rounded-full justify-center items-center mr-4">
+                    <Ionicons name="calendar" size={20} color="white" />
+                  </View>
+                  <Text className="text-blue-700 font-semibold text-lg">Last 2 Weeks</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  onPress={() => {
+                    const today = new Date();
+                    const lastMonth = new Date();
+                    lastMonth.setMonth(today.getMonth() - 1);
+                    setStartDate(lastMonth);
+                    setEndDate(today);
+                  }}
+                  className="flex-row items-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-100"
+                  activeOpacity={0.8}
+                >
+                  <View className="w-10 h-10 bg-green-500 rounded-full justify-center items-center mr-4">
+                    <Ionicons name="calendar-outline" size={20} color="white" />
+                  </View>
+                  <Text className="text-green-700 font-semibold text-lg">Last Month</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  onPress={() => {
+                    const today = new Date();
+                    setStartDate(today);
+                    setEndDate(today);
+                  }}
+                  className="flex-row items-center p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl border border-purple-100"
+                  activeOpacity={0.8}
+                >
+                  <View className="w-10 h-10 bg-purple-500 rounded-full justify-center items-center mr-4">
+                    <Ionicons name="today" size={20} color="white" />
+                  </View>
+                  <Text className="text-purple-700 font-semibold text-lg">Today Only</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          </Animated.View>
         </View>
       </ScrollView>
     </View>
