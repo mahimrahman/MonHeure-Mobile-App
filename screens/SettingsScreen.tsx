@@ -10,6 +10,14 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withSpring,
+  withTiming,
+  Easing
+} from 'react-native-reanimated';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
@@ -40,6 +48,10 @@ export default function SettingsScreen() {
   // Clear data modal
   const [showClearModal, setShowClearModal] = useState(false);
 
+  // Animation values
+  const cardOpacity = useSharedValue(0);
+  const cardTranslateY = useSharedValue(30);
+
   // Load settings from AsyncStorage
   useEffect(() => {
     (async () => {
@@ -54,6 +66,12 @@ export default function SettingsScreen() {
       setDarkTheme(theme === 'dark');
       setNotificationsEnabled(notif === 'true');
     })();
+  }, []);
+
+  // Start animations on mount
+  useEffect(() => {
+    cardOpacity.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) });
+    cardTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
   }, []);
 
   // Save settings to AsyncStorage
@@ -181,159 +199,303 @@ export default function SettingsScreen() {
     return d;
   };
 
+  // Animated styles
+  const cardAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: cardOpacity.value,
+      transform: [{ translateY: cardTranslateY.value }],
+    };
+  });
+
+  const SettingItem = ({ 
+    icon, 
+    title, 
+    subtitle, 
+    value, 
+    onPress, 
+    iconColor = '#3b82f6',
+    showSwitch = false,
+    switchValue = false,
+    onSwitchChange = () => {},
+    showChevron = true,
+    showCheckmark = false,
+    isSelected = false
+  }: {
+    icon: string;
+    title: string;
+    subtitle?: string;
+    value?: string;
+    onPress?: () => void;
+    iconColor?: string;
+    showSwitch?: boolean;
+    switchValue?: boolean;
+    onSwitchChange?: (value: boolean) => void;
+    showChevron?: boolean;
+    showCheckmark?: boolean;
+    isSelected?: boolean;
+  }) => (
+    <TouchableOpacity
+      onPress={onPress}
+      className="flex-row items-center justify-between p-4 border-b border-gray-100 last:border-b-0"
+      activeOpacity={0.7}
+    >
+      <View className="flex-row items-center flex-1">
+        <View className="w-10 h-10 rounded-full justify-center items-center mr-4" style={{ backgroundColor: `${iconColor}20` }}>
+          <Ionicons name={icon as any} size={20} color={iconColor} />
+        </View>
+        <View className="flex-1">
+          <Text className="text-gray-800 font-semibold text-lg">{title}</Text>
+          {subtitle && <Text className="text-gray-500 text-sm mt-1">{subtitle}</Text>}
+        </View>
+      </View>
+      
+      <View className="flex-row items-center">
+        {value && (
+          <Text className="text-gray-600 font-medium mr-3">{value}</Text>
+        )}
+        {showCheckmark && isSelected && (
+          <View className="w-6 h-6 bg-green-500 rounded-full justify-center items-center mr-3">
+            <Ionicons name="checkmark" size={14} color="white" />
+          </View>
+        )}
+        {showSwitch ? (
+          <Switch 
+            value={switchValue} 
+            onValueChange={onSwitchChange}
+            trackColor={{ false: '#e5e7eb', true: '#3b82f6' }}
+            thumbColor={switchValue ? '#ffffff' : '#f3f4f6'}
+          />
+        ) : showChevron ? (
+          <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+        ) : null}
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
-    <ScrollView className={darkTheme ? 'flex-1 bg-gray-900' : 'flex-1 bg-gray-50'}>
-      <View className="p-4">
-        {/* Header */}
-        <View className="mb-6">
-          <Text className={darkTheme ? 'text-2xl font-bold text-white' : 'text-2xl font-bold text-gray-800'}>Settings</Text>
-          <Text className={darkTheme ? 'text-gray-300 mt-1' : 'text-gray-600 mt-1'}>Customize your experience</Text>
-        </View>
+    <View className="flex-1 bg-gradient-to-b from-gray-50 via-blue-50 to-indigo-50">
+      {/* Header */}
+      <View className="bg-white pt-12 pb-6 px-6 border-b border-gray-100 shadow-sm">
+        <Text className="text-3xl font-bold text-gray-800 mb-2">Settings</Text>
+        <Text className="text-gray-600 text-lg">Customize your experience</Text>
+      </View>
 
-        {/* Default Punch Times */}
-        <View className={darkTheme ? 'bg-gray-800 rounded-lg shadow-sm mb-6 overflow-hidden' : 'bg-white rounded-lg shadow-sm mb-6 overflow-hidden'}>
-          <View className="p-4 border-b border-gray-100">
-            <Text className={darkTheme ? 'text-lg font-semibold text-white' : 'text-lg font-semibold text-gray-800'}>Default Punch Times</Text>
-          </View>
-          <TouchableOpacity
-            className="p-4 flex-row items-center justify-between border-b border-gray-100"
-            onPress={() => setShowPunchInPicker(true)}
-          >
-            <View className="flex-row items-center">
-              <Ionicons name="log-in" size={20} color="#3b82f6" />
-              <Text className={darkTheme ? 'ml-3 text-white' : 'ml-3 text-gray-800'}>Default Punch In</Text>
-            </View>
-            <Text className={darkTheme ? 'text-white' : 'text-gray-800'}>{defaultPunchIn}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="p-4 flex-row items-center justify-between"
-            onPress={() => setShowPunchOutPicker(true)}
-          >
-            <View className="flex-row items-center">
-              <Ionicons name="log-out" size={20} color="#ef4444" />
-              <Text className={darkTheme ? 'ml-3 text-white' : 'ml-3 text-gray-800'}>Default Punch Out</Text>
-            </View>
-            <Text className={darkTheme ? 'text-white' : 'text-gray-800'}>{defaultPunchOut}</Text>
-          </TouchableOpacity>
-        </View>
-        {showPunchInPicker && (
-          <DateTimePicker
-            value={parseTime(defaultPunchIn)}
-            mode="time"
-            is24Hour={true}
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={(event, date) => handleTimeChange('in', event, date)}
-          />
-        )}
-        {showPunchOutPicker && (
-          <DateTimePicker
-            value={parseTime(defaultPunchOut)}
-            mode="time"
-            is24Hour={true}
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={(event, date) => handleTimeChange('out', event, date)}
-          />
-        )}
-
-        {/* Dashboard View Preference */}
-        <View className={darkTheme ? 'bg-gray-800 rounded-lg shadow-sm mb-6 overflow-hidden' : 'bg-white rounded-lg shadow-sm mb-6 overflow-hidden'}>
-          <View className="p-4 border-b border-gray-100">
-            <Text className={darkTheme ? 'text-lg font-semibold text-white' : 'text-lg font-semibold text-gray-800'}>Default Dashboard View</Text>
-          </View>
-          {DASHBOARD_VIEWS.map((view) => (
-            <TouchableOpacity
-              key={view}
-              className="p-4 flex-row items-center justify-between border-b border-gray-100 last:border-b-0"
-              onPress={() => handleDashboardViewChange(view)}
-            >
-              <View className="flex-row items-center">
-                <Ionicons name={view === 'Weekly' ? 'calendar' : view === 'Monthly' ? 'calendar-outline' : 'bar-chart'} size={20} color="#3b82f6" />
-                <Text className={darkTheme ? 'ml-3 text-white' : 'ml-3 text-gray-800'}>{view}</Text>
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+        <View className="p-6 space-y-6">
+          {/* Preferences Section */}
+          <Animated.View style={cardAnimatedStyle}>
+            <View className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+              <View className="p-6 border-b border-gray-100">
+                <View className="flex-row items-center">
+                  <View className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 mr-3" />
+                  <Text className="text-2xl font-bold text-gray-800">Preferences</Text>
+                </View>
               </View>
-              {dashboardView === view && <Ionicons name="checkmark-circle" size={20} color="#10b981" />}
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Theme Toggle */}
-        <View className={darkTheme ? 'bg-gray-800 rounded-lg shadow-sm mb-6 overflow-hidden' : 'bg-white rounded-lg shadow-sm mb-6 overflow-hidden'}>
-          <View className="p-4 border-b border-gray-100">
-            <Text className={darkTheme ? 'text-lg font-semibold text-white' : 'text-lg font-semibold text-gray-800'}>Theme</Text>
-          </View>
-          <View className="p-4 flex-row items-center justify-between">
-            <View className="flex-row items-center">
-              <Ionicons name={darkTheme ? 'moon' : 'sunny'} size={20} color={darkTheme ? '#f59e0b' : '#3b82f6'} />
-              <Text className={darkTheme ? 'ml-3 text-white' : 'ml-3 text-gray-800'}>{darkTheme ? 'Dark' : 'Light'} Mode</Text>
+              
+              <SettingItem
+                icon="time"
+                title="Default Punch In"
+                subtitle="Set your default start time"
+                value={defaultPunchIn}
+                onPress={() => setShowPunchInPicker(true)}
+                iconColor="#3b82f6"
+              />
+              
+              <SettingItem
+                icon="time-outline"
+                title="Default Punch Out"
+                subtitle="Set your default end time"
+                value={defaultPunchOut}
+                onPress={() => setShowPunchOutPicker(true)}
+                iconColor="#ef4444"
+              />
             </View>
-            <Switch value={darkTheme} onValueChange={handleThemeToggle} />
-          </View>
-        </View>
+          </Animated.View>
 
-        {/* Notification Toggle */}
-        <View className={darkTheme ? 'bg-gray-800 rounded-lg shadow-sm mb-6 overflow-hidden' : 'bg-white rounded-lg shadow-sm mb-6 overflow-hidden'}>
-          <View className="p-4 border-b border-gray-100">
-            <Text className={darkTheme ? 'text-lg font-semibold text-white' : 'text-lg font-semibold text-gray-800'}>Reminders</Text>
-          </View>
-          <View className="p-4 flex-row items-center justify-between">
-            <View className="flex-row items-center">
-              <Ionicons name="notifications" size={20} color="#3b82f6" />
-              <Text className={darkTheme ? 'ml-3 text-white' : 'ml-3 text-gray-800'}>Punch Out Reminder (6:00 PM)</Text>
+          {/* Appearance Section */}
+          <Animated.View style={cardAnimatedStyle}>
+            <View className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+              <View className="p-6 border-b border-gray-100">
+                <View className="flex-row items-center">
+                  <View className="w-4 h-4 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 mr-3" />
+                  <Text className="text-2xl font-bold text-gray-800">Appearance</Text>
+                </View>
+              </View>
+              
+              <SettingItem
+                icon="color-palette"
+                title="Theme"
+                subtitle="Choose your preferred theme"
+                value={darkTheme ? 'Dark' : 'Light'}
+                onPress={handleThemeToggle}
+                iconColor="#8b5cf6"
+                showSwitch={true}
+                switchValue={darkTheme}
+                onSwitchChange={handleThemeToggle}
+                showChevron={false}
+              />
+              
+              <SettingItem
+                icon="grid"
+                title="Dashboard View"
+                subtitle="Default chart view"
+                value={dashboardView}
+                onPress={() => {}}
+                iconColor="#10b981"
+                showChevron={false}
+              />
+              
+              {DASHBOARD_VIEWS.map((view) => (
+                <SettingItem
+                  key={view}
+                  icon={view === 'Weekly' ? 'calendar' : view === 'Monthly' ? 'calendar-outline' : 'bar-chart'}
+                  title={view}
+                  onPress={() => handleDashboardViewChange(view)}
+                  iconColor="#6b7280"
+                  showCheckmark={true}
+                  isSelected={dashboardView === view}
+                  showChevron={false}
+                />
+              ))}
             </View>
-            <Switch value={notificationsEnabled} onValueChange={setNotificationsEnabled} />
-          </View>
-        </View>
+          </Animated.View>
 
-        {/* Clear All Data */}
-        <View className={darkTheme ? 'bg-gray-800 rounded-lg shadow-sm mb-6 overflow-hidden' : 'bg-white rounded-lg shadow-sm mb-6 overflow-hidden'}>
-          <View className="p-4 border-b border-gray-100">
-            <Text className={darkTheme ? 'text-lg font-semibold text-white' : 'text-lg font-semibold text-gray-800'}>Danger Zone</Text>
-          </View>
-          <TouchableOpacity
-            className="p-4 flex-row items-center justify-between border-b border-gray-100"
-            onPress={handleResetStore}
-          >
-            <View className="flex-row items-center">
-              <Ionicons name="refresh-circle" size={20} color="#f59e0b" />
-              <Text className={darkTheme ? 'ml-3 text-yellow-400' : 'ml-3 text-yellow-600'}>Reset Store State</Text>
+          {/* Notifications Section */}
+          <Animated.View style={cardAnimatedStyle}>
+            <View className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+              <View className="p-6 border-b border-gray-100">
+                <View className="flex-row items-center">
+                  <View className="w-4 h-4 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 mr-3" />
+                  <Text className="text-2xl font-bold text-gray-800">Notifications</Text>
+                </View>
+              </View>
+              
+              <SettingItem
+                icon="notifications"
+                title="Punch Out Reminder"
+                subtitle="Daily reminder at 6:00 PM"
+                onPress={() => setNotificationsEnabled(!notificationsEnabled)}
+                iconColor="#10b981"
+                showSwitch={true}
+                switchValue={notificationsEnabled}
+                onSwitchChange={setNotificationsEnabled}
+                showChevron={false}
+              />
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            className="p-4 flex-row items-center justify-between"
-            onPress={() => setShowClearModal(true)}
-          >
-            <View className="flex-row items-center">
-              <Ionicons name="trash" size={20} color="#ef4444" />
-              <Text className={darkTheme ? 'ml-3 text-red-400' : 'ml-3 text-red-600'}>Clear All Data</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
-          </TouchableOpacity>
-        </View>
+          </Animated.View>
 
-        {/* Confirmation Modal */}
-        <Modal
-          visible={showClearModal}
-          transparent
-          animationType="fade"
-        >
-          <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
-            <View className={darkTheme ? 'bg-gray-800 rounded-lg p-6 w-80' : 'bg-white rounded-lg p-6 w-80'}>
-              <Text className={darkTheme ? 'text-lg font-bold text-white mb-4' : 'text-lg font-bold text-gray-800 mb-4'}>Clear All Data?</Text>
-              <Text className={darkTheme ? 'text-gray-300 mb-6' : 'text-gray-600 mb-6'}>
+          {/* Data Management Section */}
+          <Animated.View style={cardAnimatedStyle}>
+            <View className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+              <View className="p-6 border-b border-gray-100">
+                <View className="flex-row items-center">
+                  <View className="w-4 h-4 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 mr-3" />
+                  <Text className="text-2xl font-bold text-gray-800">Data Management</Text>
+                </View>
+              </View>
+              
+              <SettingItem
+                icon="refresh-circle"
+                title="Reset Store State"
+                subtitle="Reset current punch state"
+                onPress={handleResetStore}
+                iconColor="#f59e0b"
+              />
+            </View>
+          </Animated.View>
+
+          {/* Danger Zone */}
+          <Animated.View style={cardAnimatedStyle}>
+            <View className="bg-gradient-to-r from-red-50 to-rose-50 rounded-3xl shadow-xl overflow-hidden border border-red-200">
+              <View className="p-6 border-b border-red-200">
+                <View className="flex-row items-center">
+                  <View className="w-4 h-4 rounded-full bg-gradient-to-r from-red-500 to-rose-500 mr-3" />
+                  <Text className="text-2xl font-bold text-red-800">⚠️ Danger Zone</Text>
+                </View>
+                <Text className="text-red-600 text-sm mt-2">Irreversible actions</Text>
+              </View>
+              
+              <TouchableOpacity
+                onPress={() => setShowClearModal(true)}
+                className="p-6 flex-row items-center justify-between"
+                activeOpacity={0.7}
+              >
+                <View className="flex-row items-center flex-1">
+                  <View className="w-12 h-12 bg-red-100 rounded-full justify-center items-center mr-4">
+                    <Ionicons name="trash" size={24} color="#ef4444" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-red-800 font-bold text-lg">Clear All Data</Text>
+                    <Text className="text-red-600 text-sm mt-1">Permanently delete all stored data</Text>
+                  </View>
+                </View>
+                <View className="bg-red-500 px-4 py-2 rounded-xl">
+                  <Text className="text-white font-semibold">Delete</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </View>
+      </ScrollView>
+
+      {/* Time Pickers */}
+      {showPunchInPicker && (
+        <DateTimePicker
+          value={parseTime(defaultPunchIn)}
+          mode="time"
+          is24Hour={true}
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={(event, date) => handleTimeChange('in', event, date)}
+        />
+      )}
+      {showPunchOutPicker && (
+        <DateTimePicker
+          value={parseTime(defaultPunchOut)}
+          mode="time"
+          is24Hour={true}
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={(event, date) => handleTimeChange('out', event, date)}
+        />
+      )}
+
+      {/* Confirmation Modal */}
+      <Modal
+        visible={showClearModal}
+        transparent
+        animationType="fade"
+      >
+        <View className="flex-1 bg-black bg-opacity-50 justify-center items-center p-6">
+          <View className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl">
+            <View className="items-center mb-6">
+              <View className="w-16 h-16 bg-red-100 rounded-full justify-center items-center mb-4">
+                <Ionicons name="warning" size={32} color="#ef4444" />
+              </View>
+              <Text className="text-2xl font-bold text-gray-800 mb-2">Clear All Data?</Text>
+              <Text className="text-gray-600 text-center leading-6">
                 This will permanently delete all your stored data, including punch records and preferences. This action cannot be undone.
               </Text>
-              <View className="flex-row justify-end space-x-4">
-                <TouchableOpacity onPress={() => setShowClearModal(false)}>
-                  <Text className={darkTheme ? 'text-gray-300 font-semibold' : 'text-gray-700 font-semibold'}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleClearAllData}>
-                  <Text className="text-red-600 font-semibold">Delete</Text>
-                </TouchableOpacity>
-              </View>
+            </View>
+            
+            <View className="space-y-3">
+              <TouchableOpacity 
+                onPress={handleClearAllData}
+                className="bg-red-500 p-4 rounded-2xl"
+                activeOpacity={0.8}
+              >
+                <Text className="text-white font-bold text-lg text-center">Delete All Data</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                onPress={() => setShowClearModal(false)}
+                className="bg-gray-100 p-4 rounded-2xl"
+                activeOpacity={0.8}
+              >
+                <Text className="text-gray-700 font-semibold text-lg text-center">Cancel</Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </Modal>
-      </View>
-    </ScrollView>
+        </View>
+      </Modal>
+    </View>
   );
 } 
