@@ -40,6 +40,19 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Share & Email**: Share reports via email or other apps with `react-native-share`
 - **Quick Actions**: One-tap for common ranges (last 2 weeks, last month, today)
 
+### ⚙️ Enhanced Settings & Preferences
+- **Grouped Settings Sections**: Organized into logical categories with colorful indicators
+  - **Preferences** (Blue gradient) - Default punch times
+  - **Appearance** (Purple gradient) - Theme and dashboard view
+  - **Notifications** (Green gradient) - Punch out reminders
+  - **Data Management** (Orange gradient) - Store reset
+  - **Danger Zone** (Red gradient) - Data clearing
+- **Colorful Icons**: Each setting has a colored icon with subtle background
+- **Smart Toggles**: Custom-colored switches for theme and notifications
+- **Visual Indicators**: Checkmarks for selected options, chevrons for navigation
+- **Danger Zone**: Prominent red warning area for irreversible actions
+- **Enhanced Modal**: Improved confirmation dialogs with warning icons
+
 ### 🎨 Modern UI Design
 - **Gradient Backgrounds**: Beautiful color gradients throughout the app
 - **Rounded Corners**: Modern card design with proper border radius
@@ -101,6 +114,13 @@ The app features a modern, intuitive interface with:
 - **Edit/Delete buttons**: Icon-based buttons with proper styling
 - **Smooth transitions**: Spring animations for all interactions
 
+### ⚙️ Settings Screen
+- **Grouped sections**: Organized settings with colorful gradient indicators
+- **Modern cards**: Rounded corners with shadows and borders
+- **Interactive elements**: Switches, toggles, and selection indicators
+- **Danger zone**: Prominent red warning area for data clearing
+- **Enhanced modals**: Improved confirmation dialogs with icons
+
 ## 🚦 Quick Start
 
 ### Prerequisites
@@ -149,7 +169,7 @@ MonHeure-Mobile-App/
 │   ├── DashboardScreen.tsx # Enhanced analytics with charts and stat cards
 │   ├── HistoryScreen.tsx   # Modern calendar with slide-up day cards
 │   ├── ReportScreen.tsx    # Custom date range reporting & PDF export
-│   └── SettingsScreen.tsx  # Preferences, theme, data management
+│   └── SettingsScreen.tsx  # Enhanced settings with grouped sections
 ├── components/
 │   ├── EditPunchModal.tsx  # Modal for editing punch records with validation
 │   └── DateRangePicker.tsx # Interactive date range picker for reports
@@ -202,6 +222,13 @@ MonHeure-Mobile-App/
 - **Time Period Toggle**: Switch between week/month/year views
 - **Productivity Insights**: Enhanced metrics with visual indicators
 - **Smooth Animations**: Staggered entrance animations for all elements
+
+### Enhanced Settings & Preferences
+- **Grouped Organization**: Settings organized into logical sections with visual indicators
+- **Colorful Design**: Each section has unique gradient colors and icons
+- **Interactive Elements**: Switches, toggles, and selection indicators
+- **Danger Zone**: Prominent warning area for irreversible actions
+- **Modern Modals**: Enhanced confirmation dialogs with icons and better styling
 
 ### Custom Date Range Reports
 - **Flexible Date Selection**: Choose any date range with interactive picker
@@ -293,7 +320,15 @@ npx expo build:ios
 
 ## 🔄 Recent Updates
 
-### 🎨 UI/UX Redesign (Latest)
+### ⚙️ Settings Screen Redesign (Latest)
+- **Grouped Sections**: Settings organized into logical categories with colorful gradient indicators
+- **Modern Cards**: Rounded corners with shadows and borders for each section
+- **Interactive Elements**: Switches, toggles, and selection indicators with custom colors
+- **Danger Zone**: Prominent red warning area with enhanced styling for data clearing
+- **Enhanced Modals**: Improved confirmation dialogs with warning icons and better UX
+- **Smooth Animations**: Spring-based entrance animations for all setting cards
+
+### 🎨 UI/UX Redesign
 - **Home Screen**: Large circular gradient button with glow effects and status text
 - **Dashboard**: Horizontally scrollable stat cards with gradient backgrounds
 - **History Screen**: Slide-up day cards with pastel backgrounds and swipe gestures
