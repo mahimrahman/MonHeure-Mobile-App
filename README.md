@@ -63,7 +63,7 @@ A modern React Native mobile application built with Expo for efficient time trac
 
 ### 🔧 Advanced Features
 - **Global State Management**: Zustand-powered state management with persistence
-- **AsyncStorage Database**: Robust local database storage with full CRUD operations
+- **SQLite Database**: Robust local database storage with full CRUD operations
 - **Sample Data Generation**: Load sample data for testing and demonstration
 - **Data Export**: Export all data with comprehensive reporting
 - **Data Integrity**: Proper validation and error handling
@@ -78,7 +78,8 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Expo Router** for file-based navigation
 - **Zustand** for global state management with persistence
 - **Expo Vector Icons** for beautiful icons
-- **AsyncStorage** for robust local database storage and settings
+- **SQLite** for robust local database storage
+- **AsyncStorage** for settings and preferences
 - **react-native-calendars** for interactive calendar UI
 - **react-native-chart-kit** for analytics and data visualization
 - **react-native-html-to-pdf** for professional PDF export
@@ -177,7 +178,7 @@ MonHeure-Mobile-App/
 │   ├── nativewind.d.ts     # NativeWind type definitions
 │   └── punch.ts           # Punch data types and interfaces
 ├── utils/
-│   ├── database.ts        # AsyncStorage database operations and CRUD functions
+│   ├── database.ts        # SQLite database operations and CRUD functions
 │   ├── punchStore.ts      # Zustand global state management store
 │   ├── timeCalculations.ts # Enhanced time calculation utilities with chart data
 │   ├── storage.ts         # AsyncStorage helpers for settings
@@ -238,7 +239,7 @@ MonHeure-Mobile-App/
 - **Multiple Share Options**: Email, messaging, or save to device
 
 ### Data Management
-- **AsyncStorage Database**: Robust, performant local storage with full CRUD operations
+- **SQLite Database**: Robust, performant local storage with full CRUD operations
 - **Data Integrity**: Proper validation, error handling, and transaction support
 - **Sample Data**: Generate realistic sample data for testing and demonstration
 - **Export Capabilities**: Complete data export with professional formatting
@@ -281,6 +282,22 @@ const buttonAnimatedStyle = useAnimatedStyle(() => ({
 }));
 ```
 
+### Database Operations
+```typescript
+// SQLite database operations
+import { addPunchEntry, fetchEntriesForDay, updatePunchEntry } from '../utils/database';
+
+// Add new punch entry
+const newEntry = await addPunchEntry({
+  date: '2024-01-15',
+  punchIn: new Date().toISOString(),
+  notes: 'Started work'
+});
+
+// Fetch today's entries
+const todayEntries = await fetchEntriesForDay('2024-01-15');
+```
+
 ### Adding New Features
 1. Create new screen components in `screens/`
 2. Add navigation routes in `app/` directory (Expo Router)
@@ -299,12 +316,54 @@ const buttonAnimatedStyle = useAnimatedStyle(() => ({
 - **Async/await** for database and storage operations
 - **Error Handling** with proper user feedback
 
-### Database Operations
-- **AsyncStorage Integration**: All punch data stored in local AsyncStorage database
-- **CRUD Operations**: Full create, read, update, delete functionality
-- **Query Optimization**: Efficient queries with proper data structure
-- **Transaction Support**: Data integrity with proper error handling
-- **State Synchronization**: Automatic sync between Zustand store and database
+## 🚀 Performance Tips
+
+### Optimization Strategies
+- **Lazy Loading**: Components load only when needed
+- **Memoization**: Use React.memo for expensive components
+- **Efficient Animations**: Use native driver for better performance
+- **Database Queries**: Optimize queries with proper indexing
+- **Image Optimization**: Use appropriate image formats and sizes
+
+### Memory Management
+- **Cleanup Effects**: Proper cleanup in useEffect hooks
+- **Event Listeners**: Remove listeners when components unmount
+- **Database Connections**: Proper connection management
+- **State Cleanup**: Clear unnecessary state on navigation
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### Metro Bundler Issues
+```bash
+# Clear metro cache
+npx expo start --clear
+
+# Reset cache completely
+rm -rf node_modules && npm install
+```
+
+#### Animation Performance
+- Use `useNativeDriver: true` for transform animations
+- Avoid animating layout properties on Android
+- Use `runOnJS` for JavaScript callbacks in animations
+
+#### Database Issues
+- Ensure database is properly initialized
+- Check for proper error handling in database operations
+- Verify data types match expected schema
+
+#### Build Issues
+```bash
+# Clear all caches
+npx expo start --clear
+npx expo install --fix
+
+# Rebuild node_modules
+rm -rf node_modules package-lock.json
+npm install
+```
 
 ## 📦 Building for Production
 
@@ -316,6 +375,36 @@ npx expo build:android
 ### iOS App Store
 ```bash
 npx expo build:ios
+```
+
+### EAS Build (Recommended)
+```bash
+# Install EAS CLI
+npm install -g @expo/eas-cli
+
+# Configure EAS
+eas build:configure
+
+# Build for Android
+eas build --platform android
+
+# Build for iOS
+eas build --platform ios
+```
+
+### EAS Build (Recommended)
+```bash
+# Install EAS CLI
+npm install -g @expo/eas-cli
+
+# Configure EAS
+eas build:configure
+
+# Build for Android
+eas build --platform android
+
+# Build for iOS
+eas build --platform ios
 ```
 
 ## 🔄 Recent Updates
@@ -355,6 +444,55 @@ npx expo build:ios
 - **Sample Data**: Built-in sample data generator for testing and demonstration
 - **Touch Interactions**: Improved touch feedback and gesture handling
 
+## 🚀 Performance Tips
+
+### Optimization Strategies
+- **Lazy Loading**: Components load only when needed
+- **Memoization**: Use React.memo for expensive components
+- **Efficient Animations**: Use native driver for better performance
+- **Database Queries**: Optimize queries with proper indexing
+- **Image Optimization**: Use appropriate image formats and sizes
+
+### Memory Management
+- **Cleanup Effects**: Proper cleanup in useEffect hooks
+- **Event Listeners**: Remove listeners when components unmount
+- **Database Connections**: Proper connection management
+- **State Cleanup**: Clear unnecessary state on navigation
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### Metro Bundler Issues
+```bash
+# Clear metro cache
+npx expo start --clear
+
+# Reset cache completely
+rm -rf node_modules && npm install
+```
+
+#### Animation Performance
+- Use `useNativeDriver: true` for transform animations
+- Avoid animating layout properties on Android
+- Use `runOnJS` for JavaScript callbacks in animations
+
+#### Database Issues
+- Ensure database is properly initialized
+- Check for proper error handling in database operations
+- Verify data types match expected schema
+
+#### Build Issues
+```bash
+# Clear all caches
+npx expo start --clear
+npx expo install --fix
+
+# Rebuild node_modules
+rm -rf node_modules package-lock.json
+npm install
+```
+
 ## 🐛 Known Issues
 
 - **Sharing Features**: Temporarily disabled due to native module linking issues in SDK 53
@@ -367,6 +505,13 @@ npx expo build:ios
 3. Make your changes
 4. Test thoroughly
 5. Submit a pull request
+
+### Development Guidelines
+- Follow TypeScript best practices
+- Use functional components with hooks
+- Implement proper error handling
+- Add comprehensive tests
+- Update documentation for new features
 
 ## 📄 License
 
