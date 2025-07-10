@@ -219,7 +219,8 @@ export default function SettingsScreen() {
     onSwitchChange = () => {},
     showChevron = true,
     showCheckmark = false,
-    isSelected = false
+    isSelected = false,
+    gradientColors = null
   }: {
     icon: string;
     title: string;
@@ -233,29 +234,43 @@ export default function SettingsScreen() {
     showChevron?: boolean;
     showCheckmark?: boolean;
     isSelected?: boolean;
+    gradientColors?: string[];
   }) => (
     <TouchableOpacity
       onPress={onPress}
-      className="flex-row items-center justify-between p-4 border-b border-gray-100 last:border-b-0"
+      className="flex-row items-center justify-between p-5 border-b border-gray-100 last:border-b-0"
       activeOpacity={0.7}
     >
       <View className="flex-row items-center flex-1">
-        <View className="w-10 h-10 rounded-full justify-center items-center mr-4" style={{ backgroundColor: `${iconColor}20` }}>
-          <Ionicons name={icon as any} size={20} color={iconColor} />
+        <View className="w-12 h-12 rounded-2xl justify-center items-center mr-4 overflow-hidden">
+          {gradientColors ? (
+            <LinearGradient
+              colors={gradientColors}
+              className="w-full h-full justify-center items-center"
+            >
+              <Ionicons name={icon as any} size={22} color="white" />
+            </LinearGradient>
+          ) : (
+            <View className="w-full h-full justify-center items-center" style={{ backgroundColor: `${iconColor}15` }}>
+              <Ionicons name={icon as any} size={22} color={iconColor} />
+            </View>
+          )}
         </View>
         <View className="flex-1">
-          <Text className="text-gray-800 font-semibold text-lg">{title}</Text>
+          <Text className="text-gray-800 font-bold text-lg">{title}</Text>
           {subtitle && <Text className="text-gray-500 text-sm mt-1">{subtitle}</Text>}
         </View>
       </View>
       
       <View className="flex-row items-center">
         {value && (
-          <Text className="text-gray-600 font-medium mr-3">{value}</Text>
+          <View className="bg-gray-100 px-3 py-1 rounded-full mr-3">
+            <Text className="text-gray-700 font-semibold text-sm">{value}</Text>
+          </View>
         )}
         {showCheckmark && isSelected && (
-          <View className="w-6 h-6 bg-green-500 rounded-full justify-center items-center mr-3">
-            <Ionicons name="checkmark" size={14} color="white" />
+          <View className="w-7 h-7 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full justify-center items-center mr-3">
+            <Ionicons name="checkmark" size={16} color="white" />
           </View>
         )}
         {showSwitch ? (
@@ -264,50 +279,92 @@ export default function SettingsScreen() {
             onValueChange={onSwitchChange}
             trackColor={{ false: '#e5e7eb', true: '#3b82f6' }}
             thumbColor={switchValue ? '#ffffff' : '#f3f4f6'}
+            ios_backgroundColor="#e5e7eb"
           />
         ) : showChevron ? (
-          <Ionicons name="chevron-forward" size={20} color="#9ca3af" />
+          <View className="w-8 h-8 bg-gray-100 rounded-full justify-center items-center">
+            <Ionicons name="chevron-forward" size={16} color="#9ca3af" />
+          </View>
         ) : null}
       </View>
     </TouchableOpacity>
   );
 
-  return (
-    <View className="flex-1 bg-gradient-to-b from-gray-50 via-blue-50 to-indigo-50">
-      {/* Header */}
-      <View className="bg-white pt-12 pb-6 px-6 border-b border-gray-100 shadow-sm">
-        <Text className="text-3xl font-bold text-gray-800 mb-2">Settings</Text>
-        <Text className="text-gray-600 text-lg">Customize your experience</Text>
+  const SectionHeader = ({ 
+    title, 
+    subtitle, 
+    gradientColors, 
+    icon 
+  }: {
+    title: string;
+    subtitle?: string;
+    gradientColors: string[];
+    icon: string;
+  }) => (
+    <View className="p-6 border-b border-gray-100">
+      <View className="flex-row items-center mb-2">
+        <View className="w-10 h-10 rounded-2xl mr-4 overflow-hidden">
+          <LinearGradient
+            colors={gradientColors}
+            className="w-full h-full justify-center items-center"
+          >
+            <Ionicons name={icon as any} size={20} color="white" />
+          </LinearGradient>
+        </View>
+        <View className="flex-1">
+          <Text className="text-2xl font-bold text-gray-800">{title}</Text>
+          {subtitle && <Text className="text-gray-500 text-sm mt-1">{subtitle}</Text>}
+        </View>
       </View>
+    </View>
+  );
+
+  return (
+    <View className="flex-1 bg-gradient-to-b from-slate-50 via-blue-50 to-indigo-50">
+      {/* Header */}
+      <LinearGradient
+        colors={['#667eea', '#764ba2']}
+        className="pt-12 pb-8 px-6"
+      >
+        <View className="flex-row items-center mb-4">
+          <View className="w-12 h-12 bg-white bg-opacity-20 rounded-2xl justify-center items-center mr-4">
+            <Ionicons name="settings" size={24} color="white" />
+          </View>
+          <View>
+            <Text className="text-3xl font-bold text-white mb-1">Settings</Text>
+            <Text className="text-white text-opacity-90 text-lg">Customize your experience</Text>
+          </View>
+        </View>
+      </LinearGradient>
 
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="p-6 space-y-6">
           {/* Preferences Section */}
           <Animated.View style={cardAnimatedStyle}>
             <View className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-              <View className="p-6 border-b border-gray-100">
-                <View className="flex-row items-center">
-                  <View className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 mr-3" />
-                  <Text className="text-2xl font-bold text-gray-800">Preferences</Text>
-                </View>
-              </View>
+              <SectionHeader
+                title="Preferences"
+                subtitle="Default time settings"
+                gradientColors={['#667eea', '#764ba2']}
+                icon="time"
+              />
               
               <SettingItem
-                icon="time"
+                icon="sunny"
                 title="Default Punch In"
                 subtitle="Set your default start time"
                 value={defaultPunchIn}
                 onPress={() => setShowPunchInPicker(true)}
-                iconColor="#3b82f6"
+                gradientColors={['#fbbf24', '#f59e0b']}
               />
               
               <SettingItem
-                icon="time-outline"
+                icon="moon"
                 title="Default Punch Out"
                 subtitle="Set your default end time"
                 value={defaultPunchOut}
                 onPress={() => setShowPunchOutPicker(true)}
-                iconColor="#ef4444"
+                gradientColors={['#8b5cf6', '#7c3aed']}
               />
             </View>
           </Animated.View>
@@ -315,20 +372,20 @@ export default function SettingsScreen() {
           {/* Appearance Section */}
           <Animated.View style={cardAnimatedStyle}>
             <View className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-              <View className="p-6 border-b border-gray-100">
-                <View className="flex-row items-center">
-                  <View className="w-4 h-4 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 mr-3" />
-                  <Text className="text-2xl font-bold text-gray-800">Appearance</Text>
-                </View>
-              </View>
+              <SectionHeader
+                title="Appearance"
+                subtitle="Theme and display settings"
+                gradientColors={['#ec4899', '#be185d']}
+                icon="color-palette"
+              />
               
               <SettingItem
-                icon="color-palette"
-                title="Theme"
-                subtitle="Choose your preferred theme"
-                value={darkTheme ? 'Dark' : 'Light'}
+                icon="moon"
+                title="Dark Theme"
+                subtitle="Switch between light and dark mode"
+                value={darkTheme ? 'Enabled' : 'Disabled'}
                 onPress={handleThemeToggle}
-                iconColor="#8b5cf6"
+                gradientColors={['#6366f1', '#4f46e5']}
                 showSwitch={true}
                 switchValue={darkTheme}
                 onSwitchChange={handleThemeToggle}
@@ -341,7 +398,7 @@ export default function SettingsScreen() {
                 subtitle="Default chart view"
                 value={dashboardView}
                 onPress={() => {}}
-                iconColor="#10b981"
+                gradientColors={['#10b981', '#059669']}
                 showChevron={false}
               />
               
@@ -363,19 +420,19 @@ export default function SettingsScreen() {
           {/* Notifications Section */}
           <Animated.View style={cardAnimatedStyle}>
             <View className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-              <View className="p-6 border-b border-gray-100">
-                <View className="flex-row items-center">
-                  <View className="w-4 h-4 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 mr-3" />
-                  <Text className="text-2xl font-bold text-gray-800">Notifications</Text>
-                </View>
-              </View>
+              <SectionHeader
+                title="Notifications"
+                subtitle="Reminder settings"
+                gradientColors={['#10b981', '#059669']}
+                icon="notifications"
+              />
               
               <SettingItem
-                icon="notifications"
+                icon="alarm"
                 title="Punch Out Reminder"
                 subtitle="Daily reminder at 6:00 PM"
                 onPress={() => setNotificationsEnabled(!notificationsEnabled)}
-                iconColor="#10b981"
+                gradientColors={['#f59e0b', '#d97706']}
                 showSwitch={true}
                 switchValue={notificationsEnabled}
                 onSwitchChange={setNotificationsEnabled}
@@ -387,32 +444,41 @@ export default function SettingsScreen() {
           {/* Data Management Section */}
           <Animated.View style={cardAnimatedStyle}>
             <View className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-              <View className="p-6 border-b border-gray-100">
-                <View className="flex-row items-center">
-                  <View className="w-4 h-4 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 mr-3" />
-                  <Text className="text-2xl font-bold text-gray-800">Data Management</Text>
-                </View>
-              </View>
+              <SectionHeader
+                title="Data Management"
+                subtitle="Manage your stored data"
+                gradientColors={['#f59e0b', '#d97706']}
+                icon="cloud"
+              />
               
               <SettingItem
                 icon="refresh-circle"
                 title="Reset Store State"
                 subtitle="Reset current punch state"
                 onPress={handleResetStore}
-                iconColor="#f59e0b"
+                gradientColors={['#8b5cf6', '#7c3aed']}
               />
             </View>
           </Animated.View>
 
           {/* Danger Zone */}
           <Animated.View style={cardAnimatedStyle}>
-            <View className="bg-gradient-to-r from-red-50 to-rose-50 rounded-3xl shadow-xl overflow-hidden border border-red-200">
+            <View className="bg-gradient-to-r from-red-50 via-rose-50 to-pink-50 rounded-3xl shadow-xl overflow-hidden border border-red-200">
               <View className="p-6 border-b border-red-200">
-                <View className="flex-row items-center">
-                  <View className="w-4 h-4 rounded-full bg-gradient-to-r from-red-500 to-rose-500 mr-3" />
-                  <Text className="text-2xl font-bold text-red-800">⚠️ Danger Zone</Text>
+                <View className="flex-row items-center mb-2">
+                  <View className="w-10 h-10 rounded-2xl mr-4 overflow-hidden">
+                    <LinearGradient
+                      colors={['#ef4444', '#dc2626']}
+                      className="w-full h-full justify-center items-center"
+                    >
+                      <Ionicons name="warning" size={20} color="white" />
+                    </LinearGradient>
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-2xl font-bold text-red-800">Danger Zone</Text>
+                    <Text className="text-red-600 text-sm mt-1">Irreversible actions</Text>
+                  </View>
                 </View>
-                <Text className="text-red-600 text-sm mt-2">Irreversible actions</Text>
               </View>
               
               <TouchableOpacity
@@ -421,15 +487,15 @@ export default function SettingsScreen() {
                 activeOpacity={0.7}
               >
                 <View className="flex-row items-center flex-1">
-                  <View className="w-12 h-12 bg-red-100 rounded-full justify-center items-center mr-4">
-                    <Ionicons name="trash" size={24} color="#ef4444" />
+                  <View className="w-14 h-14 bg-gradient-to-r from-red-400 to-rose-500 rounded-2xl justify-center items-center mr-4">
+                    <Ionicons name="trash" size={24} color="white" />
                   </View>
                   <View className="flex-1">
                     <Text className="text-red-800 font-bold text-lg">Clear All Data</Text>
                     <Text className="text-red-600 text-sm mt-1">Permanently delete all stored data</Text>
                   </View>
                 </View>
-                <View className="bg-red-500 px-4 py-2 rounded-xl">
+                <View className="bg-gradient-to-r from-red-500 to-rose-500 px-4 py-2 rounded-xl">
                   <Text className="text-white font-semibold">Delete</Text>
                 </View>
               </TouchableOpacity>
@@ -467,8 +533,8 @@ export default function SettingsScreen() {
         <View className="flex-1 bg-black bg-opacity-50 justify-center items-center p-6">
           <View className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl">
             <View className="items-center mb-6">
-              <View className="w-16 h-16 bg-red-100 rounded-full justify-center items-center mb-4">
-                <Ionicons name="warning" size={32} color="#ef4444" />
+              <View className="w-20 h-20 bg-gradient-to-r from-red-400 to-rose-500 rounded-full justify-center items-center mb-4">
+                <Ionicons name="warning" size={36} color="white" />
               </View>
               <Text className="text-2xl font-bold text-gray-800 mb-2">Clear All Data?</Text>
               <Text className="text-gray-600 text-center leading-6">
@@ -479,7 +545,7 @@ export default function SettingsScreen() {
             <View className="space-y-3">
               <TouchableOpacity 
                 onPress={handleClearAllData}
-                className="bg-red-500 p-4 rounded-2xl"
+                className="bg-gradient-to-r from-red-500 to-rose-500 p-4 rounded-2xl"
                 activeOpacity={0.8}
               >
                 <Text className="text-white font-bold text-lg text-center">Delete All Data</Text>
