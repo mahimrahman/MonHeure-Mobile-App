@@ -185,8 +185,7 @@ MonHeure-Mobile-App/
 │   ├── sampleData.ts      # Sample data generator for testing
 │   ├── pdfGenerator.ts    # Professional PDF report generator
 │   ├── shareUtils.ts      # Cross-platform sharing utilities
-│   ├── designSystem.ts    # Design system utilities
-│   └── punchStore.ts      # Enhanced state management
+│   └── designSystem.ts    # Design system utilities
 ├── package.json          # Dependencies and scripts
 ├── tsconfig.json        # TypeScript configuration
 ├── tailwind.config.js   # Tailwind CSS configuration
@@ -248,6 +247,7 @@ MonHeure-Mobile-App/
 ## 🎨 Styling & UI
 
 The app uses **NativeWind** (Tailwind CSS for React Native) with modern design principles:
+
 - **Gradient Backgrounds**: Beautiful color gradients throughout the app
 - **Rounded Corners**: Modern card design with proper border radius
 - **Soft Shadows**: Subtle shadows for depth and visual hierarchy
@@ -367,44 +367,28 @@ npm install
 
 ## 📦 Building for Production
 
-### Android APK
+### EAS Build (Recommended)
 ```bash
+# Install EAS CLI
+npm install -g @expo/eas-cli
+
+# Configure EAS
+eas build:configure
+
+# Build for Android
+eas build --platform android
+
+# Build for iOS
+eas build --platform ios
+```
+
+### Legacy Build Commands
+```bash
+# Android APK
 npx expo build:android
-```
 
-### iOS App Store
-```bash
+# iOS App Store
 npx expo build:ios
-```
-
-### EAS Build (Recommended)
-```bash
-# Install EAS CLI
-npm install -g @expo/eas-cli
-
-# Configure EAS
-eas build:configure
-
-# Build for Android
-eas build --platform android
-
-# Build for iOS
-eas build --platform ios
-```
-
-### EAS Build (Recommended)
-```bash
-# Install EAS CLI
-npm install -g @expo/eas-cli
-
-# Configure EAS
-eas build:configure
-
-# Build for Android
-eas build --platform android
-
-# Build for iOS
-eas build --platform ios
 ```
 
 ## 🔄 Recent Updates
@@ -444,83 +428,33 @@ eas build --platform ios
 - **Sample Data**: Built-in sample data generator for testing and demonstration
 - **Touch Interactions**: Improved touch feedback and gesture handling
 
-## 🚀 Performance Tips
-
-### Optimization Strategies
-- **Lazy Loading**: Components load only when needed
-- **Memoization**: Use React.memo for expensive components
-- **Efficient Animations**: Use native driver for better performance
-- **Database Queries**: Optimize queries with proper indexing
-- **Image Optimization**: Use appropriate image formats and sizes
-
-### Memory Management
-- **Cleanup Effects**: Proper cleanup in useEffect hooks
-- **Event Listeners**: Remove listeners when components unmount
-- **Database Connections**: Proper connection management
-- **State Cleanup**: Clear unnecessary state on navigation
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-#### Metro Bundler Issues
-```bash
-# Clear metro cache
-npx expo start --clear
-
-# Reset cache completely
-rm -rf node_modules && npm install
-```
-
-#### Animation Performance
-- Use `useNativeDriver: true` for transform animations
-- Avoid animating layout properties on Android
-- Use `runOnJS` for JavaScript callbacks in animations
-
-#### Database Issues
-- Ensure database is properly initialized
-- Check for proper error handling in database operations
-- Verify data types match expected schema
-
-#### Build Issues
-```bash
-# Clear all caches
-npx expo start --clear
-npx expo install --fix
-
-# Rebuild node_modules
-rm -rf node_modules package-lock.json
-npm install
-```
-
 ## 🐛 Known Issues
 
 - **Sharing Features**: Temporarily disabled due to native module linking issues in SDK 53
 - **Unmaintained Packages**: Some packages like `react-native-html-to-pdf` are unmaintained but functional
 
+## 📄 Documentation
+
+For detailed information about specific features, see:
+- [Database Features](DATABASE_FEATURES.md) - SQLite database implementation
+- [History Features](HISTORY_FEATURES.md) - Calendar and CRUD operations
+- [Report Features](REPORT_FEATURES.md) - PDF export and reporting
+
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-### Development Guidelines
-- Follow TypeScript best practices
-- Use functional components with hooks
-- Implement proper error handling
-- Add comprehensive tests
-- Update documentation for new features
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## 🙏 Acknowledgments
 
-For support and questions, please open an issue in the repository.
-
----
-
-**Built with ❤️ using React Native, Expo, and modern design principles** 
+- Built with [Expo](https://expo.dev/)
+- Styled with [NativeWind](https://www.nativewind.dev/)
+- Charts by [react-native-chart-kit](https://github.com/indiespirit/react-native-chart-kit)
+- Calendar by [react-native-calendars](https://github.com/wix/react-native-calendars) 
