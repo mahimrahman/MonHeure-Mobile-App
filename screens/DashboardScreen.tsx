@@ -122,7 +122,7 @@ export default function DashboardScreen() {
           colors={gradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          className="rounded-3xl p-6 shadow-xl"
+          className="rounded-2xl p-6 shadow-md"
         >
           <View className="flex-row items-center justify-between mb-4">
             <View className="w-10 h-10 bg-white/20 rounded-full justify-center items-center">
@@ -148,19 +148,19 @@ export default function DashboardScreen() {
     });
 
     return (
-      <Animated.View style={toggleAnimatedStyle} className="flex-row bg-white rounded-2xl p-1 mb-6 shadow-lg">
+      <Animated.View style={toggleAnimatedStyle} className="flex-row bg-white rounded-2xl p-1 mb-6 shadow-md">
         {(['week', 'month', 'year'] as ChartViewType[]).map((view) => (
           <TouchableOpacity
             key={view}
             onPress={() => setChartView(view)}
             className={`flex-1 py-3 px-4 rounded-xl ${
               chartView === view 
-                ? 'bg-gradient-to-r from-blue-500 to-purple-500' 
+                ? 'bg-gradient-to-r from-primary-indigo to-primary-violet' 
                 : 'bg-transparent'
             }`}
           >
             <Text className={`text-center font-semibold ${
-              chartView === view ? 'text-white' : 'text-gray-600'
+              chartView === view ? 'text-white' : 'text-text-secondary'
             }`}>
               {view.charAt(0).toUpperCase() + view.slice(1)}
             </Text>
@@ -172,9 +172,9 @@ export default function DashboardScreen() {
 
   if (loading || isLoading) {
     return (
-      <View className="flex-1 bg-gradient-to-b from-blue-50 via-indigo-50 to-purple-50 justify-center items-center">
-        <View className="bg-white rounded-3xl p-8 shadow-2xl">
-          <Text className="text-gray-600 text-lg font-medium">Loading dashboard...</Text>
+      <View className="flex-1 bg-background-light justify-center items-center">
+        <View className="bg-white rounded-2xl p-8 shadow-md">
+          <Text className="text-text-secondary text-lg font-medium">Loading dashboard...</Text>
         </View>
       </View>
     );
@@ -182,7 +182,7 @@ export default function DashboardScreen() {
 
   return (
     <ScrollView 
-      className="flex-1 bg-gradient-to-b from-blue-50 via-indigo-50 to-purple-50"
+      className="flex-1 bg-background-light"
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -191,8 +191,8 @@ export default function DashboardScreen() {
       <View className="p-6">
         {/* Header */}
         <View className="mb-8">
-          <Text className="text-3xl font-bold text-gray-800 mb-2">Dashboard</Text>
-          <Text className="text-gray-600 text-lg">Your time tracking analytics</Text>
+          <Text className="text-3xl font-bold text-text-primary mb-2">Dashboard</Text>
+          <Text className="text-text-secondary text-lg">Your time tracking analytics</Text>
         </View>
 
         {/* Current Status Card */}
@@ -201,23 +201,23 @@ export default function DashboardScreen() {
             opacity: cardOpacity.value,
             transform: [{ translateY: cardTranslateY.value }],
           }))}
-          className="bg-white rounded-3xl shadow-xl p-6 mb-8 border border-gray-100"
+          className="bg-white rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
         >
           <View className="flex-row items-center mb-4">
-            <View className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mr-3" />
-            <Text className="text-xl font-bold text-gray-800">Current Status</Text>
+            <View className="w-4 h-4 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet mr-3" />
+            <Text className="text-xl font-bold text-text-primary">Current Status</Text>
           </View>
           
           <View className="flex-row items-center justify-between mb-4">
             <View className="flex-row items-center">
-              <View className={`w-4 h-4 rounded-full mr-3 ${isPunchedIn ? 'bg-red-500' : 'bg-green-500'}`} />
-              <Text className="text-gray-800 font-semibold text-lg">
+              <View className={`w-4 h-4 rounded-full mr-3 ${isPunchedIn ? 'bg-primary-amber' : 'bg-primary-teal'}`} />
+              <Text className="text-text-primary font-semibold text-lg">
                 {isPunchedIn ? 'Currently Working' : 'Not Working'}
               </Text>
             </View>
             {isPunchedIn && currentPunchInTime && (
-              <View className="bg-blue-100 px-4 py-2 rounded-2xl">
-                <Text className="text-blue-700 font-medium">
+              <View className="bg-indigo-100 px-4 py-2 rounded-2xl">
+                <Text className="text-primary-indigo font-medium">
                   Since {formatTime(currentPunchInTime)}
                 </Text>
               </View>
@@ -227,9 +227,9 @@ export default function DashboardScreen() {
           {totalHoursToday > 0 && (
             <View className="pt-4 border-t border-gray-200">
               <View className="flex-row justify-between items-center">
-                <Text className="text-gray-600 font-medium">Today's Hours:</Text>
-                <View className="bg-green-100 px-4 py-2 rounded-2xl">
-                  <Text className="text-green-700 text-lg font-bold">
+                <Text className="text-text-secondary font-medium">Today's Hours:</Text>
+                <View className="bg-teal-100 px-4 py-2 rounded-2xl">
+                  <Text className="text-primary-teal text-lg font-bold">
                     {totalHoursToday.toFixed(2)}h
                   </Text>
                 </View>
@@ -240,7 +240,7 @@ export default function DashboardScreen() {
 
         {/* Time Stats Cards - Horizontal Scrollable */}
         <View className="mb-8">
-          <Text className="text-xl font-bold text-gray-800 mb-4">Time Overview</Text>
+          <Text className="text-xl font-bold text-text-primary mb-4">Time Overview</Text>
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false}
@@ -253,7 +253,7 @@ export default function DashboardScreen() {
                   hours={timeStats.thisWeek.totalHours}
                   days={timeStats.thisWeek.daysWorked}
                   average={timeStats.thisWeek.averageHoursPerDay}
-                  gradient={['#3b82f6', '#1d4ed8', '#1e40af']}
+                  gradient={['#6366F1', '#4F46E5', '#4338CA']}
                   icon="calendar"
                   delay={0}
                 />
@@ -262,7 +262,7 @@ export default function DashboardScreen() {
                   hours={timeStats.lastTwoWeeks.totalHours}
                   days={timeStats.lastTwoWeeks.daysWorked}
                   average={timeStats.lastTwoWeeks.averageHoursPerDay}
-                  gradient={['#06b6d4', '#0891b2', '#0e7490']}
+                  gradient={['#14B8A6', '#0D9488', '#0F766E']}
                   icon="time"
                   delay={100}
                 />
@@ -271,7 +271,7 @@ export default function DashboardScreen() {
                   hours={timeStats.thisMonth.totalHours}
                   days={timeStats.thisMonth.daysWorked}
                   average={timeStats.thisMonth.averageHoursPerDay}
-                  gradient={['#f59e0b', '#d97706', '#b45309']}
+                  gradient={['#F59E0B', '#D97706', '#B45309']}
                   icon="trending-up"
                   delay={200}
                 />
@@ -280,7 +280,7 @@ export default function DashboardScreen() {
                   hours={timeStats.thisYear.totalHours}
                   days={timeStats.thisYear.daysWorked}
                   average={timeStats.thisYear.averageHoursPerDay}
-                  gradient={['#8b5cf6', '#7c3aed', '#6d28d9']}
+                  gradient={['#8B5CF6', '#7C3AED', '#6D28D9']}
                   icon="stats-chart"
                   delay={300}
                 />
@@ -299,16 +299,16 @@ export default function DashboardScreen() {
               opacity: chartOpacity.value,
               transform: [{ translateY: chartTranslateY.value }],
             }))}
-            className="bg-white rounded-3xl shadow-xl p-6 mb-8 border border-gray-100"
+            className="bg-white rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
           >
             <View className="flex-row items-center justify-between mb-6">
-              <Text className="text-xl font-bold text-gray-800">
+              <Text className="text-xl font-bold text-text-primary">
                 {chartView === 'week' ? 'This Week' : 
                  chartView === 'month' ? 'This Month' : 'This Year'}'s Hours
               </Text>
               <View className="flex-row items-center">
-                <View className="w-3 h-3 rounded-full bg-blue-500 mr-2" />
-                <Text className="text-gray-600 text-sm">Hours worked</Text>
+                <View className="w-3 h-3 rounded-full bg-primary-indigo mr-2" />
+                <Text className="text-text-secondary text-sm">Hours worked</Text>
               </View>
             </View>
             
@@ -323,8 +323,8 @@ export default function DashboardScreen() {
                 backgroundGradientFrom: '#ffffff',
                 backgroundGradientTo: '#ffffff',
                 decimalPlaces: 1,
-                color: (opacity = 1) => `rgba(59, 130, 246, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(31, 41, 55, ${opacity})`,
+                color: (opacity = 1) => `rgba(99, 102, 241, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(17, 24, 39, ${opacity})`,
                 style: {
                   borderRadius: 16
                 },
@@ -357,13 +357,13 @@ export default function DashboardScreen() {
               opacity: chartOpacity.value,
               transform: [{ translateY: chartTranslateY.value }],
             }))}
-            className="bg-white rounded-3xl shadow-xl p-6 mb-8 border border-gray-100"
+            className="bg-white rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
           >
             <View className="flex-row items-center justify-between mb-6">
-              <Text className="text-xl font-bold text-gray-800">Trend Analysis</Text>
+              <Text className="text-xl font-bold text-text-primary">Trend Analysis</Text>
               <View className="flex-row items-center">
-                <View className="w-3 h-3 rounded-full bg-green-500 mr-2" />
-                <Text className="text-gray-600 text-sm">Daily trend</Text>
+                <View className="w-3 h-3 rounded-full bg-primary-teal mr-2" />
+                <Text className="text-text-secondary text-sm">Daily trend</Text>
               </View>
             </View>
             
@@ -378,8 +378,8 @@ export default function DashboardScreen() {
                 backgroundGradientFrom: '#ffffff',
                 backgroundGradientTo: '#ffffff',
                 decimalPlaces: 1,
-                color: (opacity = 1) => `rgba(34, 197, 94, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(31, 41, 55, ${opacity})`,
+                color: (opacity = 1) => `rgba(20, 184, 166, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(17, 24, 39, ${opacity})`,
                 style: {
                   borderRadius: 16
                 },
@@ -396,8 +396,8 @@ export default function DashboardScreen() {
                 propsForDots: {
                   r: '6',
                   strokeWidth: '2',
-                  stroke: '#22c55e',
-                  fill: '#ffffff',
+                                  stroke: '#14B8A6',
+                fill: '#ffffff',
                 },
               }}
               style={{
