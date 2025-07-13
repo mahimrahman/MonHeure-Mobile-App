@@ -54,12 +54,14 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Enhanced Modal**: Improved confirmation dialogs with warning icons
 
 ### 🎨 Modern UI Design
-- **Gradient Backgrounds**: Beautiful color gradients throughout the app
-- **Rounded Corners**: Modern card design with proper border radius
-- **Soft Shadows**: Subtle shadows for depth and visual hierarchy
+- **Modern Color Palette**: Soft, professional colors with Indigo (#6366F1), Teal (#14B8A6), Amber (#F59E0B), and Violet (#8B5CF6)
+- **Gradient Backgrounds**: Beautiful color gradients throughout the app using the new palette
+- **Rounded Corners**: Modern card design with consistent `rounded-xl` (12px) and `rounded-2xl` (16px) border radius
+- **Soft Shadows**: Subtle `shadow-md` shadows for depth and visual hierarchy
 - **Smooth Animations**: Spring-based animations with proper easing
 - **Touch-Friendly**: Large touch targets and generous spacing
 - **Responsive Design**: Works seamlessly on all screen sizes
+- **Consistent Typography**: `text-lg` classes for uniform text sizing
 
 ### 🔧 Advanced Features
 - **Global State Management**: Zustand-powered state management with persistence
@@ -89,24 +91,48 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **expo-linear-gradient** for beautiful gradient effects
 - **react-native-reanimated** for smooth animations
 
+## 🎨 Design System
+
+The app features a modern, cohesive design system with:
+
+### 🎨 **Color Palette**
+- **Primary Colors**: Indigo (#6366F1), Teal (#14B8A6), Amber (#F59E0B), Violet (#8B5CF6)
+- **Background Colors**: Light (#F9FAFB), Dark (#1F2937), Card (#FFFFFF)
+- **Text Colors**: Primary (#111827), Secondary (#6B7280), Inverse (#FFFFFF)
+- **Complete Color Scales**: 50-900 scales for each primary color
+
+### 🎨 **Design Tokens**
+- **Border Radius**: `rounded-xl` (12px), `rounded-2xl` (16px)
+- **Shadows**: `shadow-md` for consistent depth
+- **Typography**: `text-lg` for uniform sizing
+- **Spacing**: Generous padding and margins
+- **Gradients**: Beautiful color transitions
+
+### 🎨 **Component System**
+- **Cards**: Consistent styling with rounded corners and shadows
+- **Buttons**: Gradient backgrounds with proper touch targets
+- **Charts**: Indigo and Teal color schemes
+- **Modals**: Consistent border radius and shadows
+- **Status Indicators**: Color-coded using the new palette
+
 ## 📱 Screenshots & UI Features
 
 The app features a modern, intuitive interface with:
 
 ### 🏠 Home Screen
 - **Large circular gradient button** (72x72) that toggles between "Punch In" and "Punch Out"
-- **Vibrant gradients**: Blue to purple for punch-in, red gradient for punch-out
-- **Status text**: Shows current punch status with time information
-- **Glow effects**: Subtle animations and visual feedback
-- **Calendar-style card**: Today's punches in a clean, organized layout
+- **Modern gradients**: Indigo to Violet to Teal for punch-in, Amber gradient for punch-out
+- **Status text**: Shows current punch status with time information using new text color system
+- **Glow effects**: Subtle animations and visual feedback with new color palette
+- **Calendar-style card**: Today's punches in a clean, organized layout with consistent border radius
 - **Smooth animations**: Spring-based animations with proper easing
 
 ### 📊 Dashboard Screen
-- **Horizontally scrollable stat cards** with gradient backgrounds and icons
-- **Interactive charts**: Bar and line charts with custom styling
-- **Time period toggle**: Switch between week/month/year views
-- **Productivity insights**: Enhanced metrics with visual indicators
-- **Quick actions**: Touchable cards with gradient backgrounds
+- **Horizontally scrollable stat cards** with modern gradient backgrounds using the new color palette
+- **Interactive charts**: Bar and line charts with Indigo and Teal color schemes
+- **Time period toggle**: Switch between week/month/year views with consistent styling
+- **Productivity insights**: Enhanced metrics with visual indicators using new colors
+- **Quick actions**: Touchable cards with gradient backgrounds and consistent border radius
 
 ### 📅 History Screen
 - **Interactive calendar** with color-coded activity dots
@@ -116,11 +142,11 @@ The app features a modern, intuitive interface with:
 - **Smooth transitions**: Spring animations for all interactions
 
 ### ⚙️ Settings Screen
-- **Grouped sections**: Organized settings with colorful gradient indicators
-- **Modern cards**: Rounded corners with shadows and borders
-- **Interactive elements**: Switches, toggles, and selection indicators
-- **Danger zone**: Prominent red warning area for data clearing
-- **Enhanced modals**: Improved confirmation dialogs with icons
+- **Grouped sections**: Organized settings with colorful gradient indicators using new palette
+- **Modern cards**: Rounded corners with consistent `shadow-md` and borders
+- **Interactive elements**: Switches, toggles, and selection indicators with new colors
+- **Danger zone**: Prominent warning area for data clearing with updated styling
+- **Enhanced modals**: Improved confirmation dialogs with icons and consistent border radius
 
 ## 🚦 Quick Start
 
@@ -427,6 +453,17 @@ npx expo build:ios
 - **Data Validation**: Added comprehensive validation for all user inputs
 - **Sample Data**: Built-in sample data generator for testing and demonstration
 - **Touch Interactions**: Improved touch feedback and gesture handling
+
+### 🎨 Modern Design System (Latest)
+- **New Color Palette**: Soft, professional colors with Indigo (#6366F1), Teal (#14B8A6), Amber (#F59E0B), and Violet (#8B5CF6)
+- **Consistent Border Radius**: `rounded-xl` (12px) and `rounded-2xl` (16px) throughout the app
+- **Unified Shadows**: `shadow-md` for consistent depth and visual hierarchy
+- **Typography System**: `text-lg` classes for uniform text sizing
+- **Background Colors**: Light (#F9FAFB) and dark (#1F2937) mode support
+- **Text Color System**: Primary (#111827), Secondary (#6B7280), and Inverse (#FFFFFF) colors
+- **Gradient Updates**: All gradients updated to use the new color palette
+- **Chart Colors**: Charts now use Indigo and Teal color schemes
+- **Component Consistency**: All cards, buttons, and modals use the new design system
 
 ## 🐛 Known Issues
 
