@@ -60,6 +60,11 @@ export default function ReportScreen() {
   const cardOpacity = useSharedValue(0);
   const cardTranslateY = useSharedValue(30);
   const buttonScale = useSharedValue(1);
+  const listItemOpacity = useSharedValue(0);
+  const listItemTranslateY = useSharedValue(50);
+  const summaryCardScale = useSharedValue(0.8);
+  const headerOpacity = useSharedValue(0);
+  const headerTranslateY = useSharedValue(-30);
 
   // Load punch data on component mount
   useEffect(() => {
@@ -68,8 +73,16 @@ export default function ReportScreen() {
 
   // Start animations on mount
   useEffect(() => {
+    // Header animation
+    headerOpacity.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) });
+    headerTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
+    
+    // Card animation
     cardOpacity.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) });
     cardTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
+    
+    // Summary card animation
+    summaryCardScale.value = withSpring(1, { damping: 12, stiffness: 80 });
   }, []);
 
   // Filter records when date range or punch records change
@@ -80,6 +93,12 @@ export default function ReportScreen() {
   // Calculate summary when filtered records change
   useEffect(() => {
     calculateSummary();
+    
+    // Animate list items when data loads
+    if (filteredRecords.length > 0) {
+      listItemOpacity.value = withTiming(1, { duration: 400 });
+      listItemTranslateY.value = withSpring(0, { damping: 12, stiffness: 80 });
+    }
   }, [filteredRecords]);
 
   const loadPunchData = async () => {
@@ -286,13 +305,33 @@ export default function ReportScreen() {
     };
   });
 
+  const headerAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: headerOpacity.value,
+      transform: [{ translateY: headerTranslateY.value }],
+    };
+  });
+
+  const listItemAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: listItemOpacity.value,
+      transform: [{ translateY: listItemTranslateY.value }],
+    };
+  });
+
+  const summaryCardAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: summaryCardScale.value }],
+    };
+  });
+
   return (
     <View className="flex-1 bg-gradient-to-b from-blue-50 via-indigo-50 to-purple-50">
       {/* Header */}
-      <View className="bg-white pt-12 pb-6 px-6 border-b border-gray-100 shadow-sm">
-        <Text className="text-3xl font-bold text-gray-800 mb-2">Reports</Text>
-        <Text className="text-gray-600 text-lg">Generate and export your time tracking data</Text>
-      </View>
+      <Animated.View style={headerAnimatedStyle} className="bg-white pt-12 pb-6 px-6 border-b border-gray-100 shadow-sm">
+        <Text className="text-3xl font-bold text-text-primary mb-2">Reports</Text>
+        <Text className="text-text-secondary text-lg">Generate and export your time tracking data</Text>
+      </Animated.View>
 
       <ScrollView 
         className="flex-1"
@@ -313,8 +352,8 @@ export default function ReportScreen() {
           </Animated.View>
 
           {/* Enhanced Summary Cards */}
-          <Animated.View style={cardAnimatedStyle}>
-            <View className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+          <Animated.View style={[cardAnimatedStyle, summaryCardAnimatedStyle]}>
+            <View className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
               <View className="flex-row items-center mb-6">
                 <View className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mr-3" />
                 <Text className="text-2xl font-bold text-gray-800">Summary</Text>
@@ -426,7 +465,7 @@ export default function ReportScreen() {
               ) : (
                 <ScrollView className="max-h-96">
                   {groupRecordsByDate().map(([date, records]) => (
-                    <View key={date} className="overflow-hidden">
+                    <Animated.View key={date} style={listItemAnimatedStyle} className="overflow-hidden">
                       <LinearGradient
                         colors={getDayBackground(date)}
                         start={{ x: 0, y: 0 }}
@@ -481,7 +520,7 @@ export default function ReportScreen() {
                           </View>
                         </View>
                       ))}
-                    </View>
+                    </Animated.View>
                   ))}
                 </ScrollView>
               )}

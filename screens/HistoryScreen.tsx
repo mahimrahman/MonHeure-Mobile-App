@@ -60,6 +60,10 @@ export default function HistoryScreen() {
   const dayCardOpacity = useSharedValue(0);
   const dayCardTranslateY = useSharedValue(100);
   const calendarScale = useSharedValue(1);
+  const recordItemScale = useSharedValue(1);
+  const recordItemOpacity = useSharedValue(0);
+  const headerOpacity = useSharedValue(0);
+  const headerTranslateY = useSharedValue(-20);
 
   // Load punch data on component mount
   useEffect(() => {
@@ -68,6 +72,11 @@ export default function HistoryScreen() {
 
   // Start animations on mount
   useEffect(() => {
+    // Header animation
+    headerOpacity.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) });
+    headerTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
+    
+    // Card animation
     cardOpacity.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) });
     cardTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
   }, []);
@@ -124,9 +133,19 @@ export default function HistoryScreen() {
       withSpring(0.98, { duration: 200 }),
       withSpring(1, { duration: 200 })
     );
+    
+    // Animate record items when they appear
+    setTimeout(() => {
+      recordItemOpacity.value = withTiming(1, { duration: 400 });
+      recordItemScale.value = withSpring(1, { damping: 12, stiffness: 80 });
+    }, 300);
   };
 
   const hideDayCard = () => {
+    // Reset record item animations
+    recordItemOpacity.value = withTiming(0, { duration: 200 });
+    recordItemScale.value = withSpring(0.8, { damping: 15, stiffness: 100 });
+    
     dayCardOpacity.value = withTiming(0, { duration: 200 });
     dayCardTranslateY.value = withSpring(100, { damping: 15, stiffness: 100 });
     setTimeout(() => {
@@ -251,13 +270,27 @@ export default function HistoryScreen() {
     };
   });
 
+  const headerAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: headerOpacity.value,
+      transform: [{ translateY: headerTranslateY.value }],
+    };
+  });
+
+  const recordItemAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: recordItemOpacity.value,
+      transform: [{ scale: recordItemScale.value }],
+    };
+  });
+
   return (
     <View className="flex-1 bg-gradient-to-b from-blue-50 via-indigo-50 to-purple-50">
       {/* Header */}
-      <View className="bg-white pt-12 pb-6 px-6 border-b border-gray-100 shadow-sm">
-        <Text className="text-3xl font-bold text-gray-800 mb-2">History</Text>
-        <Text className="text-gray-600 text-lg">View and manage your punch records</Text>
-      </View>
+      <Animated.View style={headerAnimatedStyle} className="bg-white pt-12 pb-6 px-6 border-b border-gray-100 shadow-sm">
+        <Text className="text-3xl font-bold text-text-primary mb-2">History</Text>
+        <Text className="text-text-secondary text-lg">View and manage your punch records</Text>
+      </Animated.View>
 
       <ScrollView 
         className="flex-1"
@@ -373,7 +406,7 @@ export default function HistoryScreen() {
               {selectedDateRecords.length > 0 ? (
                 <View className="space-y-4">
                   {selectedDateRecords.map((record, index) => (
-                    <View key={record.id} className="overflow-hidden rounded-2xl">
+                    <Animated.View key={record.id} style={recordItemAnimatedStyle} className="overflow-hidden rounded-2xl">
                       <LinearGradient
                         colors={getStatusGradient(record)}
                         start={{ x: 0, y: 0 }}
@@ -463,7 +496,7 @@ export default function HistoryScreen() {
                           </TouchableOpacity>
                         </View>
                       </LinearGradient>
-                    </View>
+                    </Animated.View>
                   ))}
                 </View>
               ) : (

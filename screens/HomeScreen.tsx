@@ -52,6 +52,11 @@ export default function HomeScreen() {
   const statusTextOpacity = useSharedValue(0);
   const statusTextTranslateY = useSharedValue(20);
   const glowOpacity = useSharedValue(0);
+  const punchInRowScale = useSharedValue(1);
+  const punchOutRowScale = useSharedValue(1);
+  const totalHoursScale = useSharedValue(1);
+  const headerOpacity = useSharedValue(0);
+  const headerTranslateY = useSharedValue(-30);
 
   // Get today's punch data from store
   const todayPunch = todayEntries.find(entry => 
@@ -88,8 +93,38 @@ export default function HomeScreen() {
     };
   });
 
+  const headerAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: headerOpacity.value,
+      transform: [{ translateY: headerTranslateY.value }],
+    };
+  });
+
+  const punchInRowAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: punchInRowScale.value }],
+    };
+  });
+
+  const punchOutRowAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: punchOutRowScale.value }],
+    };
+  });
+
+  const totalHoursAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: totalHoursScale.value }],
+    };
+  });
+
   // Start animations on mount
   useEffect(() => {
+    // Header animation
+    headerOpacity.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) });
+    headerTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
+    
+    // Card animation
     cardOpacity.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) });
     cardTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
     
@@ -108,25 +143,36 @@ export default function HomeScreen() {
     statusTextTranslateY.value = withSpring(0, { damping: 12, stiffness: 80 });
   }, [isPunchedIn, currentPunchInTime]);
 
+  // Animate total hours when they appear
+  useEffect(() => {
+    if (totalHoursToday > 0) {
+      totalHoursScale.value = withSequence(
+        withSpring(0.8, { damping: 8, stiffness: 200 }),
+        withSpring(1.05, { damping: 8, stiffness: 200 }),
+        withSpring(1, { damping: 15, stiffness: 100 })
+      );
+    }
+  }, [totalHoursToday]);
+
   // Punch in/out logic
   const handlePunch = async () => {
-    // Button animation with glow effect
+    // Enhanced button animation with bounce effect
     buttonScale.value = withSequence(
-      withSpring(0.95, { duration: 100 }),
-      withSpring(1.05, { duration: 100 }),
-      withSpring(1, { duration: 200 })
+      withSpring(0.9, { damping: 8, stiffness: 200 }),
+      withSpring(1.1, { damping: 8, stiffness: 200 }),
+      withSpring(1, { damping: 15, stiffness: 100 })
     );
     
     buttonRotation.value = withSequence(
-      withTiming(-5, { duration: 100 }),
-      withTiming(5, { duration: 100 }),
-      withTiming(0, { duration: 200 })
+      withTiming(-8, { duration: 150 }),
+      withTiming(8, { duration: 150 }),
+      withTiming(0, { duration: 300 })
     );
 
-    // Glow animation
+    // Enhanced glow animation
     glowOpacity.value = withSequence(
-      withTiming(1, { duration: 200 }),
-      withTiming(0, { duration: 300 })
+      withTiming(1, { duration: 300 }),
+      withTiming(0, { duration: 500 })
     );
 
     try {
@@ -145,6 +191,19 @@ export default function HomeScreen() {
 
   // Edit modal logic
   const openEditModal = (type: 'in' | 'out') => {
+    // Animate the row press
+    if (type === 'in') {
+      punchInRowScale.value = withSequence(
+        withSpring(0.95, { damping: 8, stiffness: 200 }),
+        withSpring(1, { damping: 15, stiffness: 100 })
+      );
+    } else {
+      punchOutRowScale.value = withSequence(
+        withSpring(0.95, { damping: 8, stiffness: 200 }),
+        withSpring(1, { damping: 15, stiffness: 100 })
+      );
+    }
+
     setEditType(type);
     const currentTime = type === 'in' && todayPunch?.punchIn 
       ? new Date(todayPunch.punchIn) 
@@ -215,10 +274,10 @@ export default function HomeScreen() {
   return (
     <ScrollView className="flex-1 bg-background-light" showsVerticalScrollIndicator={false}>
       {/* Header */}
-      <View className="pt-12 pb-6 px-6">
+      <Animated.View style={headerAnimatedStyle} className="pt-12 pb-6 px-6">
         <Text className="text-3xl font-bold text-text-primary mb-2">MonHeure</Text>
         <Text className="text-text-secondary text-lg">Time Tracking Made Simple</Text>
-      </View>
+      </Animated.View>
 
       <View className="flex-1 justify-center items-center px-6 pb-8">
         {/* Main Punch Button with Glow Effect */}
@@ -278,7 +337,7 @@ export default function HomeScreen() {
             
             <View className="space-y-5">
               {/* Punch In Row */}
-              <View className="flex-row items-center p-5 bg-gradient-to-r from-indigo-50 to-violet-50 rounded-2xl border border-indigo-100">
+              <Animated.View style={punchInRowAnimatedStyle} className="flex-row items-center p-5 bg-gradient-to-r from-indigo-50 to-violet-50 rounded-2xl border border-indigo-100">
                 <View className="w-12 h-12 bg-primary-indigo rounded-full justify-center items-center mr-4">
                   <Ionicons name="log-in" size={24} color="white" />
                 </View>
@@ -294,10 +353,10 @@ export default function HomeScreen() {
                     {formatTime(todayPunch?.punchIn)}
                   </Text>
                 </TouchableOpacity>
-              </View>
+              </Animated.View>
               
               {/* Punch Out Row */}
-              <View className="flex-row items-center p-5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-100">
+              <Animated.View style={punchOutRowAnimatedStyle} className="flex-row items-center p-5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-100">
                 <View className="w-12 h-12 bg-primary-amber rounded-full justify-center items-center mr-4">
                   <Ionicons name="log-out" size={24} color="white" />
                 </View>
@@ -313,12 +372,12 @@ export default function HomeScreen() {
                     {formatTime(todayPunch?.punchOut)}
                   </Text>
                 </TouchableOpacity>
-              </View>
+              </Animated.View>
             </View>
             
             {/* Total Hours */}
             {totalHoursToday > 0 && (
-              <View className="mt-6 pt-6 border-t border-gray-200">
+              <Animated.View style={totalHoursAnimatedStyle} className="mt-6 pt-6 border-t border-gray-200">
                 <View className="flex-row justify-between items-center p-4 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-2xl border border-teal-100">
                   <View className="flex-row items-center">
                     <View className="w-10 h-10 bg-primary-teal rounded-full justify-center items-center mr-3">
@@ -335,7 +394,7 @@ export default function HomeScreen() {
                     </Text>
                   </View>
                 </View>
-              </View>
+              </Animated.View>
             )}
 
             {/* Date Display */}
