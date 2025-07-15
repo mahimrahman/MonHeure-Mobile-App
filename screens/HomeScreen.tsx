@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert, Dimensions, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, Dimensions, ScrollView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Modal from 'react-native-modal';
 import { Ionicons } from '@expo/vector-icons';
@@ -154,8 +156,10 @@ export default function HomeScreen() {
     }
   }, [totalHoursToday]);
 
-  // Punch in/out logic
+  // Enhanced punch in/out logic with haptics
   const handlePunch = async () => {
+    // Haptic feedback
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     // Enhanced button animation with bounce effect
     buttonScale.value = withSequence(
       withSpring(0.9, { damping: 8, stiffness: 200 }),
@@ -189,8 +193,9 @@ export default function HomeScreen() {
     }
   };
 
-  // Edit modal logic
+  // Enhanced edit modal logic with haptics
   const openEditModal = (type: 'in' | 'out') => {
+    Haptics.selectionAsync();
     // Animate the row press
     if (type === 'in') {
       punchInRowScale.value = withSequence(
@@ -263,157 +268,164 @@ export default function HomeScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-background-light justify-center items-center">
+      <SafeAreaView className="flex-1 bg-background-light justify-center items-center">
         <View className="bg-white rounded-2xl p-8 shadow-md">
           <Text className="text-text-secondary text-lg font-medium">Loading...</Text>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ScrollView className="flex-1 bg-background-light" showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <Animated.View style={headerAnimatedStyle} className="pt-12 pb-6 px-6">
-        <Text className="text-3xl font-bold text-text-primary mb-2">MonHeure</Text>
-        <Text className="text-text-secondary text-lg">Time Tracking Made Simple</Text>
-      </Animated.View>
-
-      <View className="flex-1 justify-center items-center px-6 pb-8">
-        {/* Main Punch Button with Glow Effect */}
-        <View className="items-center mb-6">
-          <Animated.View style={glowAnimatedStyle} className="absolute">
-            <View className="w-80 h-80 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet opacity-30 blur-xl" />
-          </Animated.View>
-          
-          <Animated.View style={buttonAnimatedStyle}>
-            <TouchableOpacity
-              className="w-72 h-72 rounded-full justify-center items-center shadow-md"
-              onPress={handlePunch}
-              activeOpacity={0.9}
-              disabled={isLoading}
-            >
-              <LinearGradient
-                colors={isPunchedIn 
-                  ? ['#EF4444', '#DC2626', '#B91C1C'] 
-                  : ['#6366F1', '#8B5CF6', '#14B8A6']
-                }
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                className="w-full h-full rounded-full justify-center items-center"
-              >
-                <View className="items-center">
-                  <Ionicons 
-                    name={isPunchedIn ? 'log-out' : 'log-in'} 
-                    size={90} 
-                    color="white" 
-                  />
-                  <Text className="text-white text-3xl font-bold mt-6 text-center">
-                    {isPunchedIn ? 'Punch Out' : 'Punch In'}
-                  </Text>
-                  <Text className="text-white text-base mt-3 opacity-90 text-center px-4">
-                    {isPunchedIn ? 'Tap to end your day' : 'Tap to start your day'}
-                  </Text>
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
-          </Animated.View>
-        </View>
-
-        {/* Status Text */}
-        <Animated.View style={statusTextAnimatedStyle} className="mb-8">
-          <Text className="text-text-primary text-lg font-medium text-center px-6 leading-6">
-            {getStatusText()}
-          </Text>
+    <SafeAreaView className="flex-1 bg-background-light">
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
+        {/* Header */}
+        <Animated.View style={headerAnimatedStyle} className="pt-12 pb-6 px-6">
+          <Text className="text-3xl font-bold text-text-primary mb-2">MonHeure</Text>
+          <Text className="text-text-secondary text-lg">Time Tracking Made Simple</Text>
         </Animated.View>
 
-        {/* Today's Times Card - Calendar Style */}
-        <Animated.View style={cardAnimatedStyle} className="w-full max-w-sm">
-          <View className="bg-white rounded-2xl shadow-md p-6 mb-6 border border-gray-100">
-            <View className="flex-row items-center mb-6">
-              <View className="w-4 h-4 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet mr-3" />
-              <Text className="text-2xl font-bold text-text-primary">Today's Schedule</Text>
-            </View>
-            
-            <View className="space-y-5">
-              {/* Punch In Row */}
-              <Animated.View style={punchInRowAnimatedStyle} className="flex-row items-center p-5 bg-gradient-to-r from-indigo-50 to-violet-50 rounded-2xl border border-indigo-100">
-                <View className="w-12 h-12 bg-primary-indigo rounded-full justify-center items-center mr-4">
-                  <Ionicons name="log-in" size={24} color="white" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-text-primary font-semibold text-lg">Punch In</Text>
-                  <Text className="text-text-secondary text-sm">Start time</Text>
-                </View>
-                <TouchableOpacity 
-                  onPress={() => openEditModal('in')}
-                  className="bg-white px-5 py-3 rounded-xl shadow-sm border border-indigo-200"
+        <View className="flex-1 justify-center items-center px-6 pb-8">
+          {/* Main Punch Button with Glow Effect */}
+          <View className="items-center mb-6">
+            <Animated.View style={glowAnimatedStyle} className="absolute">
+              <View className="w-80 h-80 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet opacity-30 blur-xl" />
+            </Animated.View>
+            <Animated.View style={buttonAnimatedStyle}>
+              <TouchableOpacity
+                className="w-72 h-72 rounded-full justify-center items-center shadow-md"
+                onPress={handlePunch}
+                activeOpacity={0.9}
+                disabled={isLoading}
+                accessibilityRole="button"
+                accessibilityLabel={isPunchedIn ? 'Punch Out' : 'Punch In'}
+                accessibilityHint={isPunchedIn ? 'Tap to end your day' : 'Tap to start your day'}
+                style={{ minWidth: 72, minHeight: 72 }}
+                {...(Platform.OS === 'android' ? { android_ripple: { color: '#8B5CF6', borderless: false, radius: 180 } } : {})}
+              >
+                <LinearGradient
+                  colors={isPunchedIn 
+                    ? ['#EF4444', '#DC2626', '#B91C1C'] 
+                    : ['#6366F1', '#8B5CF6', '#14B8A6']
+                  }
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  className="w-full h-full rounded-full justify-center items-center"
                 >
-                  <Text className="text-primary-indigo text-xl font-mono font-bold">
-                    {formatTime(todayPunch?.punchIn)}
-                  </Text>
-                </TouchableOpacity>
-              </Animated.View>
-              
-              {/* Punch Out Row */}
-              <Animated.View style={punchOutRowAnimatedStyle} className="flex-row items-center p-5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-100">
-                <View className="w-12 h-12 bg-primary-amber rounded-full justify-center items-center mr-4">
-                  <Ionicons name="log-out" size={24} color="white" />
-                </View>
-                <View className="flex-1">
-                  <Text className="text-text-primary font-semibold text-lg">Punch Out</Text>
-                  <Text className="text-text-secondary text-sm">End time</Text>
-                </View>
-                <TouchableOpacity 
-                  onPress={() => openEditModal('out')}
-                  className="bg-white px-5 py-3 rounded-xl shadow-sm border border-amber-200"
-                >
-                  <Text className="text-primary-amber text-xl font-mono font-bold">
-                    {formatTime(todayPunch?.punchOut)}
-                  </Text>
-                </TouchableOpacity>
-              </Animated.View>
-            </View>
-            
-            {/* Total Hours */}
-            {totalHoursToday > 0 && (
-              <Animated.View style={totalHoursAnimatedStyle} className="mt-6 pt-6 border-t border-gray-200">
-                <View className="flex-row justify-between items-center p-4 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-2xl border border-teal-100">
-                  <View className="flex-row items-center">
-                    <View className="w-10 h-10 bg-primary-teal rounded-full justify-center items-center mr-3">
-                      <Ionicons name="time" size={20} color="white" />
-                    </View>
-                    <View>
-                      <Text className="text-text-primary font-semibold text-lg">Total Hours</Text>
-                      <Text className="text-text-secondary text-sm">Today's work</Text>
-                    </View>
-                  </View>
-                  <View className="bg-white px-5 py-3 rounded-xl shadow-sm border border-teal-200">
-                    <Text className="text-primary-teal text-2xl font-bold">
-                      {totalHoursToday.toFixed(2)}h
+                  <View className="items-center">
+                    <Ionicons 
+                      name={isPunchedIn ? 'log-out' : 'log-in'} 
+                      size={90} 
+                      color="white" 
+                      accessibilityIgnoresInvertColors
+                    />
+                    <Text className="text-white text-3xl font-bold mt-6 text-center">
+                      {isPunchedIn ? 'Punch Out' : 'Punch In'}
+                    </Text>
+                    <Text className="text-white text-base mt-3 opacity-90 text-center px-4">
+                      {isPunchedIn ? 'Tap to end your day' : 'Tap to start your day'}
                     </Text>
                   </View>
-                </View>
-              </Animated.View>
-            )}
-
-            {/* Date Display */}
-            <View className="mt-4 pt-4 border-t border-gray-200">
-              <Text className="text-text-secondary text-center font-medium">
-                {formatDate(new Date().toISOString())}
-              </Text>
-            </View>
+                </LinearGradient>
+              </TouchableOpacity>
+            </Animated.View>
           </View>
-        </Animated.View>
 
-        {/* Reset Button */}
-        <TouchableOpacity 
-          onPress={resetToday} 
-          className="bg-gray-100 px-8 py-4 rounded-2xl border border-gray-200"
-        >
-          <Text className="text-text-secondary text-sm font-medium">Reset Today (for testing)</Text>
-        </TouchableOpacity>
-      </View>
+          {/* Status Text */}
+          <Animated.View style={statusTextAnimatedStyle} className="mb-8">
+            <Text className="text-text-primary text-lg font-medium text-center px-6 leading-6">
+              {getStatusText()}
+            </Text>
+          </Animated.View>
+
+          {/* Today's Times Card - Calendar Style */}
+          <Animated.View style={cardAnimatedStyle} className="w-full max-w-sm">
+            <View className="bg-white rounded-2xl shadow-md p-6 mb-6 border border-gray-100">
+              <View className="flex-row items-center mb-6">
+                <View className="w-4 h-4 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet mr-3" />
+                <Text className="text-2xl font-bold text-text-primary">Today's Schedule</Text>
+              </View>
+              
+              <View className="space-y-5">
+                {/* Punch In Row */}
+                <Animated.View style={punchInRowAnimatedStyle} className="flex-row items-center p-5 bg-gradient-to-r from-indigo-50 to-violet-50 rounded-2xl border border-indigo-100">
+                  <View className="w-12 h-12 bg-primary-indigo rounded-full justify-center items-center mr-4">
+                    <Ionicons name="log-in" size={24} color="white" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-text-primary font-semibold text-lg">Punch In</Text>
+                    <Text className="text-text-secondary text-sm">Start time</Text>
+                  </View>
+                  <TouchableOpacity 
+                    onPress={() => openEditModal('in')}
+                    className="bg-white px-5 py-3 rounded-xl shadow-sm border border-indigo-200"
+                  >
+                    <Text className="text-primary-indigo text-xl font-mono font-bold">
+                      {formatTime(todayPunch?.punchIn)}
+                    </Text>
+                  </TouchableOpacity>
+                </Animated.View>
+                
+                {/* Punch Out Row */}
+                <Animated.View style={punchOutRowAnimatedStyle} className="flex-row items-center p-5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-100">
+                  <View className="w-12 h-12 bg-primary-amber rounded-full justify-center items-center mr-4">
+                    <Ionicons name="log-out" size={24} color="white" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-text-primary font-semibold text-lg">Punch Out</Text>
+                    <Text className="text-text-secondary text-sm">End time</Text>
+                  </View>
+                  <TouchableOpacity 
+                    onPress={() => openEditModal('out')}
+                    className="bg-white px-5 py-3 rounded-xl shadow-sm border border-amber-200"
+                  >
+                    <Text className="text-primary-amber text-xl font-mono font-bold">
+                      {formatTime(todayPunch?.punchOut)}
+                    </Text>
+                  </TouchableOpacity>
+                </Animated.View>
+              </View>
+              
+              {/* Total Hours */}
+              {totalHoursToday > 0 && (
+                <Animated.View style={totalHoursAnimatedStyle} className="mt-6 pt-6 border-t border-gray-200">
+                  <View className="flex-row justify-between items-center p-4 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-2xl border border-teal-100">
+                    <View className="flex-row items-center">
+                      <View className="w-10 h-10 bg-primary-teal rounded-full justify-center items-center mr-3">
+                        <Ionicons name="time" size={20} color="white" />
+                      </View>
+                      <View>
+                        <Text className="text-text-primary font-semibold text-lg">Total Hours</Text>
+                        <Text className="text-text-secondary text-sm">Today's work</Text>
+                      </View>
+                    </View>
+                    <View className="bg-white px-5 py-3 rounded-xl shadow-sm border border-teal-200">
+                      <Text className="text-primary-teal text-2xl font-bold">
+                        {totalHoursToday.toFixed(2)}h
+                      </Text>
+                    </View>
+                  </View>
+                </Animated.View>
+              )}
+
+              {/* Date Display */}
+              <View className="mt-4 pt-4 border-t border-gray-200">
+                <Text className="text-text-secondary text-center font-medium">
+                  {formatDate(new Date().toISOString())}
+                </Text>
+              </View>
+            </View>
+          </Animated.View>
+
+          {/* Reset Button */}
+          <TouchableOpacity 
+            onPress={resetToday} 
+            className="bg-gray-100 px-8 py-4 rounded-2xl border border-gray-200"
+          >
+            <Text className="text-text-secondary text-sm font-medium">Reset Today (for testing)</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
 
       {/* Edit Time Modal */}
       <Modal 
@@ -438,6 +450,6 @@ export default function HomeScreen() {
           )}
         </View>
       </Modal>
-    </ScrollView>
+    </SafeAreaView>
   );
 } 
