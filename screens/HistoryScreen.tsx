@@ -7,7 +7,10 @@ import {
   Alert,
   RefreshControl,
   Dimensions,
+  Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 import { Calendar, DateData } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -120,7 +123,9 @@ export default function HistoryScreen() {
     setRefreshing(false);
   }, [refreshTodayData]);
 
+  // Enhanced date selection with haptics
   const handleDateSelect = (day: DateData) => {
+    Haptics.selectionAsync();
     setSelectedDate(day.dateString);
     showDayCard();
   };
@@ -153,7 +158,9 @@ export default function HistoryScreen() {
     }, 200);
   };
 
+  // Enhanced edit record with haptics
   const handleEditRecord = (record: PunchRecord) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setEditingRecord(record);
     setIsEditModalVisible(true);
   };
@@ -172,7 +179,9 @@ export default function HistoryScreen() {
     }
   };
 
+  // Enhanced delete record with haptics
   const handleDeleteRecord = async (recordId: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     Alert.alert(
       'Delete Record',
       'Are you sure you want to delete this punch record?',
@@ -199,7 +208,9 @@ export default function HistoryScreen() {
     );
   };
 
+  // Enhanced load sample data with haptics
   const handleLoadSampleData = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
       await generateSampleData();
       await Promise.all([
@@ -285,7 +296,7 @@ export default function HistoryScreen() {
   });
 
   return (
-    <View className="flex-1 bg-gradient-to-b from-blue-50 via-indigo-50 to-purple-50">
+    <SafeAreaView className="flex-1 bg-background-light">
       {/* Header */}
       <Animated.View style={headerAnimatedStyle} className="bg-white pt-12 pb-6 px-6 border-b border-gray-100 shadow-sm">
         <Text className="text-3xl font-bold text-text-primary mb-2">History</Text>
@@ -298,6 +309,7 @@ export default function HistoryScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
       >
         {/* Calendar */}
         <Animated.View 
@@ -305,7 +317,7 @@ export default function HistoryScreen() {
             opacity: cardOpacity.value,
             transform: [{ translateY: cardTranslateY.value }],
           })), calendarAnimatedStyle]}
-          className="bg-white m-6 rounded-3xl shadow-xl overflow-hidden border border-gray-100"
+          className="bg-white m-6 rounded-2xl shadow-md overflow-hidden border border-gray-100"
         >
           <Calendar
             onDayPress={handleDateSelect}
@@ -314,20 +326,20 @@ export default function HistoryScreen() {
               [selectedDate]: {
                 ...markedDates[selectedDate],
                 selected: true,
-                selectedColor: '#3b82f6',
+                selectedColor: '#6366F1',
               },
             }}
             theme={{
-              selectedDayBackgroundColor: '#3b82f6',
+              selectedDayBackgroundColor: '#6366F1',
               selectedDayTextColor: '#ffffff',
-              todayTextColor: '#3b82f6',
+              todayTextColor: '#6366F1',
               dayTextColor: '#374151',
               textDisabledColor: '#d1d5db',
-              dotColor: '#22c55e',
+              dotColor: '#14B8A6',
               selectedDotColor: '#ffffff',
-              arrowColor: '#3b82f6',
+              arrowColor: '#6366F1',
               monthTextColor: '#374151',
-              indicatorColor: '#3b82f6',
+              indicatorColor: '#6366F1',
               textDayFontWeight: '600',
               textMonthFontWeight: 'bold',
               textDayHeaderFontWeight: '700',
@@ -354,11 +366,16 @@ export default function HistoryScreen() {
         >
           <TouchableOpacity
             onPress={handleLoadSampleData}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-4 shadow-lg"
+            className="bg-gradient-to-r from-primary-violet to-primary-indigo rounded-2xl p-4 shadow-md"
             activeOpacity={0.9}
+            accessibilityRole="button"
+            accessibilityLabel="Load sample data"
+            accessibilityHint="Load sample punch records for testing"
+            style={{ minHeight: 44 }}
+            {...(Platform.OS === 'android' ? { android_ripple: { color: '#FFFFFF', borderless: false, radius: 20 } } : {})}
           >
             <View className="flex-row items-center justify-center">
-              <Ionicons name="add-circle" size={24} color="white" />
+              <Ionicons name="add-circle" size={24} color="white" accessibilityIgnoresInvertColors />
               <Text className="text-white font-semibold text-lg ml-2">Load Sample Data</Text>
             </View>
           </TouchableOpacity>
@@ -377,7 +394,7 @@ export default function HistoryScreen() {
         style={{ margin: 0, justifyContent: 'flex-end' }}
       >
         <Animated.View style={dayCardAnimatedStyle}>
-          <View className="bg-white rounded-t-3xl shadow-2xl border border-gray-100 max-h-[80%]">
+          <View className="bg-white rounded-t-2xl shadow-md border border-gray-100 max-h-[80%]">
             {/* Handle */}
             <View className="items-center pt-4 pb-2">
               <View className="w-12 h-1 bg-gray-300 rounded-full" />
@@ -387,16 +404,20 @@ export default function HistoryScreen() {
             <View className="px-6 pb-4 border-b border-gray-100">
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center">
-                  <View className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mr-3" />
-                  <Text className="text-2xl font-bold text-gray-800">
+                  <View className="w-4 h-4 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet mr-3" />
+                  <Text className="text-2xl font-bold text-text-primary">
                     {formatDate(selectedDate)}
                   </Text>
                 </View>
                 <TouchableOpacity
                   onPress={hideDayCard}
                   className="w-8 h-8 bg-gray-100 rounded-full justify-center items-center"
+                  accessibilityRole="button"
+                  accessibilityLabel="Close day card"
+                  style={{ minWidth: 44, minHeight: 44 }}
+                  {...(Platform.OS === 'android' ? { android_ripple: { color: '#6366F1', borderless: false, radius: 22 } } : {})}
                 >
-                  <Ionicons name="close" size={20} color="#6b7280" />
+                  <Ionicons name="close" size={20} color="#6b7280" accessibilityIgnoresInvertColors />
                 </TouchableOpacity>
               </View>
             </View>
@@ -420,6 +441,7 @@ export default function HistoryScreen() {
                                 name={record.punchOut ? "checkmark-circle" : "time"} 
                                 size={20} 
                                 color={getStatusColor(record)} 
+                                accessibilityIgnoresInvertColors
                               />
                             </View>
                             <View>
@@ -436,7 +458,7 @@ export default function HistoryScreen() {
                         <View className="space-y-3">
                           <View className="flex-row justify-between items-center p-3 bg-white/60 rounded-xl">
                             <View className="flex-row items-center">
-                              <Ionicons name="log-in" size={16} color="#3b82f6" />
+                              <Ionicons name="log-in" size={16} color="#3b82f6" accessibilityIgnoresInvertColors />
                               <Text className="text-gray-700 font-medium ml-2">Punch In</Text>
                             </View>
                             <Text className="font-mono font-bold text-blue-600 text-lg">
@@ -446,7 +468,7 @@ export default function HistoryScreen() {
                           
                           <View className="flex-row justify-between items-center p-3 bg-white/60 rounded-xl">
                             <View className="flex-row items-center">
-                              <Ionicons name="log-out" size={16} color="#ef4444" />
+                              <Ionicons name="log-out" size={16} color="#ef4444" accessibilityIgnoresInvertColors />
                               <Text className="text-gray-700 font-medium ml-2">Punch Out</Text>
                             </View>
                             <Text className="font-mono font-bold text-red-600 text-lg">
@@ -457,7 +479,7 @@ export default function HistoryScreen() {
                           {record.totalHours && (
                             <View className="flex-row justify-between items-center p-3 bg-white/60 rounded-xl">
                               <View className="flex-row items-center">
-                                <Ionicons name="time" size={16} color="#22c55e" />
+                                <Ionicons name="time" size={16} color="#22c55e" accessibilityIgnoresInvertColors />
                                 <Text className="text-gray-700 font-medium ml-2">Total Hours</Text>
                               </View>
                               <Text className="font-bold text-green-600 text-lg">
@@ -469,7 +491,7 @@ export default function HistoryScreen() {
                           {record.notes && (
                             <View className="p-3 bg-white/60 rounded-xl">
                               <View className="flex-row items-center mb-2">
-                                <Ionicons name="document-text" size={16} color="#6b7280" />
+                                <Ionicons name="document-text" size={16} color="#6b7280" accessibilityIgnoresInvertColors />
                                 <Text className="text-gray-700 font-medium ml-2">Notes</Text>
                               </View>
                               <Text className="text-gray-600 text-sm">{record.notes}</Text>
@@ -482,16 +504,24 @@ export default function HistoryScreen() {
                             onPress={() => handleEditRecord(record)}
                             className="flex-row items-center bg-blue-500 px-4 py-3 rounded-xl shadow-sm"
                             activeOpacity={0.8}
+                            accessibilityRole="button"
+                            accessibilityLabel="Edit record"
+                            style={{ minHeight: 44 }}
+                            {...(Platform.OS === 'android' ? { android_ripple: { color: '#FFFFFF', borderless: false, radius: 20 } } : {})}
                           >
-                            <Ionicons name="create" size={16} color="white" />
+                            <Ionicons name="create" size={16} color="white" accessibilityIgnoresInvertColors />
                             <Text className="text-white font-semibold ml-2">Edit</Text>
                           </TouchableOpacity>
                           <TouchableOpacity
                             onPress={() => handleDeleteRecord(record.id)}
                             className="flex-row items-center bg-red-500 px-4 py-3 rounded-xl shadow-sm"
                             activeOpacity={0.8}
+                            accessibilityRole="button"
+                            accessibilityLabel="Delete record"
+                            style={{ minHeight: 44 }}
+                            {...(Platform.OS === 'android' ? { android_ripple: { color: '#FFFFFF', borderless: false, radius: 20 } } : {})}
                           >
-                            <Ionicons name="trash" size={16} color="white" />
+                            <Ionicons name="trash" size={16} color="white" accessibilityIgnoresInvertColors />
                             <Text className="text-white font-semibold ml-2">Delete</Text>
                           </TouchableOpacity>
                         </View>
@@ -502,7 +532,7 @@ export default function HistoryScreen() {
               ) : (
                 <View className="items-center py-12">
                   <View className="w-20 h-20 bg-gray-100 rounded-full justify-center items-center mb-4">
-                    <Ionicons name="calendar-outline" size={32} color="#9ca3af" />
+                    <Ionicons name="calendar-outline" size={32} color="#9ca3af" accessibilityIgnoresInvertColors />
                   </View>
                   <Text className="text-gray-600 text-xl font-semibold mb-2">No records for this date</Text>
                   <Text className="text-gray-400 text-center">Punch in to start tracking your time</Text>
@@ -520,6 +550,6 @@ export default function HistoryScreen() {
         onSave={handleSaveRecord}
         onClose={() => setIsEditModalVisible(false)}
       />
-    </View>
+    </SafeAreaView>
   );
 } 

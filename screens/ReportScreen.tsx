@@ -8,7 +8,10 @@ import {
   RefreshControl,
   ActivityIndicator,
   Dimensions,
+  Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { 
@@ -159,11 +162,14 @@ export default function ReportScreen() {
     });
   };
 
+  // Enhanced PDF generation with haptics
   const handleGeneratePDF = async () => {
     if (filteredRecords.length === 0) {
       Alert.alert('No Data', 'No punch records found for the selected date range');
       return;
     }
+
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     // Button animation
     buttonScale.value = withSequence(
@@ -203,7 +209,9 @@ export default function ReportScreen() {
     }
   };
 
+  // Enhanced share report with haptics
   const handleShareReport = async (filePath: string) => {
+    Haptics.selectionAsync();
     const reportTitle = `Time Report ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
     
     Alert.alert(
@@ -325,8 +333,18 @@ export default function ReportScreen() {
     };
   });
 
+  if (loading || isLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background-light justify-center items-center">
+        <View className="bg-white rounded-2xl p-8 shadow-md">
+          <Text className="text-text-secondary text-lg font-medium">Loading reports...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <View className="flex-1 bg-gradient-to-b from-blue-50 via-indigo-50 to-purple-50">
+    <SafeAreaView className="flex-1 bg-background-light">
       {/* Header */}
       <Animated.View style={headerAnimatedStyle} className="bg-white pt-12 pb-6 px-6 border-b border-gray-100 shadow-sm">
         <Text className="text-3xl font-bold text-text-primary mb-2">Reports</Text>
@@ -339,6 +357,7 @@ export default function ReportScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
       >
         <View className="p-6 space-y-6">
           {/* Enhanced Date Range Picker */}
@@ -355,40 +374,40 @@ export default function ReportScreen() {
           <Animated.View style={[cardAnimatedStyle, summaryCardAnimatedStyle]}>
             <View className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
               <View className="flex-row items-center mb-6">
-                <View className="w-4 h-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mr-3" />
-                <Text className="text-2xl font-bold text-gray-800">Summary</Text>
+                <View className="w-4 h-4 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet mr-3" />
+                <Text className="text-2xl font-bold text-text-primary">Summary</Text>
               </View>
               
               <View className="grid grid-cols-2 gap-4">
-                <View className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-2xl border border-blue-100">
-                  <Text className="text-3xl font-bold text-blue-600">{summary.totalDays}</Text>
-                  <Text className="text-sm text-blue-800 font-medium">Days</Text>
+                <View className="bg-gradient-to-r from-indigo-50 to-violet-50 p-4 rounded-2xl border border-indigo-100">
+                  <Text className="text-3xl font-bold text-primary-indigo">{summary.totalDays}</Text>
+                  <Text className="text-sm text-primary-indigo font-medium">Days</Text>
                 </View>
-                <View className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-2xl border border-green-100">
-                  <Text className="text-3xl font-bold text-green-600">{summary.totalRecords}</Text>
-                  <Text className="text-sm text-green-800 font-medium">Records</Text>
+                <View className="bg-gradient-to-r from-teal-50 to-cyan-50 p-4 rounded-2xl border border-teal-100">
+                  <Text className="text-3xl font-bold text-primary-teal">{summary.totalRecords}</Text>
+                  <Text className="text-sm text-primary-teal font-medium">Records</Text>
                 </View>
-                <View className="bg-gradient-to-r from-purple-50 to-violet-50 p-4 rounded-2xl border border-purple-100">
-                  <Text className="text-2xl font-bold text-purple-600">{formatDuration(summary.totalHours)}</Text>
-                  <Text className="text-sm text-purple-800 font-medium">Total Hours</Text>
+                <View className="bg-gradient-to-r from-violet-50 to-purple-50 p-4 rounded-2xl border border-violet-100">
+                  <Text className="text-2xl font-bold text-primary-violet">{formatDuration(summary.totalHours)}</Text>
+                  <Text className="text-sm text-primary-violet font-medium">Total Hours</Text>
                 </View>
-                <View className="bg-gradient-to-r from-orange-50 to-amber-50 p-4 rounded-2xl border border-orange-100">
-                  <Text className="text-2xl font-bold text-orange-600">{formatDuration(summary.averageHoursPerDay)}</Text>
-                  <Text className="text-sm text-orange-800 font-medium">Avg/Day</Text>
+                <View className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-2xl border border-amber-100">
+                  <Text className="text-2xl font-bold text-primary-amber">{formatDuration(summary.averageHoursPerDay)}</Text>
+                  <Text className="text-sm text-primary-amber font-medium">Avg/Day</Text>
                 </View>
               </View>
 
               {/* Day Distribution */}
               <View className="mt-6 pt-6 border-t border-gray-200">
-                <Text className="text-lg font-semibold text-gray-800 mb-4">Day Distribution</Text>
+                <Text className="text-lg font-semibold text-text-primary mb-4">Day Distribution</Text>
                 <View className="flex-row space-x-4">
-                  <View className="flex-1 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-2xl border border-blue-100">
-                    <Text className="text-2xl font-bold text-blue-600">{summary.weekdays}</Text>
-                    <Text className="text-sm text-blue-800 font-medium">Weekdays</Text>
+                  <View className="flex-1 bg-gradient-to-r from-indigo-50 to-violet-50 p-4 rounded-2xl border border-indigo-100">
+                    <Text className="text-2xl font-bold text-primary-indigo">{summary.weekdays}</Text>
+                    <Text className="text-sm text-primary-indigo font-medium">Weekdays</Text>
                   </View>
-                  <View className="flex-1 bg-gradient-to-r from-pink-50 to-rose-50 p-4 rounded-2xl border border-pink-100">
-                    <Text className="text-2xl font-bold text-pink-600">{summary.weekendDays}</Text>
-                    <Text className="text-sm text-pink-800 font-medium">Weekends</Text>
+                  <View className="flex-1 bg-gradient-to-r from-rose-50 to-pink-50 p-4 rounded-2xl border border-rose-100">
+                    <Text className="text-2xl font-bold text-rose-600">{summary.weekendDays}</Text>
+                    <Text className="text-sm text-rose-600 font-medium">Weekends</Text>
                   </View>
                 </View>
               </View>
@@ -401,12 +420,17 @@ export default function ReportScreen() {
               onPress={handleGeneratePDF}
               disabled={isGeneratingPDF || filteredRecords.length === 0}
               activeOpacity={0.9}
-              className="overflow-hidden rounded-3xl shadow-xl"
+              className="overflow-hidden rounded-2xl shadow-md"
+              accessibilityRole="button"
+              accessibilityLabel={isGeneratingPDF ? 'Generating PDF' : 'Generate PDF Report'}
+              accessibilityHint="Generate a PDF report of your time tracking data"
+              style={{ minHeight: 44 }}
+              {...(Platform.OS === 'android' ? { android_ripple: { color: '#FFFFFF', borderless: false, radius: 20 } } : {})}
             >
               <LinearGradient
                 colors={isGeneratingPDF || filteredRecords.length === 0 
                   ? ['#9ca3af', '#6b7280'] 
-                  : ['#3b82f6', '#8b5cf6', '#6366f1']
+                  : ['#6366F1', '#8B5CF6', '#14B8A6']
                 }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
@@ -417,7 +441,7 @@ export default function ReportScreen() {
                     <ActivityIndicator color="white" size="large" />
                   ) : (
                     <View className="w-12 h-12 bg-white/20 rounded-full justify-center items-center mr-4">
-                      <Ionicons name="document-text" size={28} color="white" />
+                      <Ionicons name="document-text" size={28} color="white" accessibilityIgnoresInvertColors />
                     </View>
                   )}
                   <View className="flex-1">
@@ -435,15 +459,15 @@ export default function ReportScreen() {
 
           {/* Enhanced Punch Records List */}
           <Animated.View style={cardAnimatedStyle}>
-            <View className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+            <View className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
               <View className="p-6 border-b border-gray-100">
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row items-center">
-                    <View className="w-4 h-4 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 mr-3" />
-                    <Text className="text-2xl font-bold text-gray-800">Daily Records</Text>
+                    <View className="w-4 h-4 rounded-full bg-gradient-to-r from-primary-teal to-primary-indigo mr-3" />
+                    <Text className="text-2xl font-bold text-text-primary">Daily Records</Text>
                   </View>
-                  <View className="bg-blue-100 px-3 py-1 rounded-full">
-                    <Text className="text-blue-700 font-medium text-sm">
+                  <View className="bg-indigo-100 px-3 py-1 rounded-full">
+                    <Text className="text-primary-indigo font-medium text-sm">
                       {filteredRecords.length} record{filteredRecords.length !== 1 ? 's' : ''}
                     </Text>
                   </View>
@@ -453,7 +477,7 @@ export default function ReportScreen() {
               {filteredRecords.length === 0 ? (
                 <View className="p-12 items-center">
                   <View className="w-20 h-20 bg-gray-100 rounded-full justify-center items-center mb-4">
-                    <Ionicons name="document-outline" size={32} color="#9ca3af" />
+                    <Ionicons name="document-outline" size={32} color="#9ca3af" accessibilityIgnoresInvertColors />
                   </View>
                   <Text className="text-gray-600 text-xl font-semibold mb-2 text-center">
                     No punch records found
@@ -495,14 +519,14 @@ export default function ReportScreen() {
                             <View className="flex-1">
                               <View className="flex-row items-center space-x-4">
                                 <View className="flex-row items-center">
-                                  <Ionicons name="log-in" size={16} color="#3b82f6" />
+                                  <Ionicons name="log-in" size={16} color="#3b82f6" accessibilityIgnoresInvertColors />
                                   <Text className="text-gray-700 font-mono ml-2">
                                     {formatTime(record.punchIn)}
                                   </Text>
                                 </View>
-                                <Ionicons name="arrow-forward" size={16} color="#9ca3af" />
+                                <Ionicons name="arrow-forward" size={16} color="#9ca3af" accessibilityIgnoresInvertColors />
                                 <View className="flex-row items-center">
-                                  <Ionicons name="log-out" size={16} color="#ef4444" />
+                                  <Ionicons name="log-out" size={16} color="#ef4444" accessibilityIgnoresInvertColors />
                                   <Text className="text-gray-700 font-mono ml-2">
                                     {formatTime(record.punchOut)}
                                   </Text>
@@ -512,8 +536,8 @@ export default function ReportScreen() {
                                 <Text className="text-sm text-gray-500 mt-2 italic">"{record.notes}"</Text>
                               )}
                             </View>
-                            <View className="bg-green-100 px-3 py-2 rounded-xl">
-                              <Text className="font-bold text-green-700">
+                            <View className="bg-teal-100 px-3 py-2 rounded-xl">
+                              <Text className="font-bold text-primary-teal">
                                 {formatDuration(record.totalHours)}
                               </Text>
                             </View>
@@ -589,6 +613,6 @@ export default function ReportScreen() {
           </Animated.View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 } 

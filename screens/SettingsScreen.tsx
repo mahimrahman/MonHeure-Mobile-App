@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   Switch,
-  Modal,
   Alert,
+  RefreshControl,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { 
@@ -16,19 +18,27 @@ import Animated, {
   useAnimatedStyle, 
   withSpring,
   withTiming,
-  Easing
+  Easing,
+  withDelay
 } from 'react-native-reanimated';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
-import { clearAllData } from '../utils/database';
-import { usePunchStore } from '../utils/punchStore';
+import { clearAllData, exportData, importData } from '../utils/database';
+import { usePunchStore, usePunchActions } from '../utils/punchStore';
+import { shareApp } from '../utils/shareUtils';
 
 const DASHBOARD_VIEWS = ['Weekly', 'Monthly', 'Yearly'];
 
 export default function SettingsScreen() {
-  const resetState = usePunchStore(state => state.resetState);
-  
+  const [refreshing, setRefreshing] = useState(false);
+  const [settings, setSettings] = useState({
+    notifications: true,
+    darkMode: false,
+    autoBackup: true,
+    hapticFeedback: true,
+  });
+
   // Default punch times
   const [defaultPunchIn, setDefaultPunchIn] = useState('09:00');
   const [defaultPunchOut, setDefaultPunchOut] = useState('18:00');
@@ -49,8 +59,12 @@ export default function SettingsScreen() {
   const [showClearModal, setShowClearModal] = useState(false);
 
   // Animation values
+  const headerOpacity = useSharedValue(0);
+  const headerTranslateY = useSharedValue(30);
   const cardOpacity = useSharedValue(0);
-  const cardTranslateY = useSharedValue(30);
+  const cardTranslateY = useSharedValue(50);
+
+  const { refreshTodayData } = usePunchActions();
 
   // Load settings from AsyncStorage
   useEffect(() => {
@@ -70,8 +84,13 @@ export default function SettingsScreen() {
 
   // Start animations on mount
   useEffect(() => {
-    cardOpacity.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) });
-    cardTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
+    // Animate header
+    headerOpacity.value = withTiming(1, { duration: 600 });
+    headerTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
+
+    // Animate cards with delay
+    cardOpacity.value = withDelay(200, withTiming(1, { duration: 800 }));
+    cardTranslateY.value = withDelay(200, withSpring(0, { damping: 15, stiffness: 100 }));
   }, []);
 
   // Save settings to AsyncStorage
@@ -149,47 +168,206 @@ export default function SettingsScreen() {
     setNotificationId(null);
   };
 
-  // Clear all data
-  const handleClearAllData = async () => {
-    setShowClearModal(false);
-    try {
-      // Clear SQLite database
-      await clearAllData();
-      // Clear AsyncStorage settings
-      await AsyncStorage.clear();
-      // Reset Zustand store state
-      resetState();
-      Alert.alert('Data Cleared', 'All stored data has been removed.');
-      // Optionally, reset state to defaults
-      setDefaultPunchIn('09:00');
-      setDefaultPunchOut('18:00');
-      setDashboardView('Weekly');
-      setDarkTheme(false);
-      setNotificationsEnabled(false);
-    } catch (error) {
-      console.error('Error clearing data:', error);
-      Alert.alert('Error', 'Failed to clear all data');
-    }
+  // Enhanced settings toggle with haptics
+  const handleToggle = (key: string, value: boolean) => {
+    Haptics.selectionAsync();
+    setSettings(prev => ({ ...prev, [key]: value }));
   };
 
-  // Reset Zustand store only
-  const handleResetStore = () => {
+  // Enhanced clear data with haptics
+  const handleClearData = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     Alert.alert(
-      'Reset Store State',
-      'This will reset the current punch state and today\'s data. Continue?',
+      'Clear All Data',
+      'This will permanently delete all your punch records. This action cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Reset',
+          text: 'Clear All Data',
           style: 'destructive',
-          onPress: () => {
-            resetState();
-            Alert.alert('Success', 'Store state has been reset');
+          onPress: async () => {
+            try {
+              await clearAllData();
+              await refreshTodayData();
+              Alert.alert('✅ Success', 'All data has been cleared');
+            } catch (error) {
+              console.error('Error clearing data:', error);
+              Alert.alert('❌ Error', 'Failed to clear data');
+            }
           }
         }
       ]
     );
   };
+
+  // Enhanced export data with haptics
+  const handleExportData = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    try {
+      const data = await exportData();
+      Alert.alert('✅ Success', 'Data exported successfully');
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      Alert.alert('❌ Error', 'Failed to export data');
+    }
+  };
+
+  // Enhanced import data with haptics
+  const handleImportData = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    try {
+      await importData();
+      await refreshTodayData();
+      Alert.alert('✅ Success', 'Data imported successfully');
+    } catch (error) {
+      console.error('Error importing data:', error);
+      Alert.alert('❌ Error', 'Failed to import data');
+    }
+  };
+
+  // Enhanced share app with haptics
+  const handleShareApp = () => {
+    Haptics.selectionAsync();
+    shareApp();
+  };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refreshTodayData();
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refreshTodayData]);
+
+  const settingGroups: { title: string; items: SettingItem[] }[] = [
+    {
+      title: 'Preferences',
+      items: [
+        {
+          id: 'notifications',
+          title: 'Push Notifications',
+          subtitle: 'Receive reminders and updates',
+          icon: 'notifications',
+          type: 'toggle',
+          value: settings.notifications,
+          onToggle: (value) => handleToggle('notifications', value),
+        },
+        {
+          id: 'darkMode',
+          title: 'Dark Mode',
+          subtitle: 'Switch to dark theme',
+          icon: 'moon',
+          type: 'toggle',
+          value: settings.darkMode,
+          onToggle: (value) => handleToggle('darkMode', value),
+        },
+        {
+          id: 'autoBackup',
+          title: 'Auto Backup',
+          subtitle: 'Automatically backup your data',
+          icon: 'cloud-upload',
+          type: 'toggle',
+          value: settings.autoBackup,
+          onToggle: (value) => handleToggle('autoBackup', value),
+        },
+        {
+          id: 'hapticFeedback',
+          title: 'Haptic Feedback',
+          subtitle: 'Vibrate on interactions',
+          icon: 'phone-portrait',
+          type: 'toggle',
+          value: settings.hapticFeedback,
+          onToggle: (value) => handleToggle('hapticFeedback', value),
+        },
+      ],
+    },
+    {
+      title: 'Data Management',
+      items: [
+        {
+          id: 'export',
+          title: 'Export Data',
+          subtitle: 'Export your punch records',
+          icon: 'download',
+          type: 'button',
+          onPress: handleExportData,
+        },
+        {
+          id: 'import',
+          title: 'Import Data',
+          subtitle: 'Import punch records from file',
+          icon: 'upload',
+          type: 'button',
+          onPress: handleImportData,
+        },
+        {
+          id: 'clear',
+          title: 'Clear All Data',
+          subtitle: 'Permanently delete all records',
+          icon: 'trash',
+          type: 'button',
+          onPress: handleClearData,
+          danger: true,
+        },
+      ],
+    },
+    {
+      title: 'Support',
+      items: [
+        {
+          id: 'share',
+          title: 'Share App',
+          subtitle: 'Share MonHeure with friends',
+          icon: 'share-social',
+          type: 'button',
+          onPress: handleShareApp,
+        },
+        {
+          id: 'feedback',
+          title: 'Send Feedback',
+          subtitle: 'Help us improve the app',
+          icon: 'chatbubble-ellipses',
+          type: 'link',
+        },
+        {
+          id: 'privacy',
+          title: 'Privacy Policy',
+          subtitle: 'Read our privacy policy',
+          icon: 'shield-checkmark',
+          type: 'link',
+        },
+        {
+          id: 'terms',
+          title: 'Terms of Service',
+          subtitle: 'Read our terms of service',
+          icon: 'document-text',
+          type: 'link',
+        },
+      ],
+    },
+    {
+      title: 'About',
+      items: [
+        {
+          id: 'version',
+          title: 'Version',
+          subtitle: '1.0.0',
+          icon: 'information-circle',
+          type: 'link',
+        },
+        {
+          id: 'licenses',
+          title: 'Open Source Licenses',
+          subtitle: 'View third-party licenses',
+          icon: 'library',
+          type: 'link',
+        },
+      ],
+    },
+  ];
 
   // Helper to parse time string to Date
   const parseTime = (time: string) => {
@@ -200,12 +378,15 @@ export default function SettingsScreen() {
   };
 
   // Animated styles
-  const cardAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: cardOpacity.value,
-      transform: [{ translateY: cardTranslateY.value }],
-    };
-  });
+  const headerAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: headerOpacity.value,
+    transform: [{ translateY: headerTranslateY.value }],
+  }));
+
+  const cardAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: cardOpacity.value,
+    transform: [{ translateY: cardTranslateY.value }],
+  }));
 
   const SettingItem = ({ 
     icon, 
@@ -320,185 +501,115 @@ export default function SettingsScreen() {
   );
 
   return (
-    <View className="flex-1 bg-gradient-to-b from-slate-50 via-blue-50 to-indigo-50">
+    <SafeAreaView className="flex-1 bg-background-light">
       {/* Header */}
-      <LinearGradient
-        colors={['#667eea', '#764ba2']}
-        className="pt-12 pb-8 px-6"
+      <Animated.View style={headerAnimatedStyle} className="bg-white pt-12 pb-6 px-6 border-b border-gray-100 shadow-sm">
+        <Text className="text-3xl font-bold text-text-primary mb-2">Settings</Text>
+        <Text className="text-text-secondary text-lg">Customize your experience</Text>
+      </Animated.View>
+
+      <ScrollView 
+        className="flex-1"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ flexGrow: 1 }}
       >
-        <View className="flex-row items-center mb-4">
-          <View className="w-12 h-12 bg-white bg-opacity-20 rounded-2xl justify-center items-center mr-4">
-            <Ionicons name="settings" size={24} color="white" />
-          </View>
-          <View>
-            <Text className="text-3xl font-bold text-white mb-1">Settings</Text>
-            <Text className="text-white text-opacity-90 text-lg">Customize your experience</Text>
-          </View>
-        </View>
-      </LinearGradient>
-
-      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="p-6 space-y-6">
-          {/* Preferences Section */}
-          <Animated.View style={cardAnimatedStyle}>
-            <View className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-              <SectionHeader
-                title="Preferences"
-                subtitle="Default time settings"
-                gradientColors={['#667eea', '#764ba2']}
-                icon="time"
-              />
-              
-              <SettingItem
-                icon="sunny"
-                title="Default Punch In"
-                subtitle="Set your default start time"
-                value={defaultPunchIn}
-                onPress={() => setShowPunchInPicker(true)}
-                gradientColors={['#fbbf24', '#f59e0b']}
-              />
-              
-              <SettingItem
-                icon="moon"
-                title="Default Punch Out"
-                subtitle="Set your default end time"
-                value={defaultPunchOut}
-                onPress={() => setShowPunchOutPicker(true)}
-                gradientColors={['#8b5cf6', '#7c3aed']}
-              />
-            </View>
-          </Animated.View>
-
-          {/* Appearance Section */}
-          <Animated.View style={cardAnimatedStyle}>
-            <View className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-              <SectionHeader
-                title="Appearance"
-                subtitle="Theme and display settings"
-                gradientColors={['#ec4899', '#be185d']}
-                icon="color-palette"
-              />
-              
-              <SettingItem
-                icon="moon"
-                title="Dark Theme"
-                subtitle="Switch between light and dark mode"
-                value={darkTheme ? 'Enabled' : 'Disabled'}
-                onPress={handleThemeToggle}
-                gradientColors={['#6366f1', '#4f46e5']}
-                showSwitch={true}
-                switchValue={darkTheme}
-                onSwitchChange={handleThemeToggle}
-                showChevron={false}
-              />
-              
-              <SettingItem
-                icon="grid"
-                title="Dashboard View"
-                subtitle="Default chart view"
-                value={dashboardView}
-                onPress={() => {}}
-                gradientColors={['#10b981', '#059669']}
-                showChevron={false}
-              />
-              
-              {DASHBOARD_VIEWS.map((view) => (
-                <SettingItem
-                  key={view}
-                  icon={view === 'Weekly' ? 'calendar' : view === 'Monthly' ? 'calendar-outline' : 'bar-chart'}
-                  title={view}
-                  onPress={() => handleDashboardViewChange(view)}
-                  iconColor="#6b7280"
-                  showCheckmark={true}
-                  isSelected={dashboardView === view}
-                  showChevron={false}
-                />
-              ))}
-            </View>
-          </Animated.View>
-
-          {/* Notifications Section */}
-          <Animated.View style={cardAnimatedStyle}>
-            <View className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-              <SectionHeader
-                title="Notifications"
-                subtitle="Reminder settings"
-                gradientColors={['#10b981', '#059669']}
-                icon="notifications"
-              />
-              
-              <SettingItem
-                icon="alarm"
-                title="Punch Out Reminder"
-                subtitle="Daily reminder at 6:00 PM"
-                onPress={() => setNotificationsEnabled(!notificationsEnabled)}
-                gradientColors={['#f59e0b', '#d97706']}
-                showSwitch={true}
-                switchValue={notificationsEnabled}
-                onSwitchChange={setNotificationsEnabled}
-                showChevron={false}
-              />
-            </View>
-          </Animated.View>
-
-          {/* Data Management Section */}
-          <Animated.View style={cardAnimatedStyle}>
-            <View className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-              <SectionHeader
-                title="Data Management"
-                subtitle="Manage your stored data"
-                gradientColors={['#f59e0b', '#d97706']}
-                icon="cloud"
-              />
-              
-              <SettingItem
-                icon="refresh-circle"
-                title="Reset Store State"
-                subtitle="Reset current punch state"
-                onPress={handleResetStore}
-                gradientColors={['#8b5cf6', '#7c3aed']}
-              />
-            </View>
-          </Animated.View>
-
-          {/* Danger Zone */}
-          <Animated.View style={cardAnimatedStyle}>
-            <View className="bg-gradient-to-r from-red-50 via-rose-50 to-pink-50 rounded-3xl shadow-xl overflow-hidden border border-red-200">
-              <View className="p-6 border-b border-red-200">
-                <View className="flex-row items-center mb-2">
-                  <View className="w-10 h-10 rounded-2xl mr-4 overflow-hidden">
-                    <LinearGradient
-                      colors={['#ef4444', '#dc2626']}
-                      className="w-full h-full justify-center items-center"
+          {settingGroups.map((group, groupIndex) => (
+            <Animated.View key={group.title} style={cardAnimatedStyle}>
+              <View className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
+                <View className="px-6 py-4 border-b border-gray-100">
+                  <Text className="text-lg font-bold text-text-primary">{group.title}</Text>
+                </View>
+                
+                <View className="divide-y divide-gray-100">
+                  {group.items.map((item, index) => (
+                    <TouchableOpacity
+                      key={item.id}
+                      onPress={item.onPress}
+                      disabled={item.type === 'toggle'}
+                      activeOpacity={0.7}
+                      className="px-6 py-4 flex-row items-center justify-between"
+                      accessibilityRole={item.type === 'toggle' ? 'switch' : 'button'}
+                      accessibilityLabel={item.title}
+                      accessibilityHint={item.subtitle}
+                      style={{ minHeight: 44 }}
+                      {...(Platform.OS === 'android' && item.type !== 'toggle' ? { 
+                        android_ripple: { 
+                          color: item.danger ? '#FEE2E2' : '#F3F4F6', 
+                          borderless: false, 
+                          radius: 20 
+                        } 
+                      } : {})}
                     >
-                      <Ionicons name="warning" size={20} color="white" />
-                    </LinearGradient>
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-2xl font-bold text-red-800">Danger Zone</Text>
-                    <Text className="text-red-600 text-sm mt-1">Irreversible actions</Text>
-                  </View>
+                      <View className="flex-row items-center flex-1">
+                        <View className={`w-10 h-10 rounded-full justify-center items-center mr-4 ${
+                          item.danger 
+                            ? 'bg-red-100' 
+                            : 'bg-gradient-to-r from-primary-indigo to-primary-violet'
+                        }`}>
+                          <Ionicons 
+                            name={item.icon as any} 
+                            size={20} 
+                            color={item.danger ? '#EF4444' : 'white'} 
+                            accessibilityIgnoresInvertColors
+                          />
+                        </View>
+                        <View className="flex-1">
+                          <Text className={`font-semibold text-lg ${
+                            item.danger ? 'text-red-600' : 'text-text-primary'
+                          }`}>
+                            {item.title}
+                          </Text>
+                          <Text className="text-text-secondary text-sm mt-1">
+                            {item.subtitle}
+                          </Text>
+                        </View>
+                      </View>
+                      
+                      {item.type === 'toggle' ? (
+                        <Switch
+                          value={item.value}
+                          onValueChange={item.onToggle}
+                          trackColor={{ false: '#E5E7EB', true: '#6366F1' }}
+                          thumbColor={item.value ? '#FFFFFF' : '#FFFFFF'}
+                          ios_backgroundColor="#E5E7EB"
+                          accessibilityRole="switch"
+                          accessibilityLabel={`${item.title} toggle`}
+                        />
+                      ) : (
+                        <Ionicons 
+                          name="chevron-forward" 
+                          size={20} 
+                          color="#9CA3AF" 
+                          accessibilityIgnoresInvertColors
+                        />
+                      )}
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            </Animated.View>
+          ))}
+
+          {/* App Info Card */}
+          <Animated.View style={cardAnimatedStyle}>
+            <View className="bg-gradient-to-r from-primary-indigo to-primary-violet rounded-2xl p-6 shadow-md">
+              <View className="flex-row items-center mb-4">
+                <View className="w-12 h-12 bg-white/20 rounded-full justify-center items-center mr-4">
+                  <Ionicons name="time" size={28} color="white" accessibilityIgnoresInvertColors />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-white text-xl font-bold">MonHeure</Text>
+                  <Text className="text-white/80 text-sm">Time tracking made simple</Text>
                 </View>
               </View>
               
-              <TouchableOpacity
-                onPress={() => setShowClearModal(true)}
-                className="p-6 flex-row items-center justify-between"
-                activeOpacity={0.7}
-              >
-                <View className="flex-row items-center flex-1">
-                  <View className="w-14 h-14 bg-gradient-to-r from-red-400 to-rose-500 rounded-2xl justify-center items-center mr-4">
-                    <Ionicons name="trash" size={24} color="white" />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-red-800 font-bold text-lg">Clear All Data</Text>
-                    <Text className="text-red-600 text-sm mt-1">Permanently delete all stored data</Text>
-                  </View>
-                </View>
-                <View className="bg-gradient-to-r from-red-500 to-rose-500 px-4 py-2 rounded-xl">
-                  <Text className="text-white font-semibold">Delete</Text>
-                </View>
-              </TouchableOpacity>
+              <Text className="text-white/90 text-sm leading-5">
+                Track your work hours, generate reports, and stay productive with our intuitive time tracking app.
+              </Text>
             </View>
           </Animated.View>
         </View>
@@ -562,6 +673,6 @@ export default function SettingsScreen() {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 } 
