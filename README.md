@@ -37,7 +37,7 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Summary Dashboard**: Total days, records, hours, and average per day
 - **Detailed Records**: All punch-in/out entries grouped by day with notes
 - **PDF Export**: Generate professional PDF reports with `react-native-html-to-pdf`
-- **Share & Email**: Share reports via email or other apps with `react-native-share`
+- **Share & Email**: Share reports via email or other apps (feature temporarily disabled in SDK 53)
 - **Quick Actions**: One-tap for common ranges (last 2 weeks, last month, today)
 
 ### ⚙️ Enhanced Settings & Preferences
@@ -45,13 +45,15 @@ A modern React Native mobile application built with Expo for efficient time trac
   - **Preferences** (Blue gradient) - Default punch times
   - **Appearance** (Purple gradient) - Theme and dashboard view
   - **Notifications** (Green gradient) - Punch out reminders
-  - **Data Management** (Orange gradient) - Store reset
+  - **Data Management** (Orange gradient) - Store reset, data export/import
   - **Danger Zone** (Red gradient) - Data clearing
 - **Colorful Icons**: Each setting has a colored icon with subtle background
 - **Smart Toggles**: Custom-colored switches for theme and notifications
 - **Visual Indicators**: Checkmarks for selected options, chevrons for navigation
 - **Danger Zone**: Prominent red warning area for irreversible actions
 - **Enhanced Modal**: Improved confirmation dialogs with warning icons
+- **Data Export/Import**: Export and import all data as JSON
+- **Share App**: Share the app with friends (feature temporarily disabled in SDK 53)
 
 ### 🎨 Modern UI Design
 - **Modern Color Palette**: Soft, professional colors with Indigo (#6366F1), Teal (#14B8A6), Amber (#F59E0B), and Violet (#8B5CF6)
@@ -60,14 +62,22 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Soft Shadows**: Subtle `shadow-md` shadows for depth and visual hierarchy
 - **Smooth Animations**: Spring-based animations with proper easing
 - **Touch-Friendly**: Large touch targets and generous spacing
-- **Responsive Design**: Works seamlessly on all screen sizes
+- **Responsive Design**: Works seamlessly on all screen sizes and orientations
 - **Consistent Typography**: `text-lg` classes for uniform text sizing
+- **Safe Area Support**: Uses `SafeAreaView` and `SafeAreaProvider` for proper layout on all devices
+
+### 🦾 Accessibility & Native Feel
+- **Accessible Touch Targets**: All buttons and interactive elements have at least 44x44pt tap area
+- **Contrast & Labels**: Proper color contrast and accessibility labels throughout
+- **Haptic Feedback**: Uses `expo-haptics` for tactile feedback on all major interactions
+- **Platform-Specific Tweaks**: Android ripple effects, iOS haptics, and native-feeling transitions
+- **Screen Reader Support**: Accessibility roles and hints for all major controls
 
 ### 🔧 Advanced Features
 - **Global State Management**: Zustand-powered state management with persistence
 - **SQLite Database**: Robust local database storage with full CRUD operations
 - **Sample Data Generation**: Load sample data for testing and demonstration
-- **Data Export**: Export all data with comprehensive reporting
+- **Data Export/Import**: Export and import all data as JSON
 - **Data Integrity**: Proper validation and error handling
 - **Pull to Refresh**: Swipe down to refresh data across all screens
 
@@ -90,6 +100,8 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **react-native-modal** for modal dialogs
 - **expo-linear-gradient** for beautiful gradient effects
 - **react-native-reanimated** for smooth animations
+- **expo-haptics** for haptic feedback
+- **react-native-safe-area-context** for safe area support
 
 ## 🎨 Design System
 
@@ -107,13 +119,26 @@ The app features a modern, cohesive design system with:
 - **Typography**: `text-lg` for uniform sizing
 - **Spacing**: Generous padding and margins
 - **Gradients**: Beautiful color transitions
+- **Safe Area**: Uses `SafeAreaView` and `SafeAreaProvider` for all layouts
+- **Accessibility**: All components have proper roles, labels, and contrast
+- **Touch Feedback**: Haptic feedback and ripple effects for all buttons
 
 ### 🎨 **Component System**
 - **Cards**: Consistent styling with rounded corners and shadows
-- **Buttons**: Gradient backgrounds with proper touch targets
+- **Buttons**: Gradient backgrounds with proper touch targets and feedback
 - **Charts**: Indigo and Teal color schemes
 - **Modals**: Consistent border radius and shadows
 - **Status Indicators**: Color-coded using the new palette
+
+## 🦾 Accessibility & Native Experience
+
+- **Safe Area Support**: All screens use `SafeAreaView` and are wrapped in `SafeAreaProvider`
+- **Large Tap Targets**: All buttons and interactive elements are at least 44x44pt
+- **Contrast & Color**: All text and icons meet accessibility contrast standards
+- **Accessibility Labels**: All interactive elements have roles, labels, and hints
+- **Haptic Feedback**: Uses `expo-haptics` for tactile feedback on all major actions
+- **Platform-Specific Touch**: Android ripple effects, iOS haptics, and smooth transitions
+- **Screen Reader Support**: Accessibility roles and hints for all major controls
 
 ## 📱 Screenshots & UI Features
 
@@ -148,284 +173,17 @@ The app features a modern, intuitive interface with:
 - **Danger zone**: Prominent warning area for data clearing with updated styling
 - **Enhanced modals**: Improved confirmation dialogs with icons and consistent border radius
 
-## 🚦 Quick Start
-
-### Prerequisites
-
-- Node.js (v18 or higher)
-- npm or yarn
-- Expo CLI (`npm install -g @expo/cli`)
-- Expo Go app on your mobile device (for testing)
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd MonHeure-Mobile-App
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**
-   ```bash
-   npx expo start
-   ```
-
-4. **Run on your device**
-   - Install Expo Go on your mobile device
-   - Scan the QR code displayed in the terminal
-   - The app will load on your device
-
-## 📁 Project Structure
-
-```
-MonHeure-Mobile-App/
-├── app/                    # Expo Router file-based navigation
-│   ├── _layout.tsx        # Root layout with tab navigation
-│   ├── index.tsx          # Home screen route
-│   ├── dashboard.tsx      # Dashboard screen route
-│   ├── history.tsx        # History screen route
-│   ├── report.tsx         # Report screen route
-│   └── settings.tsx       # Settings screen route
-├── screens/
-│   ├── HomeScreen.tsx      # Redesigned punch interface with gradient button
-│   ├── DashboardScreen.tsx # Enhanced analytics with charts and stat cards
-│   ├── HistoryScreen.tsx   # Modern calendar with slide-up day cards
-│   ├── ReportScreen.tsx    # Custom date range reporting & PDF export
-│   └── SettingsScreen.tsx  # Enhanced settings with grouped sections
-├── components/
-│   ├── EditPunchModal.tsx  # Modal for editing punch records with validation
-│   └── DateRangePicker.tsx # Interactive date range picker for reports
-├── types/
-│   ├── nativewind.d.ts     # NativeWind type definitions
-│   └── punch.ts           # Punch data types and interfaces
-├── utils/
-│   ├── database.ts        # SQLite database operations and CRUD functions
-│   ├── punchStore.ts      # Zustand global state management store
-│   ├── timeCalculations.ts # Enhanced time calculation utilities with chart data
-│   ├── storage.ts         # AsyncStorage helpers for settings
-│   ├── sampleData.ts      # Sample data generator for testing
-│   ├── pdfGenerator.ts    # Professional PDF report generator
-│   ├── shareUtils.ts      # Cross-platform sharing utilities
-│   └── designSystem.ts    # Design system utilities
-├── package.json          # Dependencies and scripts
-├── tsconfig.json        # TypeScript configuration
-├── tailwind.config.js   # Tailwind CSS configuration
-└── metro.config.js      # Metro bundler configuration
-```
-
-## 🎯 Core Functionality
-
-### Global State Management with Zustand
-- **Persistent State**: Punch status and data persist across app sessions
-- **Real-time Updates**: All screens automatically update when state changes
-- **Database Sync**: Automatic synchronization between store and database
-- **Helper Hooks**: `usePunchStatus()`, `useTodayData()`, `usePunchActions()`
-
-### Enhanced Punch In/Out System
-- **Large Gradient Button**: 72x72 circular button with vibrant gradients
-- **Visual Status**: Button color and icon change based on work status
-- **Status Text**: Real-time display of current punch status
-- **Glow Effects**: Subtle animations for visual feedback
-- **One Tap Operation**: Simple, quick time tracking
-- **Session Persistence**: State survives app restarts and crashes
-
-### Modern Calendar-Based History
-- **Interactive Calendar**: See punch activity at a glance with color-coded dots
-- **Slide-up Day Cards**: Tap any date for comprehensive punch record view
-- **Swipe Gestures**: Swipe down to dismiss day cards
-- **Pastel Backgrounds**: Beautiful gradient backgrounds for different statuses
-- **Edit/Delete**: Full CRUD operations with icon-based buttons
-- **Sample Data**: Load sample data for testing and demonstration
-
-### Advanced Dashboard & Analytics
-- **Stat Cards**: Horizontally scrollable cards with gradient backgrounds
-- **Interactive Charts**: Bar and line charts with custom styling
-- **Time Period Toggle**: Switch between week/month/year views
-- **Productivity Insights**: Enhanced metrics with visual indicators
-- **Smooth Animations**: Staggered entrance animations for all elements
-
-### Enhanced Settings & Preferences
-- **Grouped Organization**: Settings organized into logical sections with visual indicators
-- **Colorful Design**: Each section has unique gradient colors and icons
-- **Interactive Elements**: Switches, toggles, and selection indicators
-- **Danger Zone**: Prominent warning area for irreversible actions
-- **Modern Modals**: Enhanced confirmation dialogs with icons and better styling
-
-### Custom Date Range Reports
-- **Flexible Date Selection**: Choose any date range with interactive picker
-- **Comprehensive Summary**: Total days, records, hours, and average calculations
-- **Detailed Records**: All entries grouped by day with complete information
-- **Professional PDF Export**: Beautiful, formatted reports with company branding
-- **Multiple Share Options**: Email, messaging, or save to device
-
-### Data Management
-- **SQLite Database**: Robust, performant local storage with full CRUD operations
-- **Data Integrity**: Proper validation, error handling, and transaction support
-- **Sample Data**: Generate realistic sample data for testing and demonstration
-- **Export Capabilities**: Complete data export with professional formatting
-- **State Persistence**: Automatic state restoration and database synchronization
-
-## 🎨 Styling & UI
-
-The app uses **NativeWind** (Tailwind CSS for React Native) with modern design principles:
-
-- **Gradient Backgrounds**: Beautiful color gradients throughout the app
-- **Rounded Corners**: Modern card design with proper border radius
-- **Soft Shadows**: Subtle shadows for depth and visual hierarchy
-- **Smooth Animations**: Spring-based animations with proper easing
-- **Responsive Design**: Adapts to all screen sizes and orientations
-- **Touch-Friendly**: Large touch targets and generous spacing
-- **Accessibility**: Proper contrast ratios and visual feedback
-
-## 🔧 Development
-
-### State Management with Zustand
-```typescript
-// Get current punch status
-const { isPunchedIn, currentPunchInTime } = usePunchStatus();
-
-// Get today's data
-const { todayEntries, totalHoursToday } = useTodayData();
-
-// Perform punch actions
-const { punchIn, punchOut, updateCurrentPunch } = usePunchActions();
-```
-
-### Animation System
-```typescript
-// Spring animations for smooth interactions
-const buttonScale = useSharedValue(1);
-const cardOpacity = useSharedValue(0);
-
-// Animated styles
-const buttonAnimatedStyle = useAnimatedStyle(() => ({
-  transform: [{ scale: buttonScale.value }],
-}));
-```
-
-### Database Operations
-```typescript
-// SQLite database operations
-import { addPunchEntry, fetchEntriesForDay, updatePunchEntry } from '../utils/database';
-
-// Add new punch entry
-const newEntry = await addPunchEntry({
-  date: '2024-01-15',
-  punchIn: new Date().toISOString(),
-  notes: 'Started work'
-});
-
-// Fetch today's entries
-const todayEntries = await fetchEntriesForDay('2024-01-15');
-```
-
-### Adding New Features
-1. Create new screen components in `screens/`
-2. Add navigation routes in `app/` directory (Expo Router)
-3. Style using Tailwind classes via NativeWind
-4. Add types in `types/` directory
-5. Implement database operations in `utils/database.ts`
-6. Update Zustand store in `utils/punchStore.ts` if needed
-7. Add animations using react-native-reanimated
-
-### Code Style
-- **TypeScript** for type safety and better development experience
-- **Functional Components** with React hooks for state management
-- **Zustand** for global state management with persistence
-- **Tailwind CSS** for consistent, maintainable styling
-- **React Native Reanimated** for smooth animations
-- **Async/await** for database and storage operations
-- **Error Handling** with proper user feedback
-
-## 🚀 Performance Tips
-
-### Optimization Strategies
-- **Lazy Loading**: Components load only when needed
-- **Memoization**: Use React.memo for expensive components
-- **Efficient Animations**: Use native driver for better performance
-- **Database Queries**: Optimize queries with proper indexing
-- **Image Optimization**: Use appropriate image formats and sizes
-
-### Memory Management
-- **Cleanup Effects**: Proper cleanup in useEffect hooks
-- **Event Listeners**: Remove listeners when components unmount
-- **Database Connections**: Proper connection management
-- **State Cleanup**: Clear unnecessary state on navigation
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-#### Metro Bundler Issues
-```bash
-# Clear metro cache
-npx expo start --clear
-
-# Reset cache completely
-rm -rf node_modules && npm install
-```
-
-#### Animation Performance
-- Use `useNativeDriver: true` for transform animations
-- Avoid animating layout properties on Android
-- Use `runOnJS` for JavaScript callbacks in animations
-
-#### Database Issues
-- Ensure database is properly initialized
-- Check for proper error handling in database operations
-- Verify data types match expected schema
-
-#### Build Issues
-```bash
-# Clear all caches
-npx expo start --clear
-npx expo install --fix
-
-# Rebuild node_modules
-rm -rf node_modules package-lock.json
-npm install
-```
-
-## 📦 Building for Production
-
-### EAS Build (Recommended)
-```bash
-# Install EAS CLI
-npm install -g @expo/eas-cli
-
-# Configure EAS
-eas build:configure
-
-# Build for Android
-eas build --platform android
-
-# Build for iOS
-eas build --platform ios
-```
-
-### Legacy Build Commands
-```bash
-# Android APK
-npx expo build:android
-
-# iOS App Store
-npx expo build:ios
-```
-
 ## 🔄 Recent Updates
 
-### ⚙️ Settings Screen Redesign (Latest)
-- **Grouped Sections**: Settings organized into logical categories with colorful gradient indicators
-- **Modern Cards**: Rounded corners with shadows and borders for each section
-- **Interactive Elements**: Switches, toggles, and selection indicators with custom colors
-- **Danger Zone**: Prominent red warning area with enhanced styling for data clearing
-- **Enhanced Modals**: Improved confirmation dialogs with warning icons and better UX
-- **Smooth Animations**: Spring-based entrance animations for all setting cards
+### 🦾 Full Responsiveness & Accessibility (Latest)
+- **SafeAreaView & SafeAreaProvider**: All screens now use SafeAreaView for proper layout on all devices
+- **Scrollable Containers**: All main content areas are scrollable and responsive
+- **Large Tap Targets**: All buttons and interactive elements are at least 44x44pt
+- **Haptic Feedback**: Uses expo-haptics for tactile feedback on all major actions
+- **Platform-Specific Touch**: Android ripple effects, iOS haptics, and smooth transitions
+- **Accessibility Improvements**: Proper color contrast, roles, labels, and hints throughout
+- **Consistent Spacing**: Uniform padding and margin across all screens
+- **New Utility Functions**: Added `exportData`, `importData`, and `shareApp` utilities
 
 ### 🎨 UI/UX Redesign
 - **Home Screen**: Large circular gradient button with glow effects and status text
