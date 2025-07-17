@@ -51,6 +51,29 @@ export const shareReportAsEmail = async (filePath: string, reportTitle: string, 
   }
 };
 
+export const shareApp = () => {
+  try {
+    // Temporary fallback - show alert instead of sharing
+    Alert.alert(
+      'Share App',
+      'MonHeure would be shared here. This feature is temporarily disabled due to native module compatibility.',
+      [{ text: 'OK' }]
+    );
+    
+    // TODO: Re-enable when react-native-share is properly linked
+    // const Share = require('react-native-share');
+    // const shareOptions = {
+    //   title: 'MonHeure - Time Tracking App',
+    //   message: 'Check out MonHeure, a simple and intuitive time tracking app!',
+    //   url: 'https://monheure.app', // Replace with actual app store URL
+    // };
+    // await Share.open(shareOptions);
+  } catch (error) {
+    console.error('Error sharing app:', error);
+    throw new Error('Failed to share app');
+  }
+};
+
 export const getShareOptions = (filePath: string, reportTitle: string) => {
   return [
     {

@@ -198,6 +198,66 @@ export const clearAllData = async (): Promise<void> => {
 };
 
 /**
+ * Export all data as JSON
+ */
+export const exportData = async (): Promise<string> => {
+  try {
+    const existingData = await AsyncStorage.getItem(STORAGE_KEY);
+    const records: PunchRecord[] = existingData ? JSON.parse(existingData) : [];
+    
+    const exportData = {
+      version: '1.0.0',
+      exportDate: new Date().toISOString(),
+      records: records,
+      totalRecords: records.length,
+      totalHours: records.reduce((sum, record) => sum + (record.totalHours || 0), 0)
+    };
+    
+    console.log('Data exported successfully');
+    return JSON.stringify(exportData, null, 2);
+  } catch (error) {
+    console.error('Error exporting data:', error);
+    throw error;
+  }
+};
+
+/**
+ * Import data from JSON
+ */
+export const importData = async (jsonData?: string): Promise<void> => {
+  try {
+    // For now, we'll use a simple approach - in a real app, you'd want file picker integration
+    if (!jsonData) {
+      // This would typically come from a file picker
+      throw new Error('No data provided for import');
+    }
+    
+    const importData = JSON.parse(jsonData);
+    
+    if (!importData.records || !Array.isArray(importData.records)) {
+      throw new Error('Invalid data format');
+    }
+    
+    // Validate records
+    const validRecords = importData.records.filter((record: any) => 
+      record.id && record.date && record.punchIn
+    );
+    
+    if (validRecords.length === 0) {
+      throw new Error('No valid records found in import data');
+    }
+    
+    // Store the imported data
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(validRecords));
+    
+    console.log(`Imported ${validRecords.length} records successfully`);
+  } catch (error) {
+    console.error('Error importing data:', error);
+    throw error;
+  }
+};
+
+/**
  * Get database statistics
  */
 export const getDatabaseStats = async (): Promise<{ totalEntries: number; totalHours: number }> => {
@@ -205,12 +265,12 @@ export const getDatabaseStats = async (): Promise<{ totalEntries: number; totalH
     const existingData = await AsyncStorage.getItem(STORAGE_KEY);
     const records: PunchRecord[] = existingData ? JSON.parse(existingData) : [];
     
-    const totalEntries = records.length;
-    const totalHours = records.reduce((sum, record) => {
-      return sum + (record.totalHours || 0);
-    }, 0);
+    const totalHours = records.reduce((sum, record) => sum + (record.totalHours || 0), 0);
     
-    return { totalEntries, totalHours };
+    return {
+      totalEntries: records.length,
+      totalHours: totalHours
+    };
   } catch (error) {
     console.error('Error getting database stats:', error);
     throw error;
