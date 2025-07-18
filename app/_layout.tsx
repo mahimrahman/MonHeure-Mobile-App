@@ -55,7 +55,7 @@ function TabLayoutContent() {
     return (
       <SafeAreaProvider>
         <View style={{ flex: 1, backgroundColor }} className="justify-center items-center p-6">
-          <Animated.View style={loadingAnimatedStyle} className="rounded-3xl p-8 shadow-2xl max-w-sm" style={{ backgroundColor: cardBackgroundColor }}>
+          <Animated.View style={[loadingAnimatedStyle, { backgroundColor: cardBackgroundColor }]} className="rounded-3xl p-8 shadow-2xl max-w-sm">
             <View className="items-center">
               <Ionicons name="alert-circle" size={64} color="#ef4444" className="mb-4" />
               <Text style={{ color: '#ef4444' }} className="text-xl font-bold mb-2 text-center">Initialization Error</Text>
@@ -71,7 +71,7 @@ function TabLayoutContent() {
     return (
       <SafeAreaProvider>
         <View style={{ flex: 1, backgroundColor }} className="justify-center items-center">
-          <Animated.View style={loadingAnimatedStyle} className="rounded-3xl p-8 shadow-2xl" style={{ backgroundColor: cardBackgroundColor }}>
+          <Animated.View style={[loadingAnimatedStyle, { backgroundColor: cardBackgroundColor }]} className="rounded-3xl p-8 shadow-2xl">
             <View className="items-center">
               <ActivityIndicator size="large" color="#0ea5e9" />
               <Text style={{ color: textPrimaryColor }} className="text-lg font-medium mt-4">Initializing App...</Text>
