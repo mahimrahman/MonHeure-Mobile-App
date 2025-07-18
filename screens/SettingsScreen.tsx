@@ -55,9 +55,6 @@ export default function SettingsScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [notificationId, setNotificationId] = useState<string | null>(null);
 
-  // Clear data modal
-  const [showClearModal, setShowClearModal] = useState(false);
-
   // Animation values
   const headerOpacity = useSharedValue(0);
   const headerTranslateY = useSharedValue(30);
@@ -634,45 +631,6 @@ export default function SettingsScreen() {
           onChange={(event, date) => handleTimeChange('out', event, date)}
         />
       )}
-
-      {/* Confirmation Modal */}
-      <Modal
-        visible={showClearModal}
-        transparent
-        animationType="fade"
-      >
-        <View className="flex-1 bg-black bg-opacity-50 justify-center items-center p-6">
-          <View className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl">
-            <View className="items-center mb-6">
-              <View className="w-20 h-20 bg-gradient-to-r from-red-400 to-rose-500 rounded-full justify-center items-center mb-4">
-                <Ionicons name="warning" size={36} color="white" />
-              </View>
-              <Text className="text-2xl font-bold text-gray-800 mb-2">Clear All Data?</Text>
-              <Text className="text-gray-600 text-center leading-6">
-                This will permanently delete all your stored data, including punch records and preferences. This action cannot be undone.
-              </Text>
-            </View>
-            
-            <View className="space-y-3">
-              <TouchableOpacity 
-                onPress={handleClearAllData}
-                className="bg-gradient-to-r from-red-500 to-rose-500 p-4 rounded-2xl"
-                activeOpacity={0.8}
-              >
-                <Text className="text-white font-bold text-lg text-center">Delete All Data</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                onPress={() => setShowClearModal(false)}
-                className="bg-gray-100 p-4 rounded-2xl"
-                activeOpacity={0.8}
-              >
-                <Text className="text-gray-700 font-semibold text-lg text-center">Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 } 

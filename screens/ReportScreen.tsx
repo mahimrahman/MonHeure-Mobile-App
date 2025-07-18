@@ -58,6 +58,7 @@ export default function ReportScreen() {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Animation values
   const cardOpacity = useSharedValue(0);
@@ -106,6 +107,7 @@ export default function ReportScreen() {
 
   const loadPunchData = async () => {
     try {
+      setLoading(true);
       const startDateStr = startDate.toISOString().split('T')[0];
       const endDateStr = endDate.toISOString().split('T')[0];
       const data = await fetchEntriesForRange(startDateStr, endDateStr);
@@ -113,6 +115,8 @@ export default function ReportScreen() {
     } catch (error) {
       console.error('Error loading punch data:', error);
       Alert.alert('Error', 'Failed to load punch data');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -333,7 +337,7 @@ export default function ReportScreen() {
     };
   });
 
-  if (loading || isLoading) {
+  if (loading) {
     return (
       <SafeAreaView className="flex-1 bg-background-light justify-center items-center">
         <View className="bg-white rounded-2xl p-8 shadow-md">

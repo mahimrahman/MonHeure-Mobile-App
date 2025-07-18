@@ -42,6 +42,24 @@ export default function DashboardScreen() {
   const chartOpacity = useSharedValue(0);
   const chartTranslateY = useSharedValue(50);
 
+  // Animated styles (move all to top level)
+  const headerAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: cardOpacity.value,
+    transform: [{ translateY: cardTranslateY.value }],
+  }));
+  const cardAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: cardOpacity.value,
+    transform: [{ translateY: cardTranslateY.value }],
+  }));
+  const chartAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: chartOpacity.value,
+    transform: [{ translateY: chartTranslateY.value }],
+  }));
+  const toggleAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: chartOpacity.value,
+    transform: [{ translateY: chartTranslateY.value }],
+  }));
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -66,7 +84,6 @@ export default function DashboardScreen() {
   useEffect(() => {
     cardOpacity.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) });
     cardTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
-    
     setTimeout(() => {
       chartOpacity.value = withTiming(1, { duration: 800 });
       chartTranslateY.value = withSpring(0, { damping: 12, stiffness: 80 });
@@ -100,6 +117,7 @@ export default function DashboardScreen() {
     setChartView(view);
   };
 
+  // StatCard moved out of main component, receives animatedStyle as prop
   const StatCard = ({ 
     title, 
     hours, 
@@ -107,7 +125,8 @@ export default function DashboardScreen() {
     average, 
     gradient, 
     icon, 
-    delay = 0 
+    delay = 0,
+    animatedStyle
   }: { 
     title: string; 
     hours: number; 
@@ -116,76 +135,60 @@ export default function DashboardScreen() {
     gradient: string[];
     icon: string;
     delay?: number;
-  }) => {
-    const cardAnimatedStyle = useAnimatedStyle(() => {
-      return {
-        opacity: cardOpacity.value,
-        transform: [{ translateY: cardTranslateY.value }],
-      };
-    });
-
-    return (
-      <Animated.View style={cardAnimatedStyle} className="mr-4 min-w-[160px]">
-        <LinearGradient
-          colors={gradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          className="rounded-2xl p-6 shadow-md"
-          accessibilityRole="button"
-          accessibilityLabel={`${title} statistics`}
-          accessibilityHint={`Shows ${title} time tracking data`}
-          {...(Platform.OS === 'android' ? { android_ripple: { color: '#FFFFFF', borderless: false, radius: 80 } } : {})}
-        >
-          <View className="flex-row items-center justify-between mb-4">
-            <View className="w-10 h-10 bg-white/20 rounded-full justify-center items-center">
-              <Ionicons name={icon as any} size={20} color="white" accessibilityIgnoresInvertColors />
-            </View>
-            <View className="w-3 h-3 rounded-full bg-white/30" />
+    animatedStyle: any;
+  }) => (
+    <Animated.View style={animatedStyle} className="mr-4 min-w-[160px]">
+      <LinearGradient
+        colors={gradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        className="rounded-2xl p-6 shadow-md"
+        accessibilityRole="button"
+        accessibilityLabel={`${title} statistics`}
+        accessibilityHint={`Shows ${title} time tracking data`}
+        {...(Platform.OS === 'android' ? { android_ripple: { color: '#FFFFFF', borderless: false, radius: 80 } } : {})}
+      >
+        <View className="flex-row items-center justify-between mb-4">
+          <View className="w-10 h-10 bg-white/20 rounded-full justify-center items-center">
+            <Ionicons name={icon as any} size={20} color="white" accessibilityIgnoresInvertColors />
           </View>
-          
-          <Text className="text-white/90 text-sm font-medium mb-2">{title}</Text>
-          <Text className="text-white text-2xl font-bold mb-1">{formatHours(hours)}</Text>
-          <Text className="text-white/80 text-xs">{days} days • {formatHours(average)}/day</Text>
-        </LinearGradient>
-      </Animated.View>
-    );
-  };
+          <View className="w-3 h-3 rounded-full bg-white/30" />
+        </View>
+        
+        <Text className="text-white/90 text-sm font-medium mb-2">{title}</Text>
+        <Text className="text-white text-2xl font-bold mb-1">{formatHours(hours)}</Text>
+        <Text className="text-white/80 text-xs">{days} days • {formatHours(average)}/day</Text>
+      </LinearGradient>
+    </Animated.View>
+  );
 
-  const ChartToggle = () => {
-    const toggleAnimatedStyle = useAnimatedStyle(() => {
-      return {
-        opacity: chartOpacity.value,
-        transform: [{ translateY: chartTranslateY.value }],
-      };
-    });
-
-    return (
-      <Animated.View style={toggleAnimatedStyle} className="flex-row bg-white rounded-2xl p-1 mb-6 shadow-md">
-        {(['week', 'month', 'year'] as ChartViewType[]).map((view) => (
-          <TouchableOpacity
-            key={view}
-            onPress={() => handleChartToggle(view)}
-            className={`flex-1 py-3 px-4 rounded-xl ${
-              chartView === view 
-                ? 'bg-gradient-to-r from-primary-indigo to-primary-violet' 
-                : 'bg-transparent'
-            }`}
-            accessibilityRole="button"
-            accessibilityLabel={`${view} view`}
-            accessibilityHint={`Switch to ${view} chart view`}
-            style={{ minHeight: 44 }}
-            {...(Platform.OS === 'android' ? { android_ripple: { color: '#6366F1', borderless: false, radius: 20 } } : {})}
-          >
-            <Text className={`text-center font-semibold ${
-              chartView === view ? 'text-white' : 'text-text-secondary'
-            }`}>
-              {view.charAt(0).toUpperCase() + view.slice(1)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </Animated.View>
-    );
-  };
+  // ChartToggle moved out, receives animatedStyle as prop
+  const ChartToggle = ({ animatedStyle }: { animatedStyle: any }) => (
+    <Animated.View style={animatedStyle} className="flex-row bg-white rounded-2xl p-1 mb-6 shadow-md">
+      {(['week', 'month', 'year'] as ChartViewType[]).map((view) => (
+        <TouchableOpacity
+          key={view}
+          onPress={() => handleChartToggle(view)}
+          className={`flex-1 py-3 px-4 rounded-xl ${
+            chartView === view 
+              ? 'bg-gradient-to-r from-primary-indigo to-primary-violet' 
+              : 'bg-transparent'
+          }`}
+          accessibilityRole="button"
+          accessibilityLabel={`${view} view`}
+          accessibilityHint={`Switch to ${view} chart view`}
+          style={{ minHeight: 44 }}
+          {...(Platform.OS === 'android' ? { android_ripple: { color: '#6366F1', borderless: false, radius: 20 } } : {})}
+        >
+          <Text className={`text-center font-semibold ${
+            chartView === view ? 'text-white' : 'text-text-secondary'
+          }`}>
+            {view.charAt(0).toUpperCase() + view.slice(1)}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </Animated.View>
+  );
 
   if (loading || isLoading) {
     return (
@@ -209,20 +212,14 @@ export default function DashboardScreen() {
       >
         <View className="p-6">
           {/* Header */}
-          <Animated.View style={useAnimatedStyle(() => ({
-            opacity: cardOpacity.value,
-            transform: [{ translateY: cardTranslateY.value }],
-          }))} className="mb-8">
+          <Animated.View style={headerAnimatedStyle} className="mb-8">
             <Text className="text-3xl font-bold text-text-primary mb-2">Dashboard</Text>
             <Text className="text-text-secondary text-lg">Your time tracking analytics</Text>
           </Animated.View>
 
           {/* Current Status Card */}
           <Animated.View 
-            style={useAnimatedStyle(() => ({
-              opacity: cardOpacity.value,
-              transform: [{ translateY: cardTranslateY.value }],
-            }))}
+            style={cardAnimatedStyle}
             className="bg-white rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
           >
             <View className="flex-row items-center mb-4">
@@ -278,6 +275,7 @@ export default function DashboardScreen() {
                     gradient={['#6366F1', '#4F46E5', '#4338CA']}
                     icon="calendar"
                     delay={0}
+                    animatedStyle={cardAnimatedStyle}
                   />
                   <StatCard
                     title="Last 2 Weeks"
@@ -287,6 +285,7 @@ export default function DashboardScreen() {
                     gradient={['#14B8A6', '#0D9488', '#0F766E']}
                     icon="time"
                     delay={100}
+                    animatedStyle={cardAnimatedStyle}
                   />
                   <StatCard
                     title="This Month"
@@ -296,6 +295,7 @@ export default function DashboardScreen() {
                     gradient={['#F59E0B', '#D97706', '#B45309']}
                     icon="trending-up"
                     delay={200}
+                    animatedStyle={cardAnimatedStyle}
                   />
                   <StatCard
                     title="This Year"
@@ -305,6 +305,7 @@ export default function DashboardScreen() {
                     gradient={['#8B5CF6', '#7C3AED', '#6D28D9']}
                     icon="stats-chart"
                     delay={300}
+                    animatedStyle={cardAnimatedStyle}
                   />
                 </>
               )}
@@ -312,15 +313,12 @@ export default function DashboardScreen() {
           </View>
 
           {/* Chart Toggle */}
-          <ChartToggle />
+          <ChartToggle animatedStyle={toggleAnimatedStyle} />
 
           {/* Enhanced Chart */}
           {chartData && (
             <Animated.View 
-              style={useAnimatedStyle(() => ({
-                opacity: chartOpacity.value,
-                transform: [{ translateY: chartTranslateY.value }],
-              }))}
+              style={chartAnimatedStyle}
               className="bg-white rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
             >
               <View className="flex-row items-center justify-between mb-6">
@@ -375,10 +373,7 @@ export default function DashboardScreen() {
           {/* Line Chart Alternative */}
           {chartData && (
             <Animated.View 
-              style={useAnimatedStyle(() => ({
-                opacity: chartOpacity.value,
-                transform: [{ translateY: chartTranslateY.value }],
-              }))}
+              style={chartAnimatedStyle}
               className="bg-white rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
             >
               <View className="flex-row items-center justify-between mb-6">
@@ -436,10 +431,7 @@ export default function DashboardScreen() {
 
           {/* Productivity Insights */}
           <Animated.View 
-            style={useAnimatedStyle(() => ({
-              opacity: cardOpacity.value,
-              transform: [{ translateY: cardTranslateY.value }],
-            }))}
+            style={cardAnimatedStyle}
             className="bg-white rounded-3xl shadow-xl p-6 mb-8 border border-gray-100"
           >
             <Text className="text-xl font-bold text-gray-800 mb-4">Productivity Insights</Text>
@@ -491,10 +483,7 @@ export default function DashboardScreen() {
 
           {/* Quick Actions */}
           <Animated.View 
-            style={useAnimatedStyle(() => ({
-              opacity: cardOpacity.value,
-              transform: [{ translateY: cardTranslateY.value }],
-            }))}
+            style={cardAnimatedStyle}
             className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100"
           >
             <Text className="text-xl font-bold text-gray-800 mb-4">Quick Actions</Text>
