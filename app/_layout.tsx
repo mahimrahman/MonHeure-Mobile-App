@@ -10,11 +10,13 @@ import Animated, {
   withTiming
 } from 'react-native-reanimated';
 import { usePunchStore } from '../utils/punchStore';
+import { ThemeProvider, useTheme } from '../utils/themeContext';
 
-export default function TabLayout() {
+function TabLayoutContent() {
   const [isAppReady, setIsAppReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const initializeStore = usePunchStore(state => state.initializeStore);
+  const { isDarkMode } = useTheme();
 
   // Animation values
   const loadingOpacity = useSharedValue(1);
@@ -42,15 +44,22 @@ export default function TabLayout() {
     };
   });
 
+  // Theme-aware colors
+  const backgroundColor = isDarkMode ? '#1F2937' : '#F9FAFB';
+  const cardBackgroundColor = isDarkMode ? '#374151' : '#FFFFFF';
+  const textPrimaryColor = isDarkMode ? '#F9FAFB' : '#111827';
+  const textSecondaryColor = isDarkMode ? '#9CA3AF' : '#6B7280';
+  const borderColor = isDarkMode ? '#4B5563' : '#E5E7EB';
+
   if (error) {
     return (
       <SafeAreaProvider>
-        <View className="flex-1 bg-gradient-to-b from-red-50 to-red-100 justify-center items-center p-6">
-          <Animated.View style={loadingAnimatedStyle} className="bg-white rounded-3xl p-8 shadow-2xl max-w-sm">
+        <View style={{ flex: 1, backgroundColor }} className="justify-center items-center p-6">
+          <Animated.View style={loadingAnimatedStyle} className="rounded-3xl p-8 shadow-2xl max-w-sm" style={{ backgroundColor: cardBackgroundColor }}>
             <View className="items-center">
               <Ionicons name="alert-circle" size={64} color="#ef4444" className="mb-4" />
-              <Text className="text-red-600 text-xl font-bold mb-2 text-center">Initialization Error</Text>
-              <Text className="text-red-500 text-center">{error}</Text>
+              <Text style={{ color: '#ef4444' }} className="text-xl font-bold mb-2 text-center">Initialization Error</Text>
+              <Text style={{ color: textSecondaryColor }} className="text-center">{error}</Text>
             </View>
           </Animated.View>
         </View>
@@ -61,12 +70,12 @@ export default function TabLayout() {
   if (!isAppReady) {
     return (
       <SafeAreaProvider>
-        <View className="flex-1 bg-gradient-to-b from-blue-50 via-indigo-50 to-purple-50 justify-center items-center">
-          <Animated.View style={loadingAnimatedStyle} className="bg-white rounded-3xl p-8 shadow-2xl">
+        <View style={{ flex: 1, backgroundColor }} className="justify-center items-center">
+          <Animated.View style={loadingAnimatedStyle} className="rounded-3xl p-8 shadow-2xl" style={{ backgroundColor: cardBackgroundColor }}>
             <View className="items-center">
               <ActivityIndicator size="large" color="#0ea5e9" />
-              <Text className="text-gray-600 text-lg font-medium mt-4">Initializing App...</Text>
-              <Text className="text-gray-500 text-sm mt-2">Setting up your time tracker</Text>
+              <Text style={{ color: textPrimaryColor }} className="text-lg font-medium mt-4">Initializing App...</Text>
+              <Text style={{ color: textSecondaryColor }} className="text-sm mt-2">Setting up your time tracker</Text>
             </View>
           </Animated.View>
         </View>
@@ -98,9 +107,9 @@ export default function TabLayout() {
             return <Ionicons name={iconName} size={size} color={color} />;
           },
           tabBarActiveTintColor: '#0ea5e9',
-          tabBarInactiveTintColor: '#6b7280',
+          tabBarInactiveTintColor: isDarkMode ? '#9CA3AF' : '#6B7280',
           tabBarStyle: {
-            backgroundColor: '#ffffff',
+            backgroundColor: cardBackgroundColor,
             borderTopWidth: 0,
             elevation: 20,
             shadowColor: '#000',
@@ -117,12 +126,12 @@ export default function TabLayout() {
             marginTop: 4,
           },
           headerStyle: {
-            backgroundColor: '#ffffff',
+            backgroundColor: cardBackgroundColor,
             elevation: 0,
             shadowOpacity: 0,
             borderBottomWidth: 0,
           },
-          headerTintColor: '#1f2937',
+          headerTintColor: textPrimaryColor,
           headerTitleStyle: {
             fontWeight: 'bold',
             fontSize: 20,
@@ -163,5 +172,13 @@ export default function TabLayout() {
         />
       </Tabs>
     </SafeAreaProvider>
+  );
+}
+
+export default function TabLayout() {
+  return (
+    <ThemeProvider>
+      <TabLayoutContent />
+    </ThemeProvider>
   );
 } 
