@@ -59,6 +59,7 @@ export default function HomeScreen() {
   const totalHoursScale = useSharedValue(1);
   const headerOpacity = useSharedValue(0);
   const headerTranslateY = useSharedValue(-30);
+  const backgroundGlow = useSharedValue(0);
 
   // Get today's punch data from store
   const todayPunch = todayEntries.find(entry => 
@@ -120,8 +121,17 @@ export default function HomeScreen() {
     };
   });
 
+  const backgroundGlowStyle = useAnimatedStyle(() => {
+    return {
+      opacity: backgroundGlow.value,
+    };
+  });
+
   // Start animations on mount
   useEffect(() => {
+    // Background glow animation
+    backgroundGlow.value = withTiming(1, { duration: 1000, easing: Easing.out(Easing.cubic) });
+    
     // Header animation
     headerOpacity.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) });
     headerTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
@@ -278,22 +288,44 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background-light">
+      {/* Background Gradient */}
+      <Animated.View style={backgroundGlowStyle} className="absolute inset-0">
+        <LinearGradient
+          colors={['rgba(99, 102, 241, 0.05)', 'rgba(139, 92, 246, 0.03)', 'rgba(20, 184, 166, 0.02)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          className="absolute inset-0"
+        />
+      </Animated.View>
+
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
         {/* Header */}
         <Animated.View style={headerAnimatedStyle} className="pt-12 pb-6 px-6">
-          <Text className="text-3xl font-bold text-text-primary mb-2">MonHeure</Text>
-          <Text className="text-text-secondary text-lg">Time Tracking Made Simple</Text>
+          <View className="flex-row items-center justify-between">
+            <View>
+              <Text className="text-3xl font-bold text-text-primary mb-2">MonHeure</Text>
+              <Text className="text-text-secondary text-lg">Time Tracking Made Simple</Text>
+            </View>
+            <View className="w-12 h-12 bg-gradient-to-r from-primary-indigo to-primary-violet rounded-2xl justify-center items-center shadow-md">
+              <Ionicons name="time" size={24} color="white" />
+            </View>
+          </View>
         </Animated.View>
 
         <View className="flex-1 justify-center items-center px-6 pb-8">
-          {/* Main Punch Button with Glow Effect */}
-          <View className="items-center mb-6">
+          {/* Main Punch Button with Enhanced Glow Effect */}
+          <View className="items-center mb-8">
+            {/* Multiple glow layers for enhanced effect */}
             <Animated.View style={glowAnimatedStyle} className="absolute">
-              <View className="w-80 h-80 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet opacity-30 blur-xl" />
+              <View className="w-96 h-96 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet opacity-20 blur-2xl" />
             </Animated.View>
+            <Animated.View style={glowAnimatedStyle} className="absolute">
+              <View className="w-80 h-80 rounded-full bg-gradient-to-r from-primary-violet to-primary-teal opacity-15 blur-xl" />
+            </Animated.View>
+            
             <Animated.View style={buttonAnimatedStyle}>
               <TouchableOpacity
-                className="w-72 h-72 rounded-full justify-center items-center shadow-md"
+                className="w-72 h-72 rounded-full justify-center items-center shadow-2xl"
                 onPress={handlePunch}
                 activeOpacity={0.9}
                 disabled={isLoading}
@@ -305,24 +337,26 @@ export default function HomeScreen() {
               >
                 <LinearGradient
                   colors={isPunchedIn 
-                    ? ['#EF4444', '#DC2626', '#B91C1C'] 
-                    : ['#6366F1', '#8B5CF6', '#14B8A6']
+                    ? ['#EF4444', '#DC2626', '#B91C1C', '#991B1B'] 
+                    : ['#6366F1', '#8B5CF6', '#14B8A6', '#0D9488']
                   }
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   className="w-full h-full rounded-full justify-center items-center"
                 >
                   <View className="items-center">
-                    <Ionicons 
-                      name={isPunchedIn ? 'log-out' : 'log-in'} 
-                      size={90} 
-                      color="white" 
-                      accessibilityIgnoresInvertColors
-                    />
-                    <Text className="text-white text-3xl font-bold mt-6 text-center">
+                    <View className="w-20 h-20 bg-white bg-opacity-20 rounded-full justify-center items-center mb-4">
+                      <Ionicons 
+                        name={isPunchedIn ? 'log-out' : 'log-in'} 
+                        size={40} 
+                        color="white" 
+                        accessibilityIgnoresInvertColors
+                      />
+                    </View>
+                    <Text className="text-white text-3xl font-bold mb-2 text-center">
                       {isPunchedIn ? 'Punch Out' : 'Punch In'}
                     </Text>
-                    <Text className="text-white text-base mt-3 opacity-90 text-center px-4">
+                    <Text className="text-white text-base opacity-90 text-center px-4">
                       {isPunchedIn ? 'Tap to end your day' : 'Tap to start your day'}
                     </Text>
                   </View>
@@ -331,25 +365,27 @@ export default function HomeScreen() {
             </Animated.View>
           </View>
 
-          {/* Status Text */}
+          {/* Enhanced Status Text */}
           <Animated.View style={statusTextAnimatedStyle} className="mb-8">
-            <Text className="text-text-primary text-lg font-medium text-center px-6 leading-6">
-              {getStatusText()}
-            </Text>
+            <View className="bg-white bg-opacity-80 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-sm border border-gray-100">
+              <Text className="text-text-primary text-lg font-medium text-center leading-6">
+                {getStatusText()}
+              </Text>
+            </View>
           </Animated.View>
 
-          {/* Today's Times Card - Calendar Style */}
+          {/* Today's Times Card - Enhanced Calendar Style */}
           <Animated.View style={cardAnimatedStyle} className="w-full max-w-sm">
-            <View className="bg-white rounded-2xl shadow-md p-6 mb-6 border border-gray-100">
+            <View className="bg-white rounded-2xl shadow-xl p-6 mb-6 border border-gray-100">
               <View className="flex-row items-center mb-6">
                 <View className="w-4 h-4 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet mr-3" />
                 <Text className="text-2xl font-bold text-text-primary">Today's Schedule</Text>
               </View>
               
               <View className="space-y-5">
-                {/* Punch In Row */}
-                <Animated.View style={punchInRowAnimatedStyle} className="flex-row items-center p-5 bg-gradient-to-r from-indigo-50 to-violet-50 rounded-2xl border border-indigo-100">
-                  <View className="w-12 h-12 bg-primary-indigo rounded-full justify-center items-center mr-4">
+                {/* Enhanced Punch In Row */}
+                <Animated.View style={punchInRowAnimatedStyle} className="flex-row items-center p-5 bg-gradient-to-r from-indigo-50 to-violet-50 rounded-2xl border border-indigo-100 shadow-sm">
+                  <View className="w-12 h-12 bg-gradient-to-r from-primary-indigo to-primary-violet rounded-full justify-center items-center mr-4 shadow-sm">
                     <Ionicons name="log-in" size={24} color="white" />
                   </View>
                   <View className="flex-1">
@@ -359,6 +395,7 @@ export default function HomeScreen() {
                   <TouchableOpacity 
                     onPress={() => openEditModal('in')}
                     className="bg-white px-5 py-3 rounded-xl shadow-sm border border-indigo-200"
+                    activeOpacity={0.7}
                   >
                     <Text className="text-primary-indigo text-xl font-mono font-bold">
                       {formatTime(todayPunch?.punchIn)}
@@ -366,9 +403,9 @@ export default function HomeScreen() {
                   </TouchableOpacity>
                 </Animated.View>
                 
-                {/* Punch Out Row */}
-                <Animated.View style={punchOutRowAnimatedStyle} className="flex-row items-center p-5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-100">
-                  <View className="w-12 h-12 bg-primary-amber rounded-full justify-center items-center mr-4">
+                {/* Enhanced Punch Out Row */}
+                <Animated.View style={punchOutRowAnimatedStyle} className="flex-row items-center p-5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-100 shadow-sm">
+                  <View className="w-12 h-12 bg-gradient-to-r from-primary-amber to-orange-500 rounded-full justify-center items-center mr-4 shadow-sm">
                     <Ionicons name="log-out" size={24} color="white" />
                   </View>
                   <View className="flex-1">
@@ -378,6 +415,7 @@ export default function HomeScreen() {
                   <TouchableOpacity 
                     onPress={() => openEditModal('out')}
                     className="bg-white px-5 py-3 rounded-xl shadow-sm border border-amber-200"
+                    activeOpacity={0.7}
                   >
                     <Text className="text-primary-amber text-xl font-mono font-bold">
                       {formatTime(todayPunch?.punchOut)}
@@ -386,12 +424,12 @@ export default function HomeScreen() {
                 </Animated.View>
               </View>
               
-              {/* Total Hours */}
+              {/* Enhanced Total Hours */}
               {totalHoursToday > 0 && (
                 <Animated.View style={totalHoursAnimatedStyle} className="mt-6 pt-6 border-t border-gray-200">
-                  <View className="flex-row justify-between items-center p-4 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-2xl border border-teal-100">
+                  <View className="flex-row justify-between items-center p-4 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-2xl border border-teal-100 shadow-sm">
                     <View className="flex-row items-center">
-                      <View className="w-10 h-10 bg-primary-teal rounded-full justify-center items-center mr-3">
+                      <View className="w-10 h-10 bg-gradient-to-r from-primary-teal to-cyan-500 rounded-full justify-center items-center mr-3 shadow-sm">
                         <Ionicons name="time" size={20} color="white" />
                       </View>
                       <View>
@@ -408,26 +446,29 @@ export default function HomeScreen() {
                 </Animated.View>
               )}
 
-              {/* Date Display */}
+              {/* Enhanced Date Display */}
               <View className="mt-4 pt-4 border-t border-gray-200">
-                <Text className="text-text-secondary text-center font-medium">
-                  {formatDate(new Date().toISOString())}
-                </Text>
+                <View className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-3">
+                  <Text className="text-text-secondary text-center font-medium">
+                    {formatDate(new Date().toISOString())}
+                  </Text>
+                </View>
               </View>
             </View>
           </Animated.View>
 
-          {/* Reset Button */}
+          {/* Enhanced Reset Button */}
           <TouchableOpacity 
             onPress={resetToday} 
-            className="bg-gray-100 px-8 py-4 rounded-2xl border border-gray-200"
+            className="bg-gradient-to-r from-gray-100 to-gray-200 px-8 py-4 rounded-2xl border border-gray-200 shadow-sm"
+            activeOpacity={0.7}
           >
             <Text className="text-text-secondary text-sm font-medium">Reset Today (for testing)</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
 
-      {/* Edit Time Modal */}
+      {/* Enhanced Edit Time Modal */}
       <Modal 
         isVisible={showEditModal} 
         onBackdropPress={() => setShowEditModal(false)}
@@ -435,8 +476,11 @@ export default function HomeScreen() {
         animationIn="slideInUp"
         animationOut="slideOutDown"
       >
-        <View className="bg-white rounded-2xl p-6 items-center mx-4">
-          <Text className="text-xl font-bold text-text-primary mb-6">
+        <View className="bg-white rounded-2xl p-6 items-center mx-4 shadow-2xl">
+          <View className="w-16 h-16 bg-gradient-to-r from-primary-indigo to-primary-violet rounded-full justify-center items-center mb-4">
+            <Ionicons name="time" size={32} color="white" />
+          </View>
+          <Text className="text-xl font-bold text-text-primary mb-6 text-center">
             Edit {editType === 'in' ? 'Punch In' : 'Punch Out'} Time
           </Text>
           {showPicker && (
