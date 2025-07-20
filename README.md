@@ -175,7 +175,14 @@ The app features a modern, intuitive interface with:
 
 ## 🔄 Recent Updates
 
-### 🦾 Full Responsiveness & Accessibility (Latest)
+### 🛠 Configuration Fixes (Latest)
+- **Plugin Configuration**: Fixed incorrect plugin configurations in `app.json`
+- **Expo Haptics**: Removed from plugins array (not a config plugin)
+- **Expo Linear Gradient**: Removed from plugins array (not a config plugin)
+- **Metro Configuration**: Updated for better compatibility with SDK 53
+- **Package Compatibility**: Ensured all packages are compatible with Expo SDK 53
+
+### 🦾 Full Responsiveness & Accessibility
 - **SafeAreaView & SafeAreaProvider**: All screens now use SafeAreaView for proper layout on all devices
 - **Scrollable Containers**: All main content areas are scrollable and responsive
 - **Large Tap Targets**: All buttons and interactive elements are at least 44x44pt
@@ -212,7 +219,7 @@ The app features a modern, intuitive interface with:
 - **Sample Data**: Built-in sample data generator for testing and demonstration
 - **Touch Interactions**: Improved touch feedback and gesture handling
 
-### 🎨 Modern Design System (Latest)
+### 🎨 Modern Design System
 - **New Color Palette**: Soft, professional colors with Indigo (#6366F1), Teal (#14B8A6), Amber (#F59E0B), and Violet (#8B5CF6)
 - **Consistent Border Radius**: `rounded-xl` (12px) and `rounded-2xl` (16px) throughout the app
 - **Unified Shadows**: `shadow-md` for consistent depth and visual hierarchy
@@ -223,10 +230,47 @@ The app features a modern, intuitive interface with:
 - **Chart Colors**: Charts now use Indigo and Teal color schemes
 - **Component Consistency**: All cards, buttons, and modals use the new design system
 
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- Expo CLI (`npm install -g @expo/cli`)
+- iOS Simulator (for iOS development) or Android Studio (for Android development)
+
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/MonHeure-Mobile-App.git
+   cd MonHeure-Mobile-App
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npx expo start
+   ```
+
+4. Run on your preferred platform:
+   - Press `i` for iOS Simulator
+   - Press `a` for Android Emulator
+   - Scan QR code with Expo Go app on your device
+
+### Development
+- The app uses Expo SDK 53 with React 19
+- All styling is done with NativeWind (Tailwind CSS for React Native)
+- State management is handled with Zustand
+- Database operations use SQLite via expo-sqlite
+
 ## 🐛 Known Issues
 
 - **Sharing Features**: Temporarily disabled due to native module linking issues in SDK 53
 - **Unmaintained Packages**: Some packages like `react-native-html-to-pdf` are unmaintained but functional
+- **Package Updates**: Some packages may need updates for best compatibility with Expo SDK 53
 
 ## 📄 Documentation
 
@@ -249,7 +293,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- Built with [Expo](https://expo.dev/)
-- Styled with [NativeWind](https://www.nativewind.dev/)
-- Charts by [react-native-chart-kit](https://github.com/indiespirit/react-native-chart-kit)
-- Calendar by [react-native-calendars](https://github.com/wix/react-native-calendars) 
+- Built with [Expo](https://expo.dev/) and [React Native](https://reactnative.dev/)
+- Styled with [NativeWind](https://www.nativewind.dev/) (Tailwind CSS for React Native)
+- Icons from [Expo Vector Icons](https://icons.expo.fyi/)
+- Charts powered by [react-native-chart-kit](https://github.com/indiespirit/react-native-chart-kit)
+- Calendar component from [react-native-calendars](https://github.com/wix/react-native-calendars)
+- State management with [Zustand](https://github.com/pmndrs/zustand) 
