@@ -34,6 +34,7 @@ import {
 import EditPunchModal from '../components/EditPunchModal';
 import { generateSampleData } from '../utils/sampleData';
 import { usePunchActions } from '../utils/punchStore';
+import { useTheme } from '../utils/themeContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -48,6 +49,7 @@ interface MarkedDates {
 
 export default function HistoryScreen() {
   const { refreshTodayData } = usePunchActions();
+  const { isDarkMode } = useTheme();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [punchRecords, setPunchRecords] = useState<PunchRecord[]>([]);
   const [markedDates, setMarkedDates] = useState<MarkedDates>({});
@@ -296,11 +298,11 @@ export default function HistoryScreen() {
   });
 
   return (
-    <SafeAreaView className="flex-1 bg-background-light">
+    <SafeAreaView className="flex-1 bg-background-light dark:bg-dark-bg">
       {/* Header */}
-      <Animated.View style={headerAnimatedStyle} className="bg-white pt-12 pb-6 px-6 border-b border-gray-100 shadow-sm">
-        <Text className="text-3xl font-bold text-text-primary mb-2">History</Text>
-        <Text className="text-text-secondary text-lg">View and manage your punch records</Text>
+      <Animated.View style={headerAnimatedStyle} className="bg-white dark:bg-dark-bg-card pt-12 pb-6 px-6 border-b border-gray-100 dark:border-dark-border shadow-sm">
+        <Text className="text-3xl font-bold text-text-primary dark:text-dark-text mb-2">History</Text>
+        <Text className="text-text-secondary dark:text-dark-text-secondary text-lg">View and manage your punch records</Text>
       </Animated.View>
 
       <ScrollView 
@@ -317,7 +319,7 @@ export default function HistoryScreen() {
             opacity: cardOpacity.value,
             transform: [{ translateY: cardTranslateY.value }],
           })), calendarAnimatedStyle]}
-          className="bg-white m-6 rounded-2xl shadow-md overflow-hidden border border-gray-100"
+          className="bg-white dark:bg-dark-bg-card m-6 rounded-2xl shadow-md overflow-hidden border border-gray-100 dark:border-dark-border"
         >
           <Calendar
             onDayPress={handleDateSelect}
@@ -333,12 +335,12 @@ export default function HistoryScreen() {
               selectedDayBackgroundColor: '#6366F1',
               selectedDayTextColor: '#ffffff',
               todayTextColor: '#6366F1',
-              dayTextColor: '#374151',
-              textDisabledColor: '#d1d5db',
+              dayTextColor: isDarkMode ? '#F9FAFB' : '#374151',
+              textDisabledColor: isDarkMode ? '#4B5563' : '#d1d5db',
               dotColor: '#14B8A6',
               selectedDotColor: '#ffffff',
               arrowColor: '#6366F1',
-              monthTextColor: '#374151',
+              monthTextColor: isDarkMode ? '#F9FAFB' : '#374151',
               indicatorColor: '#6366F1',
               textDayFontWeight: '600',
               textMonthFontWeight: 'bold',
@@ -346,9 +348,11 @@ export default function HistoryScreen() {
               textDayFontSize: 16,
               textMonthFontSize: 20,
               textDayHeaderFontSize: 14,
+              backgroundColor: isDarkMode ? '#374151' : '#ffffff',
+              calendarBackground: isDarkMode ? '#374151' : '#ffffff',
               'stylesheet.calendar.header': {
                 dayHeader: {
-                  color: '#6b7280',
+                  color: isDarkMode ? '#D1D5DB' : '#6b7280',
                   fontWeight: '600',
                 },
               },
@@ -394,30 +398,30 @@ export default function HistoryScreen() {
         style={{ margin: 0, justifyContent: 'flex-end' }}
       >
         <Animated.View style={dayCardAnimatedStyle}>
-          <View className="bg-white rounded-t-2xl shadow-md border border-gray-100 max-h-[80%]">
+          <View className="bg-white dark:bg-dark-bg-card rounded-t-2xl shadow-md border border-gray-100 dark:border-dark-border max-h-[80%]">
             {/* Handle */}
             <View className="items-center pt-4 pb-2">
-              <View className="w-12 h-1 bg-gray-300 rounded-full" />
+              <View className="w-12 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
             </View>
 
             {/* Header */}
-            <View className="px-6 pb-4 border-b border-gray-100">
+            <View className="px-6 pb-4 border-b border-gray-100 dark:border-dark-border">
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center">
                   <View className="w-4 h-4 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet mr-3" />
-                  <Text className="text-2xl font-bold text-text-primary">
+                  <Text className="text-2xl font-bold text-text-primary dark:text-dark-text">
                     {formatDate(selectedDate)}
                   </Text>
                 </View>
                 <TouchableOpacity
                   onPress={hideDayCard}
-                  className="w-8 h-8 bg-gray-100 rounded-full justify-center items-center"
+                  className="w-8 h-8 bg-gray-100 dark:bg-dark-bg-secondary rounded-full justify-center items-center"
                   accessibilityRole="button"
                   accessibilityLabel="Close day card"
                   style={{ minWidth: 44, minHeight: 44 }}
                   {...(Platform.OS === 'android' ? { android_ripple: { color: '#6366F1', borderless: false, radius: 22 } } : {})}
                 >
-                  <Ionicons name="close" size={20} color="#6b7280" accessibilityIgnoresInvertColors />
+                  <Ionicons name="close" size={20} color={isDarkMode ? "#D1D5DB" : "#6b7280"} accessibilityIgnoresInvertColors />
                 </TouchableOpacity>
               </View>
             </View>

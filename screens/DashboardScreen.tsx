@@ -15,6 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { getTimeStats, generateChartData, TimeStats, ChartData } from '../utils/timeCalculations';
 import { usePunchStatus, useTodayData, usePunchActions } from '../utils/punchStore';
+import { useTheme } from '../utils/themeContext';
 
 const { width } = Dimensions.get('window');
 
@@ -24,6 +25,7 @@ export default function DashboardScreen() {
   const { isPunchedIn, currentPunchInTime, isLoading } = usePunchStatus();
   const { todayEntries, totalHoursToday } = useTodayData();
   const { refreshTodayData } = usePunchActions();
+  const { isDarkMode } = useTheme();
   
   const [timeStats, setTimeStats] = useState<{
     thisWeek: TimeStats;
@@ -164,7 +166,7 @@ export default function DashboardScreen() {
 
   // ChartToggle moved out, receives animatedStyle as prop
   const ChartToggle = ({ animatedStyle }: { animatedStyle: any }) => (
-    <Animated.View style={animatedStyle} className="flex-row bg-white rounded-2xl p-1 mb-6 shadow-md">
+    <Animated.View style={animatedStyle} className="flex-row bg-white dark:bg-dark-bg-card rounded-2xl p-1 mb-6 shadow-md">
       {(['week', 'month', 'year'] as ChartViewType[]).map((view) => (
         <TouchableOpacity
           key={view}
@@ -181,7 +183,7 @@ export default function DashboardScreen() {
           {...(Platform.OS === 'android' ? { android_ripple: { color: '#6366F1', borderless: false, radius: 20 } } : {})}
         >
           <Text className={`text-center font-semibold ${
-            chartView === view ? 'text-white' : 'text-text-secondary'
+            chartView === view ? 'text-white' : 'text-text-secondary dark:text-dark-text-secondary'
           }`}>
             {view.charAt(0).toUpperCase() + view.slice(1)}
           </Text>
@@ -192,16 +194,16 @@ export default function DashboardScreen() {
 
   if (loading || isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background-light justify-center items-center">
-        <View className="bg-white rounded-2xl p-8 shadow-md">
-          <Text className="text-text-secondary text-lg font-medium">Loading dashboard...</Text>
+      <SafeAreaView className="flex-1 bg-background-light dark:bg-dark-bg justify-center items-center">
+        <View className="bg-white dark:bg-dark-bg-card rounded-2xl p-8 shadow-md">
+          <Text className="text-text-secondary dark:text-dark-text-secondary text-lg font-medium">Loading dashboard...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background-light">
+    <SafeAreaView className="flex-1 bg-background-light dark:bg-dark-bg">
       <ScrollView 
         className="flex-1"
         refreshControl={
@@ -213,29 +215,29 @@ export default function DashboardScreen() {
         <View className="p-6">
           {/* Header */}
           <Animated.View style={headerAnimatedStyle} className="mb-8">
-            <Text className="text-3xl font-bold text-text-primary mb-2">Dashboard</Text>
-            <Text className="text-text-secondary text-lg">Your time tracking analytics</Text>
+            <Text className="text-3xl font-bold text-text-primary dark:text-dark-text mb-2">Dashboard</Text>
+            <Text className="text-text-secondary dark:text-dark-text-secondary text-lg">Your time tracking analytics</Text>
           </Animated.View>
 
           {/* Current Status Card */}
           <Animated.View 
             style={cardAnimatedStyle}
-            className="bg-white rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
+            className="bg-white dark:bg-dark-bg-card rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
           >
             <View className="flex-row items-center mb-4">
               <View className="w-4 h-4 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet mr-3" />
-              <Text className="text-xl font-bold text-text-primary">Current Status</Text>
+              <Text className="text-xl font-bold text-text-primary dark:text-dark-text">Current Status</Text>
             </View>
             
             <View className="flex-row items-center justify-between mb-4">
               <View className="flex-row items-center">
                 <View className={`w-4 h-4 rounded-full mr-3 ${isPunchedIn ? 'bg-primary-amber' : 'bg-primary-teal'}`} />
-                <Text className="text-text-primary font-semibold text-lg">
+                <Text className="text-text-primary dark:text-dark-text font-semibold text-lg">
                   {isPunchedIn ? 'Currently Working' : 'Not Working'}
                 </Text>
               </View>
               {isPunchedIn && currentPunchInTime && (
-                <View className="bg-indigo-100 px-4 py-2 rounded-2xl">
+                <View className="bg-indigo-100 dark:bg-indigo-900/30 px-4 py-2 rounded-2xl">
                   <Text className="text-primary-indigo font-medium">
                     Since {formatTime(currentPunchInTime)}
                   </Text>
@@ -244,10 +246,10 @@ export default function DashboardScreen() {
             </View>
             
             {totalHoursToday > 0 && (
-              <View className="pt-4 border-t border-gray-200">
+              <View className="pt-4 border-t border-gray-200 dark:border-dark-border">
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-text-secondary font-medium">Today's Hours:</Text>
-                  <View className="bg-teal-100 px-4 py-2 rounded-2xl">
+                  <Text className="text-text-secondary dark:text-dark-text-secondary font-medium">Today's Hours:</Text>
+                  <View className="bg-teal-100 dark:bg-teal-900/30 px-4 py-2 rounded-2xl">
                     <Text className="text-primary-teal text-lg font-bold">
                       {totalHoursToday.toFixed(2)}h
                     </Text>
@@ -259,7 +261,7 @@ export default function DashboardScreen() {
 
           {/* Time Stats Cards - Horizontal Scrollable */}
           <View className="mb-8">
-            <Text className="text-xl font-bold text-text-primary mb-4">Time Overview</Text>
+            <Text className="text-xl font-bold text-text-primary dark:text-dark-text mb-4">Time Overview</Text>
             <ScrollView 
               horizontal 
               showsHorizontalScrollIndicator={false}
@@ -319,16 +321,16 @@ export default function DashboardScreen() {
           {chartData && (
             <Animated.View 
               style={chartAnimatedStyle}
-              className="bg-white rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
+              className="bg-white dark:bg-dark-bg-card rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
             >
               <View className="flex-row items-center justify-between mb-6">
-                <Text className="text-xl font-bold text-text-primary">
+                <Text className="text-xl font-bold text-text-primary dark:text-dark-text">
                   {chartView === 'week' ? 'This Week' : 
                    chartView === 'month' ? 'This Month' : 'This Year'}'s Hours
                 </Text>
                 <View className="flex-row items-center">
                   <View className="w-3 h-3 rounded-full bg-primary-indigo mr-2" />
-                  <Text className="text-text-secondary text-sm">Hours worked</Text>
+                  <Text className="text-text-secondary dark:text-dark-text-secondary text-sm">Hours worked</Text>
                 </View>
               </View>
               
@@ -374,13 +376,13 @@ export default function DashboardScreen() {
           {chartData && (
             <Animated.View 
               style={chartAnimatedStyle}
-              className="bg-white rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
+              className="bg-white dark:bg-dark-bg-card rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
             >
               <View className="flex-row items-center justify-between mb-6">
-                <Text className="text-xl font-bold text-text-primary">Trend Analysis</Text>
+                <Text className="text-xl font-bold text-text-primary dark:text-dark-text">Trend Analysis</Text>
                 <View className="flex-row items-center">
                   <View className="w-3 h-3 rounded-full bg-primary-teal mr-2" />
-                  <Text className="text-text-secondary text-sm">Daily trend</Text>
+                  <Text className="text-text-secondary dark:text-dark-text-secondary text-sm">Daily trend</Text>
                 </View>
               </View>
               
@@ -432,19 +434,19 @@ export default function DashboardScreen() {
           {/* Productivity Insights */}
           <Animated.View 
             style={cardAnimatedStyle}
-            className="bg-white rounded-3xl shadow-xl p-6 mb-8 border border-gray-100"
+            className="bg-white dark:bg-dark-bg-card rounded-3xl shadow-xl p-6 mb-8 border border-gray-100"
           >
-            <Text className="text-xl font-bold text-gray-800 mb-4">Productivity Insights</Text>
+            <Text className="text-xl font-bold text-gray-800 dark:text-dark-text mb-4">Productivity Insights</Text>
             <View className="space-y-4">
               {timeStats && (
                 <>
-                  <View className="flex-row items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-100">
+                  <View className="flex-row items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl border border-green-100 dark:border-green-800">
                     <View className="flex-row items-center">
                       <View className="w-10 h-10 bg-green-500 rounded-full justify-center items-center mr-3">
                         <Ionicons name="trending-up" size={20} color="white" />
                       </View>
                       <View>
-                        <Text className="text-gray-800 font-semibold text-lg">Best Day This Week</Text>
+                        <Text className="text-gray-800 dark:text-dark-text font-semibold text-lg">Best Day This Week</Text>
                         <Text className="text-gray-500 text-sm">Average performance</Text>
                       </View>
                     </View>
@@ -484,7 +486,7 @@ export default function DashboardScreen() {
           {/* Quick Actions */}
           <Animated.View 
             style={cardAnimatedStyle}
-            className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100"
+            className="bg-white dark:bg-dark-bg-card rounded-3xl shadow-xl p-6 border border-gray-100"
           >
             <Text className="text-xl font-bold text-gray-800 mb-4">Quick Actions</Text>
             <View className="flex-row space-x-4">

@@ -26,6 +26,7 @@ import { fetchEntriesForRange } from '../utils/database';
 import DateRangePicker from '../components/DateRangePicker';
 import { generatePDFReport } from '../utils/pdfGenerator';
 import { shareReport, shareReportAsEmail } from '../utils/shareUtils';
+import { useTheme } from '../utils/themeContext';
 
 const { width } = Dimensions.get('window');
 
@@ -39,6 +40,7 @@ interface ReportSummary {
 }
 
 export default function ReportScreen() {
+  const { isDarkMode } = useTheme();
   const [startDate, setStartDate] = useState(() => {
     const date = new Date();
     date.setDate(date.getDate() - 13); // 2 weeks ago
@@ -339,20 +341,20 @@ export default function ReportScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-background-light justify-center items-center">
-        <View className="bg-white rounded-2xl p-8 shadow-md">
-          <Text className="text-text-secondary text-lg font-medium">Loading reports...</Text>
+      <SafeAreaView className="flex-1 bg-background-light dark:bg-dark-bg justify-center items-center">
+        <View className="bg-white dark:bg-dark-bg-card rounded-2xl p-8 shadow-md">
+          <Text className="text-text-secondary dark:text-dark-text-secondary text-lg font-medium">Loading reports...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background-light">
+    <SafeAreaView className="flex-1 bg-background-light dark:bg-dark-bg">
       {/* Header */}
-      <Animated.View style={headerAnimatedStyle} className="bg-white pt-12 pb-6 px-6 border-b border-gray-100 shadow-sm">
-        <Text className="text-3xl font-bold text-text-primary mb-2">Reports</Text>
-        <Text className="text-text-secondary text-lg">Generate and export your time tracking data</Text>
+      <Animated.View style={headerAnimatedStyle} className="bg-white dark:bg-dark-bg-card pt-12 pb-6 px-6 border-b border-gray-100 dark:border-dark-border shadow-sm">
+        <Text className="text-3xl font-bold text-text-primary dark:text-dark-text mb-2">Reports</Text>
+        <Text className="text-text-secondary dark:text-dark-text-secondary text-lg">Generate and export your time tracking data</Text>
       </Animated.View>
 
       <ScrollView 
@@ -376,40 +378,40 @@ export default function ReportScreen() {
 
           {/* Enhanced Summary Cards */}
           <Animated.View style={[cardAnimatedStyle, summaryCardAnimatedStyle]}>
-            <View className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
+            <View className="bg-white dark:bg-dark-bg-card rounded-2xl shadow-md p-6 border border-gray-100 dark:border-dark-border">
               <View className="flex-row items-center mb-6">
                 <View className="w-4 h-4 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet mr-3" />
-                <Text className="text-2xl font-bold text-text-primary">Summary</Text>
+                <Text className="text-2xl font-bold text-text-primary dark:text-dark-text">Summary</Text>
               </View>
               
               <View className="grid grid-cols-2 gap-4">
-                <View className="bg-gradient-to-r from-indigo-50 to-violet-50 p-4 rounded-2xl border border-indigo-100">
+                <View className="bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-900/20 dark:to-violet-900/20 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-800">
                   <Text className="text-3xl font-bold text-primary-indigo">{summary.totalDays}</Text>
                   <Text className="text-sm text-primary-indigo font-medium">Days</Text>
                 </View>
-                <View className="bg-gradient-to-r from-teal-50 to-cyan-50 p-4 rounded-2xl border border-teal-100">
+                <View className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 p-4 rounded-2xl border border-teal-100 dark:border-teal-800">
                   <Text className="text-3xl font-bold text-primary-teal">{summary.totalRecords}</Text>
                   <Text className="text-sm text-primary-teal font-medium">Records</Text>
                 </View>
-                <View className="bg-gradient-to-r from-violet-50 to-purple-50 p-4 rounded-2xl border border-violet-100">
+                <View className="bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 p-4 rounded-2xl border border-violet-100 dark:border-violet-800">
                   <Text className="text-2xl font-bold text-primary-violet">{formatDuration(summary.totalHours)}</Text>
                   <Text className="text-sm text-primary-violet font-medium">Total Hours</Text>
                 </View>
-                <View className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-2xl border border-amber-100">
+                <View className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 p-4 rounded-2xl border border-amber-100 dark:border-amber-800">
                   <Text className="text-2xl font-bold text-primary-amber">{formatDuration(summary.averageHoursPerDay)}</Text>
                   <Text className="text-sm text-primary-amber font-medium">Avg/Day</Text>
                 </View>
               </View>
 
               {/* Day Distribution */}
-              <View className="mt-6 pt-6 border-t border-gray-200">
-                <Text className="text-lg font-semibold text-text-primary mb-4">Day Distribution</Text>
+              <View className="mt-6 pt-6 border-t border-gray-200 dark:border-dark-border">
+                <Text className="text-lg font-semibold text-text-primary dark:text-dark-text mb-4">Day Distribution</Text>
                 <View className="flex-row space-x-4">
-                  <View className="flex-1 bg-gradient-to-r from-indigo-50 to-violet-50 p-4 rounded-2xl border border-indigo-100">
+                  <View className="flex-1 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-900/20 dark:to-violet-900/20 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-800">
                     <Text className="text-2xl font-bold text-primary-indigo">{summary.weekdays}</Text>
                     <Text className="text-sm text-primary-indigo font-medium">Weekdays</Text>
                   </View>
-                  <View className="flex-1 bg-gradient-to-r from-rose-50 to-pink-50 p-4 rounded-2xl border border-rose-100">
+                  <View className="flex-1 bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20 p-4 rounded-2xl border border-rose-100 dark:border-rose-800">
                     <Text className="text-2xl font-bold text-rose-600">{summary.weekendDays}</Text>
                     <Text className="text-sm text-rose-600 font-medium">Weekends</Text>
                   </View>

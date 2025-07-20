@@ -17,6 +17,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { usePunchStatus, useTodayData, usePunchActions } from '../utils/punchStore';
+import { useTheme } from '../utils/themeContext';
 
 const { width, height } = Dimensions.get('window');
 
@@ -40,6 +41,7 @@ export default function HomeScreen() {
   const { isPunchedIn, currentPunchInTime, isLoading } = usePunchStatus();
   const { todayEntries, totalHoursToday } = useTodayData();
   const { punchIn, punchOut, updateCurrentPunch } = usePunchActions();
+  const { isDarkMode } = useTheme();
   
   const [showEditModal, setShowEditModal] = useState(false);
   const [editType, setEditType] = useState<'in' | 'out'>();
@@ -278,20 +280,23 @@ export default function HomeScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-background-light justify-center items-center">
-        <View className="bg-white rounded-2xl p-8 shadow-md">
-          <Text className="text-text-secondary text-lg font-medium">Loading...</Text>
+      <SafeAreaView className="flex-1 bg-background-light dark:bg-dark-bg justify-center items-center">
+        <View className="bg-white dark:bg-dark-bg-card rounded-2xl p-8 shadow-md">
+          <Text className="text-text-secondary dark:text-dark-text-secondary text-lg font-medium">Loading...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background-light">
+    <SafeAreaView className="flex-1 bg-background-light dark:bg-dark-bg">
       {/* Background Gradient */}
       <Animated.View style={backgroundGlowStyle} className="absolute inset-0">
         <LinearGradient
-          colors={['rgba(99, 102, 241, 0.05)', 'rgba(139, 92, 246, 0.03)', 'rgba(20, 184, 166, 0.02)']}
+          colors={isDarkMode 
+            ? ['rgba(99, 102, 241, 0.1)', 'rgba(139, 92, 246, 0.08)', 'rgba(20, 184, 166, 0.05)']
+            : ['rgba(99, 102, 241, 0.05)', 'rgba(139, 92, 246, 0.03)', 'rgba(20, 184, 166, 0.02)']
+          }
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           className="absolute inset-0"
@@ -303,8 +308,8 @@ export default function HomeScreen() {
         <Animated.View style={headerAnimatedStyle} className="pt-12 pb-6 px-6">
           <View className="flex-row items-center justify-between">
             <View>
-              <Text className="text-3xl font-bold text-text-primary mb-2">MonHeure</Text>
-              <Text className="text-text-secondary text-lg">Time Tracking Made Simple</Text>
+              <Text className="text-3xl font-bold text-text-primary dark:text-dark-text mb-2">MonHeure</Text>
+              <Text className="text-text-secondary dark:text-dark-text-secondary text-lg">Time Tracking Made Simple</Text>
             </View>
             <View className="w-12 h-12 bg-gradient-to-r from-primary-indigo to-primary-violet rounded-2xl justify-center items-center shadow-md">
               <Ionicons name="time" size={24} color="white" />
@@ -367,8 +372,8 @@ export default function HomeScreen() {
 
           {/* Enhanced Status Text */}
           <Animated.View style={statusTextAnimatedStyle} className="mb-8">
-            <View className="bg-white bg-opacity-80 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-sm border border-gray-100">
-              <Text className="text-text-primary text-lg font-medium text-center leading-6">
+            <View className="bg-white dark:bg-dark-bg-card bg-opacity-80 dark:bg-opacity-80 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-sm border border-gray-100 dark:border-dark-border">
+              <Text className="text-text-primary dark:text-dark-text text-lg font-medium text-center leading-6">
                 {getStatusText()}
               </Text>
             </View>
@@ -376,25 +381,25 @@ export default function HomeScreen() {
 
           {/* Today's Times Card - Enhanced Calendar Style */}
           <Animated.View style={cardAnimatedStyle} className="w-full max-w-sm">
-            <View className="bg-white rounded-2xl shadow-xl p-6 mb-6 border border-gray-100">
+            <View className="bg-white dark:bg-dark-bg-card rounded-2xl shadow-xl p-6 mb-6 border border-gray-100 dark:border-dark-border">
               <View className="flex-row items-center mb-6">
                 <View className="w-4 h-4 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet mr-3" />
-                <Text className="text-2xl font-bold text-text-primary">Today's Schedule</Text>
+                <Text className="text-2xl font-bold text-text-primary dark:text-dark-text">Today's Schedule</Text>
               </View>
               
               <View className="space-y-5">
                 {/* Enhanced Punch In Row */}
-                <Animated.View style={punchInRowAnimatedStyle} className="flex-row items-center p-5 bg-gradient-to-r from-indigo-50 to-violet-50 rounded-2xl border border-indigo-100 shadow-sm">
+                <Animated.View style={punchInRowAnimatedStyle} className="flex-row items-center p-5 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-900/20 dark:to-violet-900/20 rounded-2xl border border-indigo-100 dark:border-indigo-800 shadow-sm">
                   <View className="w-12 h-12 bg-gradient-to-r from-primary-indigo to-primary-violet rounded-full justify-center items-center mr-4 shadow-sm">
                     <Ionicons name="log-in" size={24} color="white" />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-text-primary font-semibold text-lg">Punch In</Text>
-                    <Text className="text-text-secondary text-sm">Start time</Text>
+                    <Text className="text-text-primary dark:text-dark-text font-semibold text-lg">Punch In</Text>
+                    <Text className="text-text-secondary dark:text-dark-text-secondary text-sm">Start time</Text>
                   </View>
                   <TouchableOpacity 
                     onPress={() => openEditModal('in')}
-                    className="bg-white px-5 py-3 rounded-xl shadow-sm border border-indigo-200"
+                    className="bg-white dark:bg-dark-bg-secondary px-5 py-3 rounded-xl shadow-sm border border-indigo-200 dark:border-indigo-700"
                     activeOpacity={0.7}
                   >
                     <Text className="text-primary-indigo text-xl font-mono font-bold">
@@ -404,17 +409,17 @@ export default function HomeScreen() {
                 </Animated.View>
                 
                 {/* Enhanced Punch Out Row */}
-                <Animated.View style={punchOutRowAnimatedStyle} className="flex-row items-center p-5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-100 shadow-sm">
+                <Animated.View style={punchOutRowAnimatedStyle} className="flex-row items-center p-5 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl border border-amber-100 dark:border-amber-800 shadow-sm">
                   <View className="w-12 h-12 bg-gradient-to-r from-primary-amber to-orange-500 rounded-full justify-center items-center mr-4 shadow-sm">
                     <Ionicons name="log-out" size={24} color="white" />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-text-primary font-semibold text-lg">Punch Out</Text>
-                    <Text className="text-text-secondary text-sm">End time</Text>
+                    <Text className="text-text-primary dark:text-dark-text font-semibold text-lg">Punch Out</Text>
+                    <Text className="text-text-secondary dark:text-dark-text-secondary text-sm">End time</Text>
                   </View>
                   <TouchableOpacity 
                     onPress={() => openEditModal('out')}
-                    className="bg-white px-5 py-3 rounded-xl shadow-sm border border-amber-200"
+                    className="bg-white dark:bg-dark-bg-secondary px-5 py-3 rounded-xl shadow-sm border border-amber-200 dark:border-amber-700"
                     activeOpacity={0.7}
                   >
                     <Text className="text-primary-amber text-xl font-mono font-bold">
@@ -426,18 +431,18 @@ export default function HomeScreen() {
               
               {/* Enhanced Total Hours */}
               {totalHoursToday > 0 && (
-                <Animated.View style={totalHoursAnimatedStyle} className="mt-6 pt-6 border-t border-gray-200">
-                  <View className="flex-row justify-between items-center p-4 bg-gradient-to-r from-teal-50 to-cyan-50 rounded-2xl border border-teal-100 shadow-sm">
+                <Animated.View style={totalHoursAnimatedStyle} className="mt-6 pt-6 border-t border-gray-200 dark:border-dark-border">
+                  <View className="flex-row justify-between items-center p-4 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 rounded-2xl border border-teal-100 dark:border-teal-800 shadow-sm">
                     <View className="flex-row items-center">
                       <View className="w-10 h-10 bg-gradient-to-r from-primary-teal to-cyan-500 rounded-full justify-center items-center mr-3 shadow-sm">
                         <Ionicons name="time" size={20} color="white" />
                       </View>
                       <View>
-                        <Text className="text-text-primary font-semibold text-lg">Total Hours</Text>
-                        <Text className="text-text-secondary text-sm">Today's work</Text>
+                        <Text className="text-text-primary dark:text-dark-text font-semibold text-lg">Total Hours</Text>
+                        <Text className="text-text-secondary dark:text-dark-text-secondary text-sm">Today's work</Text>
                       </View>
                     </View>
-                    <View className="bg-white px-5 py-3 rounded-xl shadow-sm border border-teal-200">
+                    <View className="bg-white dark:bg-dark-bg-secondary px-5 py-3 rounded-xl shadow-sm border border-teal-200 dark:border-teal-700">
                       <Text className="text-primary-teal text-2xl font-bold">
                         {totalHoursToday.toFixed(2)}h
                       </Text>
@@ -447,9 +452,9 @@ export default function HomeScreen() {
               )}
 
               {/* Enhanced Date Display */}
-              <View className="mt-4 pt-4 border-t border-gray-200">
-                <View className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-3">
-                  <Text className="text-text-secondary text-center font-medium">
+              <View className="mt-4 pt-4 border-t border-gray-200 dark:border-dark-border">
+                <View className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-xl p-3">
+                  <Text className="text-text-secondary dark:text-dark-text-secondary text-center font-medium">
                     {formatDate(new Date().toISOString())}
                   </Text>
                 </View>
@@ -460,10 +465,10 @@ export default function HomeScreen() {
           {/* Enhanced Reset Button */}
           <TouchableOpacity 
             onPress={resetToday} 
-            className="bg-gradient-to-r from-gray-100 to-gray-200 px-8 py-4 rounded-2xl border border-gray-200 shadow-sm"
+            className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 px-8 py-4 rounded-2xl border border-gray-200 dark:border-dark-border shadow-sm"
             activeOpacity={0.7}
           >
-            <Text className="text-text-secondary text-sm font-medium">Reset Today (for testing)</Text>
+            <Text className="text-text-secondary dark:text-dark-text-secondary text-sm font-medium">Reset Today (for testing)</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -476,11 +481,11 @@ export default function HomeScreen() {
         animationIn="slideInUp"
         animationOut="slideOutDown"
       >
-        <View className="bg-white rounded-2xl p-6 items-center mx-4 shadow-2xl">
+        <View className="bg-white dark:bg-dark-bg-card rounded-2xl p-6 items-center mx-4 shadow-2xl">
           <View className="w-16 h-16 bg-gradient-to-r from-primary-indigo to-primary-violet rounded-full justify-center items-center mb-4">
             <Ionicons name="time" size={32} color="white" />
           </View>
-          <Text className="text-xl font-bold text-text-primary mb-6 text-center">
+          <Text className="text-xl font-bold text-text-primary dark:text-dark-text mb-6 text-center">
             Edit {editType === 'in' ? 'Punch In' : 'Punch Out'} Time
           </Text>
           {showPicker && (

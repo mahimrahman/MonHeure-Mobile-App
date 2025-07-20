@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View } from 'react-native';
 
 interface ThemeContextType {
   isDarkMode: boolean;
@@ -65,7 +66,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   return (
     <ThemeContext.Provider value={value}>
-      {children}
+      <View className={isDarkMode ? 'dark' : ''} style={{ flex: 1 }}>
+        {children}
+      </View>
     </ThemeContext.Provider>
   );
 }; 

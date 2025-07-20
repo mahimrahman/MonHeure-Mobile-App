@@ -7,6 +7,7 @@ module.exports = {
     "./screens/**/*.{js,jsx,ts,tsx}",
     "./utils/**/*.{js,jsx,ts,tsx}"
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -85,6 +86,17 @@ module.exports = {
           'dark-primary': '#F9FAFB',
           'dark-secondary': '#D1D5DB',
           'dark-tertiary': '#9CA3AF',
+        },
+        // Dark mode specific colors
+        dark: {
+          bg: '#1F2937',
+          'bg-card': '#374151',
+          'bg-secondary': '#4B5563',
+          text: '#F9FAFB',
+          'text-secondary': '#D1D5DB',
+          'text-tertiary': '#9CA3AF',
+          border: '#4B5563',
+          'border-light': '#6B7280',
         },
       },
       borderRadius: {
