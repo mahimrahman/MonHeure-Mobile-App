@@ -11,6 +11,11 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Glow Effects**: Subtle animations and visual feedback on interactions
 - **Session Persistence**: State survives app restarts and crashes
 
+### 🌙 Global Dark Mode Support (NEW)
+- **Full-App Dark Mode**: Dark mode now applies to the entire app, not just the settings page
+- **Automatic & Manual Toggle**: Easily switch between light and dark themes from settings
+- **Consistent Theming**: All screens, cards, and UI elements adapt to dark mode
+
 ### 📊 Enhanced Dashboard & Analytics
 - **Horizontally Scrollable Stat Cards**: 
   - "This Week" (Blue gradient)
@@ -65,6 +70,7 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Responsive Design**: Works seamlessly on all screen sizes and orientations
 - **Consistent Typography**: `text-lg` classes for uniform text sizing
 - **Safe Area Support**: Uses `SafeAreaView` and `SafeAreaProvider` for proper layout on all devices
+- **Dark Mode Ready**: All UI elements and backgrounds adapt to dark mode for a seamless experience
 
 ### 🦾 Accessibility & Native Feel
 - **Accessible Touch Targets**: All buttons and interactive elements have at least 44x44pt tap area
@@ -109,8 +115,8 @@ The app features a modern, cohesive design system with:
 
 ### 🎨 **Color Palette**
 - **Primary Colors**: Indigo (#6366F1), Teal (#14B8A6), Amber (#F59E0B), Violet (#8B5CF6)
-- **Background Colors**: Light (#F9FAFB), Dark (#1F2937), Card (#FFFFFF)
-- **Text Colors**: Primary (#111827), Secondary (#6B7280), Inverse (#FFFFFF)
+- **Background Colors**: Light (#F9FAFB), Dark (#1F2937), Card (#FFFFFF), **Card Dark (#374151)**
+- **Text Colors**: Primary (#111827), Secondary (#6B7280), Inverse (#FFFFFF), **Dark Mode Texts (#F9FAFB, #D1D5DB, #9CA3AF)**
 - **Complete Color Scales**: 50-900 scales for each primary color
 
 ### 🎨 **Design Tokens**
@@ -122,6 +128,7 @@ The app features a modern, cohesive design system with:
 - **Safe Area**: Uses `SafeAreaView` and `SafeAreaProvider` for all layouts
 - **Accessibility**: All components have proper roles, labels, and contrast
 - **Touch Feedback**: Haptic feedback and ripple effects for all buttons
+- **Dark Mode Classes**: All components use Tailwind's `dark:` classes for seamless dark mode
 
 ### 🎨 **Component System**
 - **Cards**: Consistent styling with rounded corners and shadows
@@ -139,6 +146,7 @@ The app features a modern, cohesive design system with:
 - **Haptic Feedback**: Uses `expo-haptics` for tactile feedback on all major actions
 - **Platform-Specific Touch**: Android ripple effects, iOS haptics, and smooth transitions
 - **Screen Reader Support**: Accessibility roles and hints for all major controls
+- **Dark Mode**: All accessibility features are preserved in both light and dark themes
 
 ## 📱 Screenshots & UI Features
 
@@ -151,6 +159,7 @@ The app features a modern, intuitive interface with:
 - **Glow effects**: Subtle animations and visual feedback with new color palette
 - **Calendar-style card**: Today's punches in a clean, organized layout with consistent border radius
 - **Smooth animations**: Spring-based animations with proper easing
+- **Dark Mode**: All elements adapt to dark mode for a seamless experience
 
 ### 📊 Dashboard Screen
 - **Horizontally scrollable stat cards** with modern gradient backgrounds using the new color palette
@@ -158,6 +167,7 @@ The app features a modern, intuitive interface with:
 - **Time period toggle**: Switch between week/month/year views with consistent styling
 - **Productivity insights**: Enhanced metrics with visual indicators using new colors
 - **Quick actions**: Touchable cards with gradient backgrounds and consistent border radius
+- **Dark Mode**: Dashboard and all cards adapt to dark mode
 
 ### 📅 History Screen
 - **Interactive calendar** with color-coded activity dots
@@ -165,6 +175,7 @@ The app features a modern, intuitive interface with:
 - **Pastel backgrounds**: Gradient backgrounds for different record statuses
 - **Edit/Delete buttons**: Icon-based buttons with proper styling
 - **Smooth transitions**: Spring animations for all interactions
+- **Dark Mode**: Calendar, cards, and modals fully support dark mode
 
 ### ⚙️ Settings Screen
 - **Grouped sections**: Organized settings with colorful gradient indicators using new palette
@@ -172,10 +183,17 @@ The app features a modern, intuitive interface with:
 - **Interactive elements**: Switches, toggles, and selection indicators with new colors
 - **Danger zone**: Prominent warning area for data clearing with updated styling
 - **Enhanced modals**: Improved confirmation dialogs with icons and consistent border radius
+- **Dark Mode**: Settings and all controls adapt to dark mode
 
 ## 🔄 Recent Updates
 
-### 🛠 Configuration Fixes (Latest)
+### 🌙 Global Dark Mode (Latest)
+- **Full-App Dark Mode**: Dark mode now applies to the entire app, not just the settings page
+- **Tailwind Dark Classes**: All screens and components use Tailwind's `dark:` classes
+- **Consistent Theming**: All cards, backgrounds, and text colors adapt to dark mode
+- **Theme Context**: Theme context and provider updated for global dark mode
+
+### 🛠 Configuration Fixes
 - **Plugin Configuration**: Fixed incorrect plugin configurations in `app.json`
 - **Expo Haptics**: Removed from plugins array (not a config plugin)
 - **Expo Linear Gradient**: Removed from plugins array (not a config plugin)
