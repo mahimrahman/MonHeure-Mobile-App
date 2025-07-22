@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Dimensions, RefreshControl, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, ScrollView, Dimensions, RefreshControl, TouchableOpacity, Platform, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { LineChart, BarChart } from 'react-native-chart-kit';
@@ -43,8 +43,9 @@ export default function DashboardScreen() {
   const cardTranslateY = useSharedValue(30);
   const chartOpacity = useSharedValue(0);
   const chartTranslateY = useSharedValue(50);
+  const backgroundGlow = useSharedValue(0);
 
-  // Animated styles (move all to top level)
+  // Animated styles
   const headerAnimatedStyle = useAnimatedStyle(() => ({
     opacity: cardOpacity.value,
     transform: [{ translateY: cardTranslateY.value }],
@@ -60,6 +61,9 @@ export default function DashboardScreen() {
   const toggleAnimatedStyle = useAnimatedStyle(() => ({
     opacity: chartOpacity.value,
     transform: [{ translateY: chartTranslateY.value }],
+  }));
+  const backgroundGlowStyle = useAnimatedStyle(() => ({
+    opacity: backgroundGlow.value,
   }));
 
   const loadData = async () => {
@@ -84,6 +88,7 @@ export default function DashboardScreen() {
 
   // Start animations on mount
   useEffect(() => {
+    backgroundGlow.value = withTiming(1, { duration: 1000, easing: Easing.out(Easing.cubic) });
     cardOpacity.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) });
     cardTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
     setTimeout(() => {
@@ -139,41 +144,42 @@ export default function DashboardScreen() {
     delay?: number;
     animatedStyle: any;
   }) => (
-    <Animated.View style={animatedStyle} className="mr-4 min-w-[160px]">
-      <LinearGradient
-        colors={gradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        className="rounded-2xl p-6 shadow-md"
-        accessibilityRole="button"
-        accessibilityLabel={`${title} statistics`}
-        accessibilityHint={`Shows ${title} time tracking data`}
-        {...(Platform.OS === 'android' ? { android_ripple: { color: '#FFFFFF', borderless: false, radius: 80 } } : {})}
+    <Animated.View style={animatedStyle} className="mr-4 min-w-[170px]">
+      <TouchableOpacity
+        activeOpacity={0.85}
+        className="rounded-2xl overflow-hidden"
+        style={{ shadowColor: gradient[0], shadowOpacity: 0.15, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } }}
       >
-        <View className="flex-row items-center justify-between mb-4">
-          <View className="w-10 h-10 bg-white/20 rounded-full justify-center items-center">
-            <Ionicons name={icon as any} size={20} color="white" accessibilityIgnoresInvertColors />
+        <LinearGradient
+          colors={gradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          className="rounded-2xl p-6"
+        >
+          <View className="flex-row items-center justify-between mb-4">
+            <View className="w-10 h-10 bg-white/20 rounded-full justify-center items-center">
+              <Ionicons name={icon as any} size={22} color="white" accessibilityIgnoresInvertColors />
+            </View>
+            <View className="w-3 h-3 rounded-full bg-white/30" />
           </View>
-          <View className="w-3 h-3 rounded-full bg-white/30" />
-        </View>
-        
-        <Text className="text-white/90 text-sm font-medium mb-2">{title}</Text>
-        <Text className="text-white text-2xl font-bold mb-1">{formatHours(hours)}</Text>
-        <Text className="text-white/80 text-xs">{days} days • {formatHours(average)}/day</Text>
-      </LinearGradient>
+          <Text className="text-white/90 text-base font-semibold mb-2 tracking-wide">{title}</Text>
+          <Text className="text-white text-3xl font-extrabold mb-1 tracking-tight">{formatHours(hours)}</Text>
+          <Text className="text-white/80 text-xs">{days} days • {formatHours(average)}/day</Text>
+        </LinearGradient>
+      </TouchableOpacity>
     </Animated.View>
   );
 
   // ChartToggle moved out, receives animatedStyle as prop
   const ChartToggle = ({ animatedStyle }: { animatedStyle: any }) => (
-    <Animated.View style={animatedStyle} className="flex-row bg-white dark:bg-dark-bg-card rounded-2xl p-1 mb-6 shadow-md">
+    <Animated.View style={animatedStyle} className="flex-row bg-white/80 dark:bg-dark-bg-card/80 rounded-2xl p-1 mb-6 shadow-md backdrop-blur-md">
       {(['week', 'month', 'year'] as ChartViewType[]).map((view) => (
         <TouchableOpacity
           key={view}
           onPress={() => handleChartToggle(view)}
-          className={`flex-1 py-3 px-4 rounded-xl ${
+          className={`flex-1 py-3 px-4 rounded-xl transition-all duration-200 ${
             chartView === view 
-              ? 'bg-gradient-to-r from-primary-indigo to-primary-violet' 
+              ? 'bg-gradient-to-r from-primary-indigo to-primary-violet scale-105' 
               : 'bg-transparent'
           }`}
           accessibilityRole="button"
@@ -182,7 +188,7 @@ export default function DashboardScreen() {
           style={{ minHeight: 44 }}
           {...(Platform.OS === 'android' ? { android_ripple: { color: '#6366F1', borderless: false, radius: 20 } } : {})}
         >
-          <Text className={`text-center font-semibold ${
+          <Text className={`text-center font-semibold transition-all duration-200 ${
             chartView === view ? 'text-white' : 'text-text-secondary dark:text-dark-text-secondary'
           }`}>
             {view.charAt(0).toUpperCase() + view.slice(1)}
@@ -204,8 +210,20 @@ export default function DashboardScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background-light dark:bg-dark-bg">
+      {/* Animated Background Gradient */}
+      <Animated.View style={backgroundGlowStyle} className="absolute inset-0 z-0">
+        <LinearGradient
+          colors={isDarkMode
+            ? ['rgba(99,102,241,0.12)', 'rgba(139,92,246,0.10)', 'rgba(20,184,166,0.08)']
+            : ['rgba(99,102,241,0.07)', 'rgba(139,92,246,0.04)', 'rgba(20,184,166,0.03)']
+          }
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          className="absolute inset-0"
+        />
+      </Animated.View>
       <ScrollView 
-        className="flex-1"
+        className="flex-1 z-10"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -213,6 +231,17 @@ export default function DashboardScreen() {
         contentContainerStyle={{ flexGrow: 1 }}
       >
         <View className="p-6">
+          {/* Summary Header */}
+          <View className="flex-row items-center mb-10">
+            <View className="w-16 h-16 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet justify-center items-center shadow-lg mr-4">
+              <Image source={require('../assets/avatar.png')} style={{ width: 48, height: 48, borderRadius: 24 }} />
+            </View>
+            <View className="flex-1">
+              <Text className="text-2xl font-bold text-text-primary dark:text-dark-text mb-1">Welcome back 👋</Text>
+              <Text className="text-text-secondary dark:text-dark-text-secondary text-base">Here's your productivity overview</Text>
+            </View>
+          </View>
+
           {/* Header */}
           <Animated.View style={headerAnimatedStyle} className="mb-8">
             <Text className="text-3xl font-bold text-text-primary dark:text-dark-text mb-2">Dashboard</Text>
@@ -222,13 +251,12 @@ export default function DashboardScreen() {
           {/* Current Status Card */}
           <Animated.View 
             style={cardAnimatedStyle}
-            className="bg-white dark:bg-dark-bg-card rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
+            className="bg-white/80 dark:bg-dark-bg-card/80 rounded-2xl shadow-xl p-6 mb-8 border border-gray-100 dark:border-dark-border backdrop-blur-md"
           >
             <View className="flex-row items-center mb-4">
               <View className="w-4 h-4 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet mr-3" />
               <Text className="text-xl font-bold text-text-primary dark:text-dark-text">Current Status</Text>
             </View>
-            
             <View className="flex-row items-center justify-between mb-4">
               <View className="flex-row items-center">
                 <View className={`w-4 h-4 rounded-full mr-3 ${isPunchedIn ? 'bg-primary-amber' : 'bg-primary-teal'}`} />
@@ -244,7 +272,6 @@ export default function DashboardScreen() {
                 </View>
               )}
             </View>
-            
             {totalHoursToday > 0 && (
               <View className="pt-4 border-t border-gray-200 dark:border-dark-border">
                 <View className="flex-row justify-between items-center">
@@ -321,7 +348,7 @@ export default function DashboardScreen() {
           {chartData && (
             <Animated.View 
               style={chartAnimatedStyle}
-              className="bg-white dark:bg-dark-bg-card rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
+              className="bg-white/90 dark:bg-dark-bg-card/90 rounded-2xl shadow-xl p-6 mb-8 border border-gray-100 dark:border-dark-border backdrop-blur-md"
             >
               <View className="flex-row items-center justify-between mb-6">
                 <Text className="text-xl font-bold text-text-primary dark:text-dark-text">
@@ -333,7 +360,6 @@ export default function DashboardScreen() {
                   <Text className="text-text-secondary dark:text-dark-text-secondary text-sm">Hours worked</Text>
                 </View>
               </View>
-              
               <BarChart
                 data={chartData}
                 width={width - 80}
@@ -341,12 +367,12 @@ export default function DashboardScreen() {
                 yAxisLabel=""
                 yAxisSuffix="h"
                 chartConfig={{
-                  backgroundColor: '#ffffff',
-                  backgroundGradientFrom: '#ffffff',
-                  backgroundGradientTo: '#ffffff',
+                  backgroundColor: isDarkMode ? '#374151' : '#ffffff',
+                  backgroundGradientFrom: isDarkMode ? '#374151' : '#ffffff',
+                  backgroundGradientTo: isDarkMode ? '#374151' : '#ffffff',
                   decimalPlaces: 1,
                   color: (opacity = 1) => `rgba(99, 102, 241, ${opacity})`,
-                  labelColor: (opacity = 1) => `rgba(17, 24, 39, ${opacity})`,
+                  labelColor: (opacity = 1) => isDarkMode ? `rgba(249,250,251,${opacity})` : `rgba(17,24,39,${opacity})`,
                   style: {
                     borderRadius: 16
                   },
@@ -357,7 +383,7 @@ export default function DashboardScreen() {
                   },
                   propsForBackgroundLines: {
                     strokeDasharray: '',
-                    stroke: 'rgba(156, 163, 175, 0.2)',
+                    stroke: isDarkMode ? 'rgba(156,163,175,0.15)' : 'rgba(156,163,175,0.2)',
                     strokeWidth: 1,
                   },
                 }}
@@ -376,7 +402,7 @@ export default function DashboardScreen() {
           {chartData && (
             <Animated.View 
               style={chartAnimatedStyle}
-              className="bg-white dark:bg-dark-bg-card rounded-2xl shadow-md p-6 mb-8 border border-gray-100"
+              className="bg-white/90 dark:bg-dark-bg-card/90 rounded-2xl shadow-xl p-6 mb-8 border border-gray-100 dark:border-dark-border backdrop-blur-md"
             >
               <View className="flex-row items-center justify-between mb-6">
                 <Text className="text-xl font-bold text-text-primary dark:text-dark-text">Trend Analysis</Text>
@@ -385,7 +411,6 @@ export default function DashboardScreen() {
                   <Text className="text-text-secondary dark:text-dark-text-secondary text-sm">Daily trend</Text>
                 </View>
               </View>
-              
               <LineChart
                 data={chartData}
                 width={width - 80}
@@ -393,12 +418,12 @@ export default function DashboardScreen() {
                 yAxisLabel=""
                 yAxisSuffix="h"
                 chartConfig={{
-                  backgroundColor: '#ffffff',
-                  backgroundGradientFrom: '#ffffff',
-                  backgroundGradientTo: '#ffffff',
+                  backgroundColor: isDarkMode ? '#374151' : '#ffffff',
+                  backgroundGradientFrom: isDarkMode ? '#374151' : '#ffffff',
+                  backgroundGradientTo: isDarkMode ? '#374151' : '#ffffff',
                   decimalPlaces: 1,
                   color: (opacity = 1) => `rgba(20, 184, 166, ${opacity})`,
-                  labelColor: (opacity = 1) => `rgba(17, 24, 39, ${opacity})`,
+                  labelColor: (opacity = 1) => isDarkMode ? `rgba(249,250,251,${opacity})` : `rgba(17,24,39,${opacity})`,
                   style: {
                     borderRadius: 16
                   },
@@ -409,14 +434,14 @@ export default function DashboardScreen() {
                   },
                   propsForBackgroundLines: {
                     strokeDasharray: '',
-                    stroke: 'rgba(156, 163, 175, 0.2)',
+                    stroke: isDarkMode ? 'rgba(156,163,175,0.15)' : 'rgba(156,163,175,0.2)',
                     strokeWidth: 1,
                   },
                   propsForDots: {
                     r: '6',
                     strokeWidth: '2',
                     stroke: '#14B8A6',
-                    fill: '#ffffff',
+                    fill: isDarkMode ? '#374151' : '#ffffff',
                   },
                 }}
                 style={{
@@ -434,7 +459,7 @@ export default function DashboardScreen() {
           {/* Productivity Insights */}
           <Animated.View 
             style={cardAnimatedStyle}
-            className="bg-white dark:bg-dark-bg-card rounded-3xl shadow-xl p-6 mb-8 border border-gray-100"
+            className="bg-white/80 dark:bg-dark-bg-card/80 rounded-3xl shadow-xl p-6 mb-8 border border-gray-100 dark:border-dark-border backdrop-blur-md"
           >
             <Text className="text-xl font-bold text-gray-800 dark:text-dark-text mb-4">Productivity Insights</Text>
             <View className="space-y-4">
@@ -454,25 +479,25 @@ export default function DashboardScreen() {
                       {timeStats.thisWeek.averageHoursPerDay > 0 ? formatHours(timeStats.thisWeek.averageHoursPerDay) : 'No data'}
                     </Text>
                   </View>
-                  <View className="flex-row items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100">
+                  <View className="flex-row items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl border border-blue-100 dark:border-blue-800">
                     <View className="flex-row items-center">
                       <View className="w-10 h-10 bg-blue-500 rounded-full justify-center items-center mr-3">
                         <Ionicons name="calendar" size={20} color="white" />
                       </View>
                       <View>
-                        <Text className="text-gray-800 font-semibold text-lg">Days Worked This Month</Text>
+                        <Text className="text-gray-800 dark:text-dark-text font-semibold text-lg">Days Worked This Month</Text>
                         <Text className="text-gray-500 text-sm">Consistency tracker</Text>
                       </View>
                     </View>
                     <Text className="font-bold text-gray-800 text-lg">{timeStats.thisMonth.daysWorked}</Text>
                   </View>
-                  <View className="flex-row items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-100">
+                  <View className="flex-row items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-2xl border border-orange-100 dark:border-orange-800">
                     <View className="flex-row items-center">
                       <View className="w-10 h-10 bg-orange-500 rounded-full justify-center items-center mr-3">
                         <Ionicons name="time" size={20} color="white" />
                       </View>
                       <View>
-                        <Text className="text-gray-800 font-semibold text-lg">Total Hours This Year</Text>
+                        <Text className="text-gray-800 dark:text-dark-text font-semibold text-lg">Total Hours This Year</Text>
                         <Text className="text-gray-500 text-sm">Annual achievement</Text>
                       </View>
                     </View>
@@ -486,27 +511,27 @@ export default function DashboardScreen() {
           {/* Quick Actions */}
           <Animated.View 
             style={cardAnimatedStyle}
-            className="bg-white dark:bg-dark-bg-card rounded-3xl shadow-xl p-6 border border-gray-100"
+            className="bg-white/80 dark:bg-dark-bg-card/80 rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-dark-border backdrop-blur-md"
           >
-            <Text className="text-xl font-bold text-gray-800 mb-4">Quick Actions</Text>
+            <Text className="text-xl font-bold text-gray-800 dark:text-dark-text mb-4">Quick Actions</Text>
             <View className="flex-row space-x-4">
-              <TouchableOpacity className="flex-1 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-2xl items-center border border-blue-100">
-                <View className="w-12 h-12 bg-blue-500 rounded-full justify-center items-center mb-2">
+              <TouchableOpacity className="flex-1 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-2xl items-center border border-blue-100 dark:border-blue-800 active:scale-95 transition-all duration-150">
+                <View className="w-12 h-12 bg-blue-500 rounded-full justify-center items-center mb-2 shadow-md">
                   <Ionicons name="refresh" size={24} color="white" />
                 </View>
-                <Text className="text-blue-600 font-medium">Refresh</Text>
+                <Text className="text-blue-600 dark:text-blue-300 font-medium">Refresh</Text>
               </TouchableOpacity>
-              <TouchableOpacity className="flex-1 bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-2xl items-center border border-green-100">
-                <View className="w-12 h-12 bg-green-500 rounded-full justify-center items-center mb-2">
+              <TouchableOpacity className="flex-1 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-4 rounded-2xl items-center border border-green-100 dark:border-green-800 active:scale-95 transition-all duration-150">
+                <View className="w-12 h-12 bg-green-500 rounded-full justify-center items-center mb-2 shadow-md">
                   <Ionicons name="share" size={24} color="white" />
                 </View>
-                <Text className="text-green-600 font-medium">Export</Text>
+                <Text className="text-green-600 dark:text-green-300 font-medium">Export</Text>
               </TouchableOpacity>
-              <TouchableOpacity className="flex-1 bg-gradient-to-r from-orange-50 to-amber-50 p-4 rounded-2xl items-center border border-orange-100">
-                <View className="w-12 h-12 bg-orange-500 rounded-full justify-center items-center mb-2">
+              <TouchableOpacity className="flex-1 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 p-4 rounded-2xl items-center border border-orange-100 dark:border-orange-800 active:scale-95 transition-all duration-150">
+                <View className="w-12 h-12 bg-orange-500 rounded-full justify-center items-center mb-2 shadow-md">
                   <Ionicons name="settings" size={24} color="white" />
                 </View>
-                <Text className="text-orange-600 font-medium">Settings</Text>
+                <Text className="text-orange-600 dark:text-orange-300 font-medium">Settings</Text>
               </TouchableOpacity>
             </View>
           </Animated.View>
