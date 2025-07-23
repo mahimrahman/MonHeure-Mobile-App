@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Dimensions,
   Platform,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
@@ -71,6 +72,45 @@ export default function ReportScreen() {
   const summaryCardScale = useSharedValue(0.8);
   const headerOpacity = useSharedValue(0);
   const headerTranslateY = useSharedValue(-30);
+  const backgroundGlow = useSharedValue(0);
+
+  // Animated styles
+  const cardAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: cardOpacity.value,
+      transform: [{ translateY: cardTranslateY.value }],
+    };
+  });
+
+  const buttonAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: buttonScale.value }],
+    };
+  });
+
+  const headerAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: headerOpacity.value,
+      transform: [{ translateY: headerTranslateY.value }],
+    };
+  });
+
+  const listItemAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: listItemOpacity.value,
+      transform: [{ translateY: listItemTranslateY.value }],
+    };
+  });
+
+  const summaryCardAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: summaryCardScale.value }],
+    };
+  });
+
+  const backgroundGlowStyle = useAnimatedStyle(() => ({
+    opacity: backgroundGlow.value,
+  }));
 
   // Load punch data on component mount
   useEffect(() => {
@@ -79,14 +119,13 @@ export default function ReportScreen() {
 
   // Start animations on mount
   useEffect(() => {
+    backgroundGlow.value = withTiming(1, { duration: 1000, easing: Easing.out(Easing.cubic) });
     // Header animation
     headerOpacity.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) });
     headerTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
-    
     // Card animation
     cardOpacity.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) });
     cardTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
-    
     // Summary card animation
     summaryCardScale.value = withSpring(1, { damping: 12, stiffness: 80 });
   }, []);
@@ -305,40 +344,6 @@ export default function ReportScreen() {
     return Object.entries(grouped).sort(([a], [b]) => new Date(b).getTime() - new Date(a).getTime());
   };
 
-  // Animated styles
-  const cardAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: cardOpacity.value,
-      transform: [{ translateY: cardTranslateY.value }],
-    };
-  });
-
-  const buttonAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: buttonScale.value }],
-    };
-  });
-
-  const headerAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: headerOpacity.value,
-      transform: [{ translateY: headerTranslateY.value }],
-    };
-  });
-
-  const listItemAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: listItemOpacity.value,
-      transform: [{ translateY: listItemTranslateY.value }],
-    };
-  });
-
-  const summaryCardAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: summaryCardScale.value }],
-    };
-  });
-
   if (loading) {
     return (
       <SafeAreaView className="flex-1 bg-background-light dark:bg-dark-bg justify-center items-center">
@@ -351,14 +356,35 @@ export default function ReportScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background-light dark:bg-dark-bg">
+      {/* Animated Background Gradient */}
+      <Animated.View style={backgroundGlowStyle} className="absolute inset-0 z-0">
+        <LinearGradient
+          colors={isDarkMode
+            ? ['rgba(99,102,241,0.12)', 'rgba(139,92,246,0.10)', 'rgba(20,184,166,0.08)']
+            : ['rgba(99,102,241,0.07)', 'rgba(139,92,246,0.04)', 'rgba(20,184,166,0.03)']
+          }
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          className="absolute inset-0"
+        />
+      </Animated.View>
+      {/* Summary Header */}
+      <View className="flex-row items-center px-6 pt-12 pb-6 mb-2 z-10">
+        <View className="w-16 h-16 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet justify-center items-center shadow-lg mr-4">
+          <Ionicons name="document-text" size={36} color="white" />
+        </View>
+        <View className="flex-1">
+          <Text className="text-2xl font-bold text-text-primary dark:text-dark-text mb-1">Reports & Exports</Text>
+          <Text className="text-text-secondary dark:text-dark-text-secondary text-base">Your work history and PDF exports</Text>
+        </View>
+      </View>
       {/* Header */}
-      <Animated.View style={headerAnimatedStyle} className="bg-white dark:bg-dark-bg-card pt-12 pb-6 px-6 border-b border-gray-100 dark:border-dark-border shadow-sm">
+      <Animated.View style={headerAnimatedStyle} className="bg-white/80 dark:bg-dark-bg-card/80 px-6 py-4 border-b border-gray-100 dark:border-dark-border shadow-sm backdrop-blur-md z-10">
         <Text className="text-3xl font-bold text-text-primary dark:text-dark-text mb-2">Reports</Text>
         <Text className="text-text-secondary dark:text-dark-text-secondary text-lg">Generate and export your time tracking data</Text>
       </Animated.View>
-
       <ScrollView 
-        className="flex-1"
+        className="flex-1 z-10"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -378,12 +404,11 @@ export default function ReportScreen() {
 
           {/* Enhanced Summary Cards */}
           <Animated.View style={[cardAnimatedStyle, summaryCardAnimatedStyle]}>
-            <View className="bg-white dark:bg-dark-bg-card rounded-2xl shadow-md p-6 border border-gray-100 dark:border-dark-border">
+            <View className="bg-white/80 dark:bg-dark-bg-card/80 rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-dark-border backdrop-blur-md">
               <View className="flex-row items-center mb-6">
                 <View className="w-4 h-4 rounded-full bg-gradient-to-r from-primary-indigo to-primary-violet mr-3" />
                 <Text className="text-2xl font-bold text-text-primary dark:text-dark-text">Summary</Text>
               </View>
-              
               <View className="grid grid-cols-2 gap-4">
                 <View className="bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-900/20 dark:to-violet-900/20 p-4 rounded-2xl border border-indigo-100 dark:border-indigo-800">
                   <Text className="text-3xl font-bold text-primary-indigo">{summary.totalDays}</Text>
@@ -402,7 +427,6 @@ export default function ReportScreen() {
                   <Text className="text-sm text-primary-amber font-medium">Avg/Day</Text>
                 </View>
               </View>
-
               {/* Day Distribution */}
               <View className="mt-6 pt-6 border-t border-gray-200 dark:border-dark-border">
                 <Text className="text-lg font-semibold text-text-primary dark:text-dark-text mb-4">Day Distribution</Text>
@@ -426,7 +450,7 @@ export default function ReportScreen() {
               onPress={handleGeneratePDF}
               disabled={isGeneratingPDF || filteredRecords.length === 0}
               activeOpacity={0.9}
-              className="overflow-hidden rounded-2xl shadow-md"
+              className="overflow-hidden rounded-2xl shadow-xl backdrop-blur-md"
               accessibilityRole="button"
               accessibilityLabel={isGeneratingPDF ? 'Generating PDF' : 'Generate PDF Report'}
               accessibilityHint="Generate a PDF report of your time tracking data"
@@ -465,14 +489,14 @@ export default function ReportScreen() {
 
           {/* Enhanced Punch Records List */}
           <Animated.View style={cardAnimatedStyle}>
-            <View className="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
-              <View className="p-6 border-b border-gray-100">
+            <View className="bg-white/80 dark:bg-dark-bg-card/80 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-dark-border backdrop-blur-md">
+              <View className="p-6 border-b border-gray-100 dark:border-dark-border">
                 <View className="flex-row items-center justify-between">
                   <View className="flex-row items-center">
                     <View className="w-4 h-4 rounded-full bg-gradient-to-r from-primary-teal to-primary-indigo mr-3" />
-                    <Text className="text-2xl font-bold text-text-primary">Daily Records</Text>
+                    <Text className="text-2xl font-bold text-text-primary dark:text-dark-text">Daily Records</Text>
                   </View>
-                  <View className="bg-indigo-100 px-3 py-1 rounded-full">
+                  <View className="bg-indigo-100 dark:bg-indigo-900/30 px-3 py-1 rounded-full">
                     <Text className="text-primary-indigo font-medium text-sm">
                       {filteredRecords.length} record{filteredRecords.length !== 1 ? 's' : ''}
                     </Text>
@@ -482,13 +506,13 @@ export default function ReportScreen() {
 
               {filteredRecords.length === 0 ? (
                 <View className="p-12 items-center">
-                  <View className="w-20 h-20 bg-gray-100 rounded-full justify-center items-center mb-4">
+                  <View className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full justify-center items-center mb-4">
                     <Ionicons name="document-outline" size={32} color="#9ca3af" accessibilityIgnoresInvertColors />
                   </View>
-                  <Text className="text-gray-600 text-xl font-semibold mb-2 text-center">
+                  <Text className="text-gray-600 dark:text-gray-300 text-xl font-semibold mb-2 text-center">
                     No punch records found
                   </Text>
-                  <Text className="text-gray-400 text-center">
+                  <Text className="text-gray-400 dark:text-gray-500 text-center">
                     Try adjusting the date range or add some punch records
                   </Text>
                 </View>
@@ -504,45 +528,44 @@ export default function ReportScreen() {
                       >
                         <View className="flex-row items-center justify-between">
                           <View className="flex-row items-center">
-                            <Text className="font-bold text-gray-800 text-lg">{formatDate(date)}</Text>
+                            <Text className="font-bold text-gray-800 dark:text-dark-text text-lg">{formatDate(date)}</Text>
                             {(isWeekend(date) || isHoliday(date)) && (
-                              <View className="ml-3 bg-white/60 px-2 py-1 rounded-full">
-                                <Text className="text-xs font-medium text-gray-700">
+                              <View className="ml-3 bg-white/60 dark:bg-gray-700 px-2 py-1 rounded-full">
+                                <Text className="text-xs font-medium text-gray-700 dark:text-gray-200">
                                   {isHoliday(date) ? 'Holiday' : 'Weekend'}
                                 </Text>
                               </View>
                             )}
                           </View>
-                          <Text className="font-bold text-gray-800">
+                          <Text className="font-bold text-gray-800 dark:text-dark-text">
                             {formatDuration(records.reduce((sum, r) => sum + (r.totalHours || 0), 0))}
                           </Text>
                         </View>
                       </LinearGradient>
-                      
                       {records.map((record, index) => (
-                        <View key={record.id} className="px-6 py-4 border-b border-gray-100 last:border-b-0">
+                        <View key={record.id} className="px-6 py-4 border-b border-gray-100 dark:border-dark-border last:border-b-0">
                           <View className="flex-row items-center justify-between">
                             <View className="flex-1">
                               <View className="flex-row items-center space-x-4">
                                 <View className="flex-row items-center">
                                   <Ionicons name="log-in" size={16} color="#3b82f6" accessibilityIgnoresInvertColors />
-                                  <Text className="text-gray-700 font-mono ml-2">
+                                  <Text className="text-gray-700 dark:text-gray-200 font-mono ml-2">
                                     {formatTime(record.punchIn)}
                                   </Text>
                                 </View>
                                 <Ionicons name="arrow-forward" size={16} color="#9ca3af" accessibilityIgnoresInvertColors />
                                 <View className="flex-row items-center">
                                   <Ionicons name="log-out" size={16} color="#ef4444" accessibilityIgnoresInvertColors />
-                                  <Text className="text-gray-700 font-mono ml-2">
+                                  <Text className="text-gray-700 dark:text-gray-200 font-mono ml-2">
                                     {formatTime(record.punchOut)}
                                   </Text>
                                 </View>
                               </View>
                               {record.notes && (
-                                <Text className="text-sm text-gray-500 mt-2 italic">"{record.notes}"</Text>
+                                <Text className="text-sm text-gray-500 dark:text-gray-400 mt-2 italic">"{record.notes}"</Text>
                               )}
                             </View>
-                            <View className="bg-teal-100 px-3 py-2 rounded-xl">
+                            <View className="bg-teal-100 dark:bg-teal-900/30 px-3 py-2 rounded-xl">
                               <Text className="font-bold text-primary-teal">
                                 {formatDuration(record.totalHours)}
                               </Text>
@@ -559,12 +582,11 @@ export default function ReportScreen() {
 
           {/* Quick Actions */}
           <Animated.View style={cardAnimatedStyle}>
-            <View className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
+            <View className="bg-white/80 dark:bg-dark-bg-card/80 rounded-3xl shadow-xl p-6 border border-gray-100 dark:border-dark-border backdrop-blur-md">
               <View className="flex-row items-center mb-6">
                 <View className="w-4 h-4 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 mr-3" />
-                <Text className="text-2xl font-bold text-gray-800">Quick Actions</Text>
+                <Text className="text-2xl font-bold text-gray-800 dark:text-dark-text">Quick Actions</Text>
               </View>
-              
               <View className="space-y-4">
                 <TouchableOpacity 
                   onPress={() => {
@@ -574,15 +596,14 @@ export default function ReportScreen() {
                     setStartDate(twoWeeksAgo);
                     setEndDate(today);
                   }}
-                  className="flex-row items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl border border-blue-100"
+                  className="flex-row items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl border border-blue-100 dark:border-blue-800 active:scale-95 transition-all duration-150"
                   activeOpacity={0.8}
                 >
-                  <View className="w-10 h-10 bg-blue-500 rounded-full justify-center items-center mr-4">
+                  <View className="w-10 h-10 bg-blue-500 rounded-full justify-center items-center mr-4 shadow-md">
                     <Ionicons name="calendar" size={20} color="white" />
                   </View>
-                  <Text className="text-blue-700 font-semibold text-lg">Last 2 Weeks</Text>
+                  <Text className="text-blue-700 dark:text-blue-300 font-semibold text-lg">Last 2 Weeks</Text>
                 </TouchableOpacity>
-                
                 <TouchableOpacity 
                   onPress={() => {
                     const today = new Date();
@@ -591,28 +612,27 @@ export default function ReportScreen() {
                     setStartDate(lastMonth);
                     setEndDate(today);
                   }}
-                  className="flex-row items-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-100"
+                  className="flex-row items-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl border border-green-100 dark:border-green-800 active:scale-95 transition-all duration-150"
                   activeOpacity={0.8}
                 >
-                  <View className="w-10 h-10 bg-green-500 rounded-full justify-center items-center mr-4">
+                  <View className="w-10 h-10 bg-green-500 rounded-full justify-center items-center mr-4 shadow-md">
                     <Ionicons name="calendar-outline" size={20} color="white" />
                   </View>
-                  <Text className="text-green-700 font-semibold text-lg">Last Month</Text>
+                  <Text className="text-green-700 dark:text-green-300 font-semibold text-lg">Last Month</Text>
                 </TouchableOpacity>
-                
                 <TouchableOpacity 
                   onPress={() => {
                     const today = new Date();
                     setStartDate(today);
                     setEndDate(today);
                   }}
-                  className="flex-row items-center p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl border border-purple-100"
+                  className="flex-row items-center p-4 bg-gradient-to-r from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 rounded-2xl border border-purple-100 dark:border-purple-800 active:scale-95 transition-all duration-150"
                   activeOpacity={0.8}
                 >
-                  <View className="w-10 h-10 bg-purple-500 rounded-full justify-center items-center mr-4">
+                  <View className="w-10 h-10 bg-purple-500 rounded-full justify-center items-center mr-4 shadow-md">
                     <Ionicons name="today" size={20} color="white" />
                   </View>
-                  <Text className="text-purple-700 font-semibold text-lg">Today Only</Text>
+                  <Text className="text-purple-700 dark:text-purple-300 font-semibold text-lg">Today Only</Text>
                 </TouchableOpacity>
               </View>
             </View>
