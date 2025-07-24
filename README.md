@@ -38,12 +38,13 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Pastel Backgrounds**: Beautiful gradient backgrounds for different statuses
 
 ### 📈 Comprehensive Reporting
+- **Modern Reports Page**: Animated background, glassmorphism, and a summary header for a premium look
 - **Custom Date Range Reports**: Select any date range with interactive date picker
 - **Summary Dashboard**: Total days, records, hours, and average per day
-- **Detailed Records**: All punch-in/out entries grouped by day with notes
+- **Beautiful Record Cards**: Grouped by day, with gradients and clear status
+- **Quick Actions**: One-tap for common ranges (last 2 weeks, last month, today) with vibrant icons and micro-interactions
 - **PDF Export**: Generate professional PDF reports with `react-native-html-to-pdf`
 - **Share & Email**: Share reports via email or other apps (feature temporarily disabled in SDK 53)
-- **Quick Actions**: One-tap for common ranges (last 2 weeks, last month, today)
 
 ### ⚙️ Enhanced Settings & Preferences
 - **Grouped Settings Sections**: Organized into logical categories with colorful indicators
@@ -162,12 +163,23 @@ The app features a modern, intuitive interface with:
 - **Dark Mode**: All elements adapt to dark mode for a seamless experience
 
 ### 📊 Dashboard Screen
-- **Horizontally scrollable stat cards** with modern gradient backgrounds using the new color palette
+- **Animated background gradient** for depth and premium feel
+- **Summary header** with avatar and greeting
+- **Horizontally scrollable stat cards** with glassmorphism and vibrant gradients
 - **Interactive charts**: Bar and line charts with Indigo and Teal color schemes
 - **Time period toggle**: Switch between week/month/year views with consistent styling
 - **Productivity insights**: Enhanced metrics with visual indicators using new colors
-- **Quick actions**: Touchable cards with gradient backgrounds and consistent border radius
+- **Quick actions**: Touchable cards with gradient backgrounds, icons, and micro-interactions
 - **Dark Mode**: Dashboard and all cards adapt to dark mode
+
+### 📈 Reports Page (NEW UI)
+- **Animated background gradient** for a modern, premium look
+- **Summary header** with report icon and greeting
+- **Glassmorphism and blur effects** on summary/stat cards and record cards
+- **Beautiful record cards**: Grouped by day, with gradients and clear status
+- **Quick actions**: One-tap for common ranges (last 2 weeks, last month, today) with vibrant icons and micro-interactions
+- **PDF Export**: Generate professional PDF reports with a single tap
+- **Dark Mode**: Reports page and all cards adapt to dark mode
 
 ### 📅 History Screen
 - **Interactive calendar** with color-coded activity dots
@@ -187,7 +199,15 @@ The app features a modern, intuitive interface with:
 
 ## 🔄 Recent Updates
 
-### 🌙 Global Dark Mode (Latest)
+### ✨ Modern Reports Page UI (Latest)
+- **Animated background gradient** for depth and premium feel
+- **Summary header** with report icon and greeting
+- **Glassmorphism and blur effects** on summary/stat cards and record cards
+- **Beautiful record cards**: Grouped by day, with gradients and clear status
+- **Quick actions**: One-tap for common ranges (last 2 weeks, last month, today) with vibrant icons and micro-interactions
+- **Consistent dark mode support**
+
+### 🌙 Global Dark Mode
 - **Full-App Dark Mode**: Dark mode now applies to the entire app, not just the settings page
 - **Tailwind Dark Classes**: All screens and components use Tailwind's `dark:` classes
 - **Consistent Theming**: All cards, backgrounds, and text colors adapt to dark mode
