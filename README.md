@@ -288,12 +288,17 @@ The app features a modern, intuitive interface with:
    npm install
    ```
 
-3. Start the development server:
+3. **Add an Avatar Image:**
+   - Place a PNG image named `avatar.png` in the `assets` directory at the project root.
+   - This image will be used as the user avatar on the dashboard.
+   - You can use any placeholder avatar (e.g., from [ui-avatars.com](https://ui-avatars.com/) or your own custom image).
+
+4. Start the development server:
    ```bash
    npx expo start
    ```
 
-4. Run on your preferred platform:
+5. Run on your preferred platform:
    - Press `i` for iOS Simulator
    - Press `a` for Android Emulator
    - Scan QR code with Expo Go app on your device
