@@ -5,16 +5,19 @@ A modern React Native mobile application built with Expo for efficient time trac
 ## 🚀 Features
 
 ### 🎯 Core Time Tracking
-- **Large Circular Punch Button**: Vibrant gradient button (blue to purple) with smooth animations
+- **Large Circular Punch Button**: Vibrant gradient button with smooth animations and haptic feedback
 - **Real-time Status Display**: Shows current punch status with time information
 - **One-tap Operation**: Simple, intuitive time tracking with visual feedback
-- **Glow Effects**: Subtle animations and visual feedback on interactions
+- **Enhanced Glow Effects**: Multiple glow layers for premium visual effects
 - **Session Persistence**: State survives app restarts and crashes
+- **Haptic Feedback**: Tactile feedback on all major interactions using expo-haptics
+- **Time Editing**: Edit punch-in and punch-out times with validation
 
-### 🌙 Global Dark Mode Support (NEW)
-- **Full-App Dark Mode**: Dark mode now applies to the entire app, not just the settings page
+### 🌙 Global Dark Mode Support
+- **Full-App Dark Mode**: Dark mode applies to the entire app with consistent theming
 - **Automatic & Manual Toggle**: Easily switch between light and dark themes from settings
 - **Consistent Theming**: All screens, cards, and UI elements adapt to dark mode
+- **Theme Context**: Global theme management with React Context
 
 ### 📊 Enhanced Dashboard & Analytics
 - **Horizontally Scrollable Stat Cards**: 
@@ -26,6 +29,7 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Time Period Toggle**: Switch between week/month/year views
 - **Productivity Insights**: Best day tracking, consistency metrics
 - **Smooth Animations**: Staggered entrance animations and transitions
+- **Pull to Refresh**: Swipe down to refresh dashboard data
 
 ### 📅 Modern Calendar & History
 - **Interactive Calendar View**: Visual calendar with activity dots using `react-native-calendars`
@@ -36,6 +40,7 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Full CRUD Operations**: Create, read, update, and delete punch records
 - **Swipe Gestures**: Swipe down to dismiss day cards
 - **Pastel Backgrounds**: Beautiful gradient backgrounds for different statuses
+- **Time Validation**: Ensures punch-out time is after punch-in time
 
 ### 📈 Comprehensive Reporting
 - **Modern Reports Page**: Animated background, glassmorphism, and a summary header for a premium look
@@ -66,7 +71,7 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Gradient Backgrounds**: Beautiful color gradients throughout the app using the new palette
 - **Rounded Corners**: Modern card design with consistent `rounded-xl` (12px) and `rounded-2xl` (16px) border radius
 - **Soft Shadows**: Subtle `shadow-md` shadows for depth and visual hierarchy
-- **Smooth Animations**: Spring-based animations with proper easing
+- **Smooth Animations**: Spring-based animations with proper easing using react-native-reanimated
 - **Touch-Friendly**: Large touch targets and generous spacing
 - **Responsive Design**: Works seamlessly on all screen sizes and orientations
 - **Consistent Typography**: `text-lg` classes for uniform text sizing
@@ -87,6 +92,7 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Data Export/Import**: Export and import all data as JSON
 - **Data Integrity**: Proper validation and error handling
 - **Pull to Refresh**: Swipe down to refresh data across all screens
+- **Error Handling**: Comprehensive error handling with user-friendly alerts
 
 ## 🛠 Tech Stack
 
@@ -155,12 +161,15 @@ The app features a modern, intuitive interface with:
 
 ### 🏠 Home Screen
 - **Large circular gradient button** (72x72) that toggles between "Punch In" and "Punch Out"
+- **Enhanced animations**: Spring-based animations with bounce effects and rotation
+- **Multiple glow layers**: Premium visual effects with multiple gradient layers
 - **Modern gradients**: Indigo to Violet to Teal for punch-in, Amber gradient for punch-out
 - **Status text**: Shows current punch status with time information using new text color system
-- **Glow effects**: Subtle animations and visual feedback with new color palette
 - **Calendar-style card**: Today's punches in a clean, organized layout with consistent border radius
 - **Smooth animations**: Spring-based animations with proper easing
 - **Dark Mode**: All elements adapt to dark mode for a seamless experience
+- **Haptic feedback**: Tactile feedback on all interactions
+- **Time editing**: Edit punch-in and punch-out times with validation
 
 ### 📊 Dashboard Screen
 - **Animated background gradient** for depth and premium feel
@@ -171,6 +180,7 @@ The app features a modern, intuitive interface with:
 - **Productivity insights**: Enhanced metrics with visual indicators using new colors
 - **Quick actions**: Touchable cards with gradient backgrounds, icons, and micro-interactions
 - **Dark Mode**: Dashboard and all cards adapt to dark mode
+- **Pull to refresh**: Swipe down to refresh dashboard data
 
 ### 📈 Reports Page (NEW UI)
 - **Animated background gradient** for a modern, premium look
@@ -188,6 +198,7 @@ The app features a modern, intuitive interface with:
 - **Edit/Delete buttons**: Icon-based buttons with proper styling
 - **Smooth transitions**: Spring animations for all interactions
 - **Dark Mode**: Calendar, cards, and modals fully support dark mode
+- **Time validation**: Ensures punch-out time is after punch-in time
 
 ### ⚙️ Settings Screen
 - **Grouped sections**: Organized settings with colorful gradient indicators using new palette
@@ -199,13 +210,13 @@ The app features a modern, intuitive interface with:
 
 ## 🔄 Recent Updates
 
-### ✨ Modern Reports Page UI (Latest)
-- **Animated background gradient** for depth and premium feel
-- **Summary header** with report icon and greeting
-- **Glassmorphism and blur effects** on summary/stat cards and record cards
-- **Beautiful record cards**: Grouped by day, with gradients and clear status
-- **Quick actions**: One-tap for common ranges (last 2 weeks, last month, today) with vibrant icons and micro-interactions
-- **Consistent dark mode support**
+### ✨ Enhanced Home Screen Animations (Latest)
+- **Multiple glow layers**: Premium visual effects with multiple gradient layers
+- **Enhanced button animations**: Spring-based animations with bounce effects and rotation
+- **Improved haptic feedback**: Tactile feedback on all major interactions
+- **Better visual hierarchy**: Enhanced status text and card layouts
+- **Consistent dark mode support**: All elements adapt seamlessly to dark mode
+- **Time editing functionality**: Edit punch-in and punch-out times with validation
 
 ### 🌙 Global Dark Mode
 - **Full-App Dark Mode**: Dark mode now applies to the entire app, not just the settings page
@@ -341,4 +352,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Icons from [Expo Vector Icons](https://icons.expo.fyi/)
 - Charts powered by [react-native-chart-kit](https://github.com/indiespirit/react-native-chart-kit)
 - Calendar component from [react-native-calendars](https://github.com/wix/react-native-calendars)
-- State management with [Zustand](https://github.com/pmndrs/zustand) 
+- State management with [Zustand](https://github.com/pmndrs/zustand)
+- Animations powered by [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/)
+- Haptic feedback with [expo-haptics](https://docs.expo.dev/versions/latest/sdk/haptics/) 
