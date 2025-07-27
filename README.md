@@ -12,6 +12,7 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Session Persistence**: State survives app restarts and crashes
 - **Haptic Feedback**: Tactile feedback on all major interactions using expo-haptics
 - **Time Editing**: Edit punch-in and punch-out times with validation
+- **24-hour Format**: Time picker with 24-hour format for precise time entry
 
 ### 🌙 Global Dark Mode Support
 - **Full-App Dark Mode**: Dark mode applies to the entire app with consistent theming
@@ -30,6 +31,7 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Productivity Insights**: Best day tracking, consistency metrics
 - **Smooth Animations**: Staggered entrance animations and transitions
 - **Pull to Refresh**: Swipe down to refresh dashboard data
+- **Avatar Support**: User avatar display on dashboard header
 
 ### 📅 Modern Calendar & History
 - **Interactive Calendar View**: Visual calendar with activity dots using `react-native-calendars`
@@ -41,6 +43,7 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Swipe Gestures**: Swipe down to dismiss day cards
 - **Pastel Backgrounds**: Beautiful gradient backgrounds for different statuses
 - **Time Validation**: Ensures punch-out time is after punch-in time
+- **Notes Support**: Add and edit notes for each punch record
 
 ### 📈 Comprehensive Reporting
 - **Modern Reports Page**: Animated background, glassmorphism, and a summary header for a premium look
@@ -50,6 +53,7 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Quick Actions**: One-tap for common ranges (last 2 weeks, last month, today) with vibrant icons and micro-interactions
 - **PDF Export**: Generate professional PDF reports with `react-native-html-to-pdf`
 - **Share & Email**: Share reports via email or other apps (feature temporarily disabled in SDK 53)
+- **Professional PDF Design**: Beautiful, formatted PDF reports with company branding
 
 ### ⚙️ Enhanced Settings & Preferences
 - **Grouped Settings Sections**: Organized into logical categories with colorful indicators
@@ -65,6 +69,7 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Enhanced Modal**: Improved confirmation dialogs with warning icons
 - **Data Export/Import**: Export and import all data as JSON
 - **Share App**: Share the app with friends (feature temporarily disabled in SDK 53)
+- **Profile Management**: Edit profile, payment methods, and account settings
 
 ### 🎨 Modern UI Design
 - **Modern Color Palette**: Soft, professional colors with Indigo (#6366F1), Teal (#14B8A6), Amber (#F59E0B), and Violet (#8B5CF6)
@@ -93,6 +98,7 @@ A modern React Native mobile application built with Expo for efficient time trac
 - **Data Integrity**: Proper validation and error handling
 - **Pull to Refresh**: Swipe down to refresh data across all screens
 - **Error Handling**: Comprehensive error handling with user-friendly alerts
+- **Database Statistics**: Track total entries and hours worked
 
 ## 🛠 Tech Stack
 
@@ -170,6 +176,7 @@ The app features a modern, intuitive interface with:
 - **Dark Mode**: All elements adapt to dark mode for a seamless experience
 - **Haptic feedback**: Tactile feedback on all interactions
 - **Time editing**: Edit punch-in and punch-out times with validation
+- **24-hour time picker**: Precise time entry with 24-hour format
 
 ### 📊 Dashboard Screen
 - **Animated background gradient** for depth and premium feel
@@ -181,6 +188,7 @@ The app features a modern, intuitive interface with:
 - **Quick actions**: Touchable cards with gradient backgrounds, icons, and micro-interactions
 - **Dark Mode**: Dashboard and all cards adapt to dark mode
 - **Pull to refresh**: Swipe down to refresh dashboard data
+- **Avatar display**: User avatar in dashboard header
 
 ### 📈 Reports Page (NEW UI)
 - **Animated background gradient** for a modern, premium look
@@ -190,6 +198,7 @@ The app features a modern, intuitive interface with:
 - **Quick actions**: One-tap for common ranges (last 2 weeks, last month, today) with vibrant icons and micro-interactions
 - **PDF Export**: Generate professional PDF reports with a single tap
 - **Dark Mode**: Reports page and all cards adapt to dark mode
+- **Professional PDF design**: Beautiful, formatted PDF reports with company branding
 
 ### 📅 History Screen
 - **Interactive calendar** with color-coded activity dots
@@ -199,6 +208,7 @@ The app features a modern, intuitive interface with:
 - **Smooth transitions**: Spring animations for all interactions
 - **Dark Mode**: Calendar, cards, and modals fully support dark mode
 - **Time validation**: Ensures punch-out time is after punch-in time
+- **Notes support**: Add and edit notes for each punch record
 
 ### ⚙️ Settings Screen
 - **Grouped sections**: Organized settings with colorful gradient indicators using new palette
@@ -207,6 +217,7 @@ The app features a modern, intuitive interface with:
 - **Danger zone**: Prominent warning area for data clearing with updated styling
 - **Enhanced modals**: Improved confirmation dialogs with icons and consistent border radius
 - **Dark Mode**: Settings and all controls adapt to dark mode
+- **Profile management**: Edit profile, payment methods, and account settings
 
 ## 🔄 Recent Updates
 
@@ -217,6 +228,7 @@ The app features a modern, intuitive interface with:
 - **Better visual hierarchy**: Enhanced status text and card layouts
 - **Consistent dark mode support**: All elements adapt seamlessly to dark mode
 - **Time editing functionality**: Edit punch-in and punch-out times with validation
+- **24-hour time picker**: Precise time entry with 24-hour format
 
 ### 🌙 Global Dark Mode
 - **Full-App Dark Mode**: Dark mode now applies to the entire app, not just the settings page
