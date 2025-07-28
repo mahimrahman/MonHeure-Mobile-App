@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Stack } from 'expo-router';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Animated, { 
@@ -12,7 +11,7 @@ import Animated, {
 import { usePunchStore } from '../utils/punchStore';
 import { ThemeProvider, useTheme } from '../utils/themeContext';
 
-function TabLayoutContent() {
+function LayoutContent() {
   const [isAppReady, setIsAppReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const initializeStore = usePunchStore(state => state.initializeStore);
@@ -49,7 +48,6 @@ function TabLayoutContent() {
   const cardBackgroundColor = isDarkMode ? '#374151' : '#FFFFFF';
   const textPrimaryColor = isDarkMode ? '#F9FAFB' : '#111827';
   const textSecondaryColor = isDarkMode ? '#9CA3AF' : '#6B7280';
-  const borderColor = isDarkMode ? '#4B5563' : '#E5E7EB';
 
   if (error) {
     return (
@@ -57,7 +55,6 @@ function TabLayoutContent() {
         <View style={{ flex: 1, backgroundColor }} className="justify-center items-center p-6">
           <Animated.View style={[loadingAnimatedStyle, { backgroundColor: cardBackgroundColor }]} className="rounded-3xl p-8 shadow-2xl max-w-sm">
             <View className="items-center">
-              <Ionicons name="alert-circle" size={64} color="#ef4444" className="mb-4" />
               <Text style={{ color: '#ef4444' }} className="text-xl font-bold mb-2 text-center">Initialization Error</Text>
               <Text style={{ color: textSecondaryColor }} className="text-center">{error}</Text>
             </View>
@@ -73,7 +70,7 @@ function TabLayoutContent() {
         <View style={{ flex: 1, backgroundColor }} className="justify-center items-center">
           <Animated.View style={[loadingAnimatedStyle, { backgroundColor: cardBackgroundColor }]} className="rounded-3xl p-8 shadow-2xl">
             <View className="items-center">
-              <ActivityIndicator size="large" color="#0ea5e9" />
+              <ActivityIndicator size="large" color="#8B5CF6" />
               <Text style={{ color: textPrimaryColor }} className="text-lg font-medium mt-4">Initializing App...</Text>
               <Text style={{ color: textSecondaryColor }} className="text-sm mt-2">Setting up your time tracker</Text>
             </View>
@@ -85,100 +82,25 @@ function TabLayoutContent() {
 
   return (
     <SafeAreaProvider>
-      <Tabs
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName: keyof typeof Ionicons.glyphMap;
-
-            if (route.name === 'index') {
-              iconName = focused ? 'home' : 'home-outline';
-            } else if (route.name === 'dashboard') {
-              iconName = focused ? 'analytics' : 'analytics-outline';
-            } else if (route.name === 'report') {
-              iconName = focused ? 'document-text' : 'document-text-outline';
-            } else if (route.name === 'history') {
-              iconName = focused ? 'time' : 'time-outline';
-            } else if (route.name === 'settings') {
-              iconName = focused ? 'settings' : 'settings-outline';
-            } else {
-              iconName = 'help-outline';
-            }
-
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: '#0ea5e9',
-          tabBarInactiveTintColor: isDarkMode ? '#9CA3AF' : '#6B7280',
-          tabBarStyle: {
-            backgroundColor: cardBackgroundColor,
-            borderTopWidth: 0,
-            elevation: 20,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: -4 },
-            shadowOpacity: 0.1,
-            shadowRadius: 20,
-            height: 80,
-            paddingBottom: 20,
-            paddingTop: 10,
-          },
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: '600',
-            marginTop: 4,
-          },
-          headerStyle: {
-            backgroundColor: cardBackgroundColor,
-            elevation: 0,
-            shadowOpacity: 0,
-            borderBottomWidth: 0,
-          },
-          headerTintColor: textPrimaryColor,
-          headerTitleStyle: {
-            fontWeight: 'bold',
-            fontSize: 20,
-          },
-          headerShadowVisible: false,
-        })}
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: isDarkMode ? '#1F2937' : '#F9FAFB' }
+        }}
       >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: 'Home',
-            headerShown: false,
-          }}
-        />
-        <Tabs.Screen
-          name="dashboard"
-          options={{
-            title: 'Dashboard',
-          }}
-        />
-        <Tabs.Screen
-          name="report"
-          options={{
-            title: 'Report',
-          }}
-        />
-        <Tabs.Screen
-          name="history"
-          options={{
-            title: 'History',
-          }}
-        />
-        <Tabs.Screen
-          name="settings"
-          options={{
-            title: 'Settings',
-          }}
-        />
-      </Tabs>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="dashboard" />
+        <Stack.Screen name="history" />
+        <Stack.Screen name="settings" />
+      </Stack>
     </SafeAreaProvider>
   );
 }
 
-export default function TabLayout() {
+export default function Layout() {
   return (
     <ThemeProvider>
-      <TabLayoutContent />
+      <LayoutContent />
     </ThemeProvider>
   );
 } 
