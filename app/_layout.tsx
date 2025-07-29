@@ -10,6 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { usePunchStore } from '../utils/punchStore';
 import { ThemeProvider, useTheme } from '../utils/themeContext';
+import '../global.css';
 
 function LayoutContent() {
   const [isAppReady, setIsAppReady] = useState(false);
