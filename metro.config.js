@@ -5,9 +5,6 @@ const config = getDefaultConfig(__dirname);
 // Add support for native modules
 config.resolver.platforms = ['ios', 'android', 'native', 'web'];
 
-// Add support for SVG files
-config.transformer.babelTransformerPath = require.resolve('react-native-svg-transformer');
-
 // Add support for NativeWind
 config.resolver.sourceExts.push('css');
 
