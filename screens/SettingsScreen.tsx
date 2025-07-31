@@ -176,8 +176,77 @@ export default function SettingsScreen() {
     };
   });
 
+  // iOS-style settings group component
+  const SettingsGroup = ({ title, children }: { title?: string; children: React.ReactNode }) => (
+    <View className="mb-6">
+      {title && (
+        <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 px-4">
+          {title}
+        </Text>
+      )}
+      <View className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+        {children}
+      </View>
+    </View>
+  );
+
+  // iOS-style settings row component
+  const SettingsRow = ({ 
+    icon, 
+    title, 
+    subtitle, 
+    onPress, 
+    rightElement, 
+    showChevron = true,
+    isDestructive = false 
+  }: {
+    icon: string;
+    title: string;
+    subtitle?: string;
+    onPress?: () => void;
+    rightElement?: React.ReactNode;
+    showChevron?: boolean;
+    isDestructive?: boolean;
+  }) => (
+    <TouchableOpacity
+      onPress={onPress}
+      className={`flex-row items-center px-4 py-3 ${onPress ? 'active:bg-gray-50 dark:active:bg-gray-700' : ''}`}
+      activeOpacity={onPress ? 0.7 : 1}
+    >
+      <View className="w-8 h-8 rounded-lg justify-center items-center mr-3">
+        <Ionicons 
+          name={icon as any} 
+          size={20} 
+          color={isDestructive ? '#EF4444' : (isDarkMode ? '#8B5CF6' : '#6366F1')} 
+        />
+      </View>
+      <View className="flex-1">
+        <Text className={`text-base font-medium ${isDestructive ? 'text-red-500' : 'text-gray-900 dark:text-white'}`}>
+          {title}
+        </Text>
+        {subtitle && (
+          <Text className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+            {subtitle}
+          </Text>
+        )}
+      </View>
+      {rightElement && (
+        <View className="mr-2">
+          {rightElement}
+        </View>
+      )}
+      {showChevron && onPress && (
+        <Ionicons 
+          name="chevron-forward" 
+          size={16} 
+          color="#C7D2FE" 
+        />
+      )}
+    </TouchableOpacity>
+  );
+
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-gray-900">
+    <SafeAreaView className="flex-1 bg-gray-50 dark:bg-gray-900">
       <ScrollView 
         className="flex-1" 
         showsVerticalScrollIndicator={false}
@@ -224,138 +293,102 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
-        <View className="px-6 pb-8">
-          {/* Settings Title */}
-          <Text className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-8">
-            Settings
-          </Text>
-
-          <Animated.View style={cardAnimatedStyle} className="space-y-6">
+        <View className="px-4 pb-8">
+          <Animated.View style={cardAnimatedStyle}>
             {/* Appearance Section */}
-            <View className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-              <Text className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                Appearance
-              </Text>
-              
-              <View className="flex-row items-center justify-between">
-                <View className="flex-row items-center">
-                  <View className="w-10 h-10 bg-yellow-500 rounded-lg justify-center items-center mr-3">
-                    <Ionicons name="sunny" size={20} color="white" />
-                  </View>
-                  <Text className="text-gray-900 dark:text-white font-medium text-lg">Theme</Text>
-                </View>
-                <View className="flex-row items-center">
-                  <Ionicons 
-                    name="sunny" 
-                    size={16} 
-                    color={isDarkMode ? '#9CA3AF' : '#F59E0B'} 
-                  />
+            <SettingsGroup title="Appearance">
+              <SettingsRow
+                icon="color-palette"
+                title="Theme"
+                subtitle={isDarkMode ? "Dark mode is on" : "Light mode is on"}
+                rightElement={
                   <Switch
                     value={isDarkMode}
                     onValueChange={handleThemeToggle}
                     trackColor={{ false: '#E5E7EB', true: '#8B5CF6' }}
                     thumbColor={isDarkMode ? '#FFFFFF' : '#FFFFFF'}
                     ios_backgroundColor="#E5E7EB"
-                    style={{ marginHorizontal: 8 }}
                   />
-                  <Ionicons 
-                    name="moon" 
-                    size={16} 
-                    color={isDarkMode ? '#8B5CF6' : '#9CA3AF'} 
-                  />
-                </View>
-              </View>
-            </View>
+                }
+                showChevron={false}
+              />
+            </SettingsGroup>
 
             {/* Data Management Section */}
-            <View className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-              <Text className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                Data Management
-              </Text>
-              
-              <View className="space-y-4">
-                <View>
-                  <Text className="text-gray-900 dark:text-white font-medium text-lg mb-2">
-                    Clear All Data
-                  </Text>
-                  <Text className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                    Permanently delete all your punch logs.
-                  </Text>
-                  <TouchableOpacity
-                    onPress={handleClearData}
-                    className="bg-red-500 px-4 py-3 rounded-lg flex-row items-center justify-center"
-                    activeOpacity={0.8}
-                  >
-                    <Ionicons name="trash" size={20} color="white" />
-                    <Text className="text-white font-semibold ml-2">Clear Data</Text>
-                  </TouchableOpacity>
-                </View>
+            <SettingsGroup title="Data Management">
+              <SettingsRow
+                icon="cloud-upload"
+                title="Export Data"
+                subtitle="Backup your time logs"
+                onPress={handleExportData}
+              />
+              <SettingsRow
+                icon="cloud-download"
+                title="Import Data"
+                subtitle="Restore from backup"
+                onPress={handleImportData}
+              />
+              <SettingsRow
+                icon="trash"
+                title="Clear All Data"
+                subtitle="Permanently delete all data"
+                onPress={handleClearData}
+                isDestructive={true}
+              />
+            </SettingsGroup>
+
+            {/* Support Section */}
+            <SettingsGroup title="Support">
+              <SettingsRow
+                icon="share"
+                title="Share App"
+                subtitle="Tell friends about MonHeure"
+                onPress={handleShareApp}
+              />
+              <SettingsRow
+                icon="chatbubble"
+                title="Send Feedback"
+                subtitle="Help us improve the app"
+                onPress={handleSendFeedback}
+              />
+            </SettingsGroup>
+
+            {/* About Section */}
+            <SettingsGroup title="About">
+              <SettingsRow
+                icon="information-circle"
+                title="Version"
+                subtitle="1.0.0"
+                showChevron={false}
+              />
+              <SettingsRow
+                icon="document-text"
+                title="Terms of Service"
+                subtitle="Read our terms"
+                onPress={() => Alert.alert('Terms of Service', 'Terms of service content...')}
+              />
+              <SettingsRow
+                icon="shield-checkmark"
+                title="Privacy Policy"
+                subtitle="How we protect your data"
+                onPress={() => Alert.alert('Privacy Policy', 'Privacy policy content...')}
+              />
+            </SettingsGroup>
+
+            {/* App Info */}
+            <View className="mt-8 items-center">
+              <View className="w-16 h-16 bg-purple-500 rounded-2xl justify-center items-center mb-4">
+                <Ionicons name="time" size={32} color="white" />
               </View>
-            </View>
-
-            {/* Additional Options */}
-            <View className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-              <Text className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                Additional Options
+              <Text className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                MonHeure
               </Text>
-              
-              <View className="space-y-4">
-                <TouchableOpacity
-                  onPress={handleExportData}
-                  className="flex-row items-center justify-between py-3"
-                  activeOpacity={0.7}
-                >
-                  <View className="flex-row items-center">
-                    <View className="w-10 h-10 bg-blue-500 rounded-lg justify-center items-center mr-3">
-                      <Ionicons name="download" size={20} color="white" />
-                    </View>
-                    <Text className="text-gray-900 dark:text-white font-medium">Export Data</Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={handleImportData}
-                  className="flex-row items-center justify-between py-3"
-                  activeOpacity={0.7}
-                >
-                  <View className="flex-row items-center">
-                    <View className="w-10 h-10 bg-green-500 rounded-lg justify-center items-center mr-3">
-                      <Ionicons name="upload" size={20} color="white" />
-                    </View>
-                    <Text className="text-gray-900 dark:text-white font-medium">Import Data</Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={handleShareApp}
-                  className="flex-row items-center justify-between py-3"
-                  activeOpacity={0.7}
-                >
-                  <View className="flex-row items-center">
-                    <View className="w-10 h-10 bg-purple-500 rounded-lg justify-center items-center mr-3">
-                      <Ionicons name="share" size={20} color="white" />
-                    </View>
-                    <Text className="text-gray-900 dark:text-white font-medium">Share App</Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={handleSendFeedback}
-                  className="flex-row items-center justify-between py-3"
-                  activeOpacity={0.7}
-                >
-                  <View className="flex-row items-center">
-                    <View className="w-10 h-10 bg-orange-500 rounded-lg justify-center items-center mr-3">
-                      <Ionicons name="chatbubble" size={20} color="white" />
-                    </View>
-                    <Text className="text-gray-900 dark:text-white font-medium">Send Feedback</Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-                </TouchableOpacity>
-              </View>
+              <Text className="text-sm text-gray-500 dark:text-gray-400">
+                Time tracking made simple
+              </Text>
+              <Text className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                Version 1.0.0
+              </Text>
             </View>
           </Animated.View>
         </View>
