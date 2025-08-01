@@ -1,62 +1,66 @@
 # MonHeure - Time Tracking App
 
-A modern, elegant time tracking mobile application built with React Native and Expo. Track your work hours with a beautiful, intuitive interface that supports both light and dark themes.
-
-![MonHeure App](https://img.shields.io/badge/React%20Native-0.79.4-blue?style=for-the-badge&logo=react)
-![Expo](https://img.shields.io/badge/Expo-53.0.0-black?style=for-the-badge&logo=expo)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.1.3-blue?style=for-the-badge&logo=typescript)
-![NativeWind](https://img.shields.io/badge/NativeWind-2.0.11-green?style=for-the-badge)
+A modern, intuitive time tracking application built with React Native and Expo. Track your work hours with precision, view detailed analytics, and manage your time efficiently with a beautiful, native iOS-style interface.
 
 ## ✨ Features
 
-### 🎯 Core Time Tracking
-- **One-Tap Punch In/Out** - Simple, intuitive time tracking
-- **Real-Time Session Timer** - See your current session duration
-- **Haptic Feedback** - Tactile response for better UX
-- **Time Editing** - Edit punch times with validation
-- **24-Hour Format** - Professional time picker interface
+### 🕐 Core Time Tracking
+- **One-Tap Punch In/Out** with haptic feedback
+- **Real-time Session Timer** showing current work duration
+- **Enhanced Glow Effects** with multiple visual layers
+- **Time Editing** with validation and 24-hour format support
+- **24-hour Format** time picker for precise time selection
 
-### 🎨 Modern UI/UX
-- **Clean, Minimal Design** - Inspired by modern design principles
-- **Full Dark/Light Mode** - Seamless theme switching
-- **Smooth Animations** - React Native Reanimated powered
-- **Responsive Layout** - Works on all device sizes
-- **Accessibility Support** - Screen reader friendly
+### 🌙 Global Dark Mode Support
+- **Full-App Dark Mode** with consistent theming
+- **Theme Context** for seamless theme switching
+- **Automatic Theme Persistence** across app sessions
 
-### 📊 Dashboard & Analytics
-- **Today's Hours** - Real-time daily tracking
-- **Weekly Summary** - This week's total hours
-- **Session Count** - Total punch sessions
-- **Pull to Refresh** - Easy data updates
-- **Quick Actions** - Export, share, settings
+### 📊 Enhanced Dashboard & Analytics
+- **Today's Summary** with hours worked and sessions count
+- **Weekly Overview** with productivity insights
+- **Pull to Refresh** functionality
+- **Avatar Support** for personalized experience
 
-### 📝 Time Logs & History
-- **Comprehensive Logs** - View all your time entries
-- **Date & Time Display** - Clear, readable format
-- **Duration Calculation** - Automatic time calculations
-- **Edit Functionality** - Modify existing entries
-- **Notes Support** - Add context to your entries
+### 📅 Modern Calendar & History
+- **Clean Time Logs** with detailed entries
+- **Time Validation** ensuring punch-out after punch-in
+- **Notes Support** for adding context to entries
+- **Inline Editing** for quick modifications
 
-### ⚙️ Settings & Preferences
-- **Theme Toggle** - Light/Dark mode switching
-- **Data Management** - Clear all data option
-- **Export/Import** - Backup and restore data
-- **Share App** - Spread the word
-- **Feedback System** - User feedback integration
+### ⚙️ iPhone-Style Settings
+- **Native iOS Design** with proper grouping and hierarchy
+- **Settings Groups**: Appearance, Data Management, Support, About
+- **iOS-Style Settings Rows** with icons, titles, and subtitles
+- **Theme Toggle** with switch component
+- **Data Management** (Export, Import, Clear Data)
+- **Support Options** (Share App, Send Feedback)
+- **About Section** with app version and legal info
+
+### 🎨 Modern UI Design
+- **Smooth Animations** powered by `react-native-reanimated`
+- **Haptic Feedback** for enhanced user experience
+- **Consistent Design Language** across all screens
+- **Professional Typography** and spacing
+
+### 🔧 Advanced Features
+- **Error Handling** with comprehensive, user-friendly alerts
+- **Database Statistics** tracking total entries and hours worked
+- **Pull to Refresh** on all data screens
+- **Professional PDF Design** for reports
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- npm or yarn
-- Expo CLI
+- Node.js (v16 or higher)
+- Expo CLI (`npm install -g @expo/cli`)
 - iOS Simulator or Android Emulator (optional)
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/MonHeure-Mobile-App.git
+   git clone <repository-url>
    cd MonHeure-Mobile-App
    ```
 
@@ -72,181 +76,186 @@ A modern, elegant time tracking mobile application built with React Native and E
 
 4. **Run on your device**
    - Scan the QR code with Expo Go app (iOS/Android)
-   - Press `i` for iOS Simulator
-   - Press `a` for Android Emulator
+   - Or press `i` for iOS Simulator / `a` for Android Emulator
 
-## 🛠️ Tech Stack
+## 📱 Screens
+
+### Home Screen (UI Features)
+- **Enhanced animations** with bounce and rotation effects
+- **Multiple glow layers** for visual depth
+- **Haptic feedback** on all interactions
+- **Time editing** with validation
+- **24-hour time picker** for precise selection
+- **Real-time session timer** display
+- **Dashboard cards** showing today's hours, weekly hours, and total sessions
+
+### Dashboard Screen (UI Features)
+- **Pull to refresh** functionality
+- **Avatar display** for personalization
+- **Current status** indicator
+- **Today's summary** with key metrics
+- **Weekly summary** with productivity insights
+- **Quick actions** for common tasks
+
+### History Screen (UI Features)
+- **Time validation** ensuring data integrity
+- **Notes support** for entry context
+- **Inline editing** modal for quick changes
+- **Clean list design** with proper spacing
+- **Date formatting** with full day/month/year display
+
+### Settings Screen (UI Features)
+- **iPhone-style design** with native iOS appearance
+- **Settings groups** with proper organization
+- **iOS-style settings rows** with icons and subtitles
+- **Theme toggle** with switch component
+- **Data management** options (Export, Import, Clear)
+- **Support section** with feedback options
+- **About section** with app information
+
+## 🛠 Tech Stack
 
 ### Core Framework
-- **React Native 0.79.4** - Cross-platform mobile development
+- **React Native** - Cross-platform mobile development
 - **Expo SDK 53** - Development platform and tools
-- **TypeScript 5.1.3** - Type safety and better development experience
+- **TypeScript** - Type safety and better development experience
 
-### UI & Styling
-- **NativeWind 2.0.11** - Tailwind CSS for React Native
-- **React Native Reanimated 3.17.4** - Smooth animations
-- **Expo Linear Gradient 14.1.5** - Beautiful gradient effects
+### Styling & UI
+- **NativeWind** - Tailwind CSS for React Native
+- **react-native-reanimated** - Smooth animations and interactions
+- **expo-haptics** - Haptic feedback for enhanced UX
 
-### State Management & Data
-- **Zustand 5.0.6** - Lightweight state management
-- **Expo SQLite 15.2.12** - Local database storage
-- **AsyncStorage 2.1.2** - Persistent settings storage
+### Navigation
+- **Expo Router** - File-based navigation system
 
-### Navigation & UI Components
-- **Expo Router 5.1.1** - File-based navigation
-- **React Native Safe Area Context 5.4.0** - Safe area handling
-- **React Native Modal 14.0.0** - Modal dialogs
-- **React Native Share 12.1.0** - Social sharing
+### State Management
+- **Zustand** - Lightweight state management with persistence
 
-### Charts & Data Visualization
-- **React Native Chart Kit 6.12.0** - Beautiful charts
-- **React Native SVG 15.11.2** - SVG support for charts
+### Database & Storage
+- **expo-sqlite** - Robust local database storage
+- **AsyncStorage** - Settings and preferences storage
 
-### Utilities & Enhancements
-- **Expo Haptics 14.1.4** - Tactile feedback
-- **Expo Notifications 0.31.3** - Push notifications
-- **React Native HTML to PDF 0.12.0** - PDF export
-- **React Native Calendars 1.1313.0** - Calendar integration
+### UI Components
+- **@react-native-community/datetimepicker** - Native date/time selection
+- **react-native-safe-area-context** - Safe area handling
+- **expo-linear-gradient** - Gradient effects
 
-## 📱 App Structure
+### Development Tools
+- **Metro** - JavaScript bundler
+- **Babel** - JavaScript compiler with plugins
+- **Tailwind CSS** - Utility-first CSS framework
+
+## 📁 Project Structure
 
 ```
 MonHeure-Mobile-App/
 ├── app/                    # Expo Router pages
-│   ├── _layout.tsx        # Root layout with navigation
+│   ├── _layout.tsx        # Root layout configuration
 │   ├── index.tsx          # Home screen
 │   ├── dashboard.tsx      # Dashboard screen
 │   ├── history.tsx        # History screen
 │   └── settings.tsx       # Settings screen
 ├── screens/               # Screen components
-│   ├── HomeScreen.tsx     # Main punch interface
-│   ├── DashboardScreen.tsx # Analytics dashboard
-│   ├── HistoryScreen.tsx  # Time logs view
-│   └── SettingsScreen.tsx # App settings
-├── utils/                 # Utility functions
-│   ├── punchStore.ts      # Zustand store
+│   ├── HomeScreen.tsx     # Main time tracking interface
+│   ├── DashboardScreen.tsx # Analytics and overview
+│   ├── HistoryScreen.tsx  # Time logs and history
+│   └── SettingsScreen.tsx # App settings and preferences
+├── utils/                 # Utility functions and contexts
+│   ├── database.ts        # Database operations
+│   ├── punchStore.ts      # Zustand state management
 │   ├── themeContext.tsx   # Theme management
-│   ├── database.ts        # SQLite operations
-│   └── timeCalculations.ts # Time calculations
+│   ├── timeCalculations.ts # Time calculation utilities
+│   └── shareUtils.ts      # Sharing functionality
 ├── components/            # Reusable components
-├── types/                 # TypeScript type definitions
-├── assets/               # Images and static files
-└── global.css            # Global styles
+├── assets/               # Images, fonts, and static files
+├── global.css            # Tailwind CSS directives
+├── tailwind.config.js    # Tailwind configuration
+├── babel.config.js       # Babel configuration
+├── metro.config.js       # Metro bundler configuration
+└── package.json          # Dependencies and scripts
 ```
 
-## 🎨 Design System
+## 🎯 Recent Updates
 
-### Color Palette
-- **Primary Purple**: `#8B5CF6` - Main brand color
-- **Primary Indigo**: `#6366F1` - Secondary brand color
-- **Success Green**: `#14B8A6` - Positive actions
-- **Warning Amber**: `#F59E0B` - Caution states
-- **Error Red**: `#EF4444` - Error states
+### Enhanced iPhone-Style Settings (Latest)
+- **Native iOS Design** with proper grouping and visual hierarchy
+- **Settings Groups**: Appearance, Data Management, Support, About
+- **iOS-Style Settings Rows** with icons, titles, and subtitles
+- **Theme Toggle** with native switch component
+- **Data Management** options with proper destructive styling
+- **Support Section** with feedback and sharing options
+- **About Section** with app version and legal information
+- **App Icon** display at bottom with version info
+- **Consistent Spacing** and typography matching iOS standards
 
-### Typography
-- **Headings**: Bold, large text for titles
-- **Body**: Regular weight for content
-- **Captions**: Smaller text for metadata
+### Enhanced Home Screen Animations (Latest)
+- **Multiple glow layers** for enhanced visual depth
+- **Enhanced button animations** with bounce and rotation effects
+- **Improved haptic feedback** for better user experience
+- **Better visual hierarchy** with proper spacing and typography
+- **Consistent dark mode support** across all elements
+- **Time editing functionality** with validation
+- **24-hour time picker** for precise time selection
 
-### Spacing
-- **Consistent 4px grid** - All spacing follows 4px increments
-- **Rounded corners** - Modern, friendly appearance
-- **Subtle shadows** - Depth and hierarchy
+### Modern Navigation System
+- **3-Icon Navigation** (Home, History, Settings) with top-level icons
+- **Active state indicators** with purple highlighting
+- **Smooth transitions** between screens
+- **Consistent navigation** across all screens
 
-## 🔧 Configuration
+## 🔧 Configuration Files
 
-### Environment Setup
-The app uses several configuration files:
-
-- **babel.config.js** - Babel configuration with NativeWind and Reanimated
-- **metro.config.js** - Metro bundler configuration
-- **tailwind.config.js** - Tailwind CSS configuration
-- **tsconfig.json** - TypeScript configuration
-
-### Theme Configuration
-The app supports both light and dark themes with automatic switching:
-
-```typescript
-// Theme context usage
-const { isDarkMode, toggleTheme } = useTheme();
+### Babel Configuration (`babel.config.js`)
+```javascript
+module.exports = function (api) {
+  api.cache(true);
+  return {
+    presets: ['babel-preset-expo'],
+    plugins: [
+      'nativewind/babel',
+      'react-native-reanimated/plugin',
+      'expo-router/babel',
+    ],
+  };
+};
 ```
 
-## 📊 Database Schema
+### Metro Configuration (`metro.config.js`)
+```javascript
+const { getDefaultConfig } = require('expo/metro-config');
 
-The app uses SQLite for local data storage:
+const config = getDefaultConfig(__dirname);
 
-```sql
-CREATE TABLE punch_records (
-  id TEXT PRIMARY KEY,
-  date TEXT NOT NULL,
-  punchIn TEXT,
-  punchOut TEXT,
-  totalHours REAL,
-  notes TEXT,
-  createdAt TEXT,
-  updatedAt TEXT
-);
+// Add support for native modules
+config.resolver.platforms = ['ios', 'android', 'native', 'web'];
+
+// Add support for NativeWind
+config.resolver.sourceExts.push('css');
+
+module.exports = config;
 ```
 
-## 🚀 Deployment
+### Tailwind Configuration (`tailwind.config.js`)
+```javascript
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./app/**/*.{js,jsx,ts,tsx}", "./screens/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
 
-### Building for Production
+## 🎨 Design Philosophy
 
-1. **Configure app.json**
-   ```json
-   {
-     "expo": {
-       "name": "MonHeure",
-       "slug": "monheure",
-       "version": "1.0.0",
-       "platforms": ["ios", "android"]
-     }
-   }
-   ```
+MonHeure follows modern mobile design principles:
 
-2. **Build for iOS**
-   ```bash
-   npx expo build:ios
-   ```
-
-3. **Build for Android**
-   ```bash
-   npx expo build:android
-   ```
-
-### App Store Deployment
-- Configure app signing certificates
-- Set up App Store Connect
-- Submit for review
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **Metro bundler errors**
-   ```bash
-   npx expo start --clear
-   ```
-
-2. **NativeWind styles not working**
-   - Ensure `global.css` is imported in `_layout.tsx`
-   - Check `babel.config.js` has `nativewind/babel` plugin
-   - Verify `tailwind.config.js` content paths
-
-3. **Reanimated animations not working**
-   - Ensure `react-native-reanimated/plugin` is in babel config
-   - Restart the development server
-
-4. **SQLite database issues**
-   - Check database initialization in `punchStore.ts`
-   - Verify table creation scripts
-
-### Development Tips
-
-- Use Expo DevTools for debugging
-- Enable React Native Debugger for better debugging
-- Use TypeScript strict mode for better code quality
-- Test on both iOS and Android regularly
+- **Native Feel**: Mimics iOS and Android native patterns
+- **Accessibility**: Proper touch targets, contrast, and screen reader support
+- **Performance**: Optimized animations and smooth interactions
+- **Consistency**: Unified design language across all screens
+- **Simplicity**: Clean, uncluttered interface focused on core functionality
 
 ## 🤝 Contributing
 
@@ -262,19 +271,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **Expo Team** - For the amazing development platform
-- **React Native Community** - For the excellent libraries
-- **Tailwind CSS** - For the utility-first CSS framework
-- **Ionicons** - For the beautiful icon set
-
-## 📞 Support
-
-If you encounter any issues or have questions:
-
-1. Check the [troubleshooting section](#troubleshooting)
-2. Search existing [issues](../../issues)
-3. Create a new issue with detailed information
+- **Expo Team** for the amazing development platform
+- **React Native Community** for excellent libraries and tools
+- **Tailwind CSS** for the utility-first styling approach
+- **Zustand** for lightweight state management
+- **react-native-reanimated** for smooth animations
+- **expo-haptics** for enhanced user feedback
 
 ---
 
-**Made with ❤️ for productive time tracking** 
+**MonHeure** - Time tracking made simple and beautiful. ⏰✨ 
