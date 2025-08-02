@@ -175,6 +175,13 @@ MonHeure-Mobile-App/
 └── package.json          # Dependencies and scripts
 ```
 
+## 📚 Additional Documentation
+
+For detailed information about specific features, see:
+- **[DATABASE_FEATURES.md](DATABASE_FEATURES.md)** - Database operations and schema
+- **[HISTORY_FEATURES.md](HISTORY_FEATURES.md)** - Time logs and history functionality
+- **[REPORT_FEATURES.md](REPORT_FEATURES.md)** - Reporting and analytics features
+
 ## 🎯 Recent Updates
 
 ### Enhanced iPhone-Style Settings (Latest)
