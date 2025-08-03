@@ -28,6 +28,15 @@ A modern, intuitive time tracking application built with React Native and Expo. 
 - **Notes Support** for adding context to entries
 - **Inline Editing** for quick modifications
 
+### 📈 Comprehensive Reporting System
+- **Date Range Selection** with custom picker
+- **Detailed Analytics** with total hours, days, and averages
+- **PDF Report Generation** with professional formatting
+- **Share Reports** via email or other apps
+- **Weekend/Weekday Tracking** with visual indicators
+- **Holiday Detection** for accurate reporting
+- **Interactive Charts** and data visualization
+
 ### ⚙️ iPhone-Style Settings
 - **Native iOS Design** with proper grouping and hierarchy
 - **Settings Groups**: Appearance, Data Management, Support, About
@@ -104,6 +113,15 @@ A modern, intuitive time tracking application built with React Native and Expo. 
 - **Clean list design** with proper spacing
 - **Date formatting** with full day/month/year display
 
+### Report Screen (UI Features)
+- **Date range picker** with custom selection
+- **Comprehensive analytics** with detailed statistics
+- **PDF generation** with professional formatting
+- **Share functionality** via email and other apps
+- **Interactive charts** and data visualization
+- **Weekend/weekday tracking** with visual indicators
+- **Holiday detection** for accurate reporting
+
 ### Settings Screen (UI Features)
 - **iPhone-style design** with native iOS appearance
 - **Settings groups** with proper organization
@@ -140,6 +158,11 @@ A modern, intuitive time tracking application built with React Native and Expo. 
 - **react-native-safe-area-context** - Safe area handling
 - **expo-linear-gradient** - Gradient effects
 
+### Reporting & Sharing
+- **react-native-html-to-pdf** - PDF report generation
+- **react-native-share** - Share functionality
+- **react-native-chart-kit** - Data visualization
+
 ### Development Tools
 - **Metro** - JavaScript bundler
 - **Babel** - JavaScript compiler with plugins
@@ -154,19 +177,23 @@ MonHeure-Mobile-App/
 │   ├── index.tsx          # Home screen
 │   ├── dashboard.tsx      # Dashboard screen
 │   ├── history.tsx        # History screen
+│   ├── report.tsx         # Report screen
 │   └── settings.tsx       # Settings screen
 ├── screens/               # Screen components
 │   ├── HomeScreen.tsx     # Main time tracking interface
 │   ├── DashboardScreen.tsx # Analytics and overview
 │   ├── HistoryScreen.tsx  # Time logs and history
+│   ├── ReportScreen.tsx   # Comprehensive reporting
 │   └── SettingsScreen.tsx # App settings and preferences
 ├── utils/                 # Utility functions and contexts
 │   ├── database.ts        # Database operations
 │   ├── punchStore.ts      # Zustand state management
 │   ├── themeContext.tsx   # Theme management
 │   ├── timeCalculations.ts # Time calculation utilities
-│   └── shareUtils.ts      # Sharing functionality
+│   ├── shareUtils.ts      # Sharing functionality
+│   └── pdfGenerator.ts    # PDF report generation
 ├── components/            # Reusable components
+│   └── DateRangePicker.tsx # Custom date range picker
 ├── assets/               # Images, fonts, and static files
 ├── global.css            # Tailwind CSS directives
 ├── tailwind.config.js    # Tailwind configuration
@@ -194,6 +221,15 @@ For detailed information about specific features, see:
 - **About Section** with app version and legal information
 - **App Icon** display at bottom with version info
 - **Consistent Spacing** and typography matching iOS standards
+
+### Comprehensive Reporting System (Latest)
+- **Date Range Selection** with custom picker component
+- **Detailed Analytics** with total hours, days, and averages
+- **PDF Report Generation** with professional formatting
+- **Share Reports** via email and other applications
+- **Weekend/Weekday Tracking** with visual indicators
+- **Holiday Detection** for accurate reporting
+- **Interactive Charts** and data visualization
 
 ### Enhanced Home Screen Animations (Latest)
 - **Multiple glow layers** for enhanced visual depth
