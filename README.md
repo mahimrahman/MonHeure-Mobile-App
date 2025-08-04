@@ -290,6 +290,40 @@ module.exports = {
 }
 ```
 
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **Metro bundler errors**
+   ```bash
+   npx expo start --clear
+   ```
+
+2. **NativeWind styles not working**
+   - Ensure `global.css` is imported in `_layout.tsx`
+   - Check `babel.config.js` has `nativewind/babel` plugin
+   - Verify `tailwind.config.js` content paths
+
+3. **Reanimated animations not working**
+   - Ensure `react-native-reanimated/plugin` is in babel config
+   - Restart the development server
+
+4. **SQLite database issues**
+   - Check database initialization in `punchStore.ts`
+   - Verify table creation scripts
+
+5. **PDF generation errors**
+   - Ensure `react-native-html-to-pdf` is properly installed
+   - Check file permissions on device
+
+### Development Tips
+
+- Use Expo DevTools for debugging
+- Enable React Native Debugger for better debugging
+- Use TypeScript strict mode for better code quality
+- Test on both iOS and Android regularly
+- Clear cache when experiencing unexpected behavior
+
 ## 🎨 Design Philosophy
 
 MonHeure follows modern mobile design principles:
