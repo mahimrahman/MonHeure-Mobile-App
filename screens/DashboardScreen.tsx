@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { View, Text, ScrollView, Dimensions, RefreshControl, TouchableOpacity, Platform, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
@@ -8,7 +8,6 @@ import Animated, {
   useAnimatedStyle, 
   withSpring,
   withTiming,
-  withDelay,
   Easing
 } from 'react-native-reanimated';
 import { getTimeStats, TimeStats } from '../utils/timeCalculations';
@@ -34,15 +33,33 @@ export default function DashboardScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Animation values
+  // Optimized animation values
   const headerOpacity = useSharedValue(0);
   const headerTranslateY = useSharedValue(-20);
   const cardOpacity = useSharedValue(0);
   const cardTranslateY = useSharedValue(30);
-  const statsCardScale = useSharedValue(0.9);
-  const actionCardOpacity = useSharedValue(0);
 
-  const loadData = async () => {
+  // Memoized values for better performance
+  const productivityScore = useMemo(() => {
+    if (!timeStats) return 0;
+    const weeklyHours = timeStats.thisWeek.totalHours;
+    const targetHours = 40; // 8 hours per day, 5 days per week
+    return Math.min(Math.round((weeklyHours / targetHours) * 100), 100);
+  }, [timeStats]);
+
+  const productivityColor = useMemo(() => {
+    if (productivityScore >= 80) return '#10B981'; // Green
+    if (productivityScore >= 60) return '#F59E0B'; // Yellow
+    return '#EF4444'; // Red
+  }, [productivityScore]);
+
+  const productivityMessage = useMemo(() => {
+    if (productivityScore >= 80) return 'Excellent Progress!';
+    if (productivityScore >= 60) return 'Good Progress';
+    return 'Keep Going!';
+  }, [productivityScore]);
+
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       const stats = await getTimeStats();
@@ -52,30 +69,22 @@ export default function DashboardScreen() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
-  // Start animations on mount
+  // Optimized animations
   useEffect(() => {
-    // Header animation
-    headerOpacity.value = withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) });
+    headerOpacity.value = withTiming(1, { duration: 400, easing: Easing.out(Easing.cubic) });
     headerTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
     
-    // Card animation
-    cardOpacity.value = withDelay(200, withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) }));
+    cardOpacity.value = withDelay(200, withTiming(1, { duration: 600, easing: Easing.out(Easing.cubic) }));
     cardTranslateY.value = withDelay(200, withSpring(0, { damping: 15, stiffness: 100 }));
-    
-    // Stats card animation
-    statsCardScale.value = withDelay(400, withSpring(1, { damping: 12, stiffness: 100 }));
-    
-    // Action card animation
-    actionCardOpacity.value = withDelay(600, withTiming(1, { duration: 600 }));
   }, []);
 
-  const onRefresh = async () => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
     try {
       await refreshTodayData();
@@ -87,35 +96,22 @@ export default function DashboardScreen() {
     } finally {
       setRefreshing(false);
     }
-  };
+  }, [refreshTodayData, loadData]);
 
-  const formatHours = (hours: number) => {
+  const formatHours = useCallback((hours: number) => {
     if (hours === 0) return '0h';
     const h = Math.floor(hours);
     const m = Math.round((hours - h) * 60);
     return m > 0 ? `${h}h ${m}m` : `${h}h`;
-  };
+  }, []);
 
-  const formatTime = (dateString?: string) => {
+  const formatTime = useCallback((dateString?: string) => {
     if (!dateString) return '--:--';
     const d = new Date(dateString);
     return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
+  }, []);
 
-  const getProductivityScore = () => {
-    if (!timeStats) return 0;
-    const weeklyHours = timeStats.thisWeek.totalHours;
-    const targetHours = 40; // 8 hours per day, 5 days per week
-    return Math.min(Math.round((weeklyHours / targetHours) * 100), 100);
-  };
-
-  const getProductivityColor = (score: number) => {
-    if (score >= 80) return '#10B981'; // Green
-    if (score >= 60) return '#F59E0B'; // Yellow
-    return '#EF4444'; // Red
-  };
-
-  const handleQuickAction = (action: string) => {
+  const handleQuickAction = useCallback((action: string) => {
     Haptics.selectionAsync();
     switch (action) {
       case 'export':
@@ -131,34 +127,18 @@ export default function DashboardScreen() {
         router.push('/history');
         break;
     }
-  };
+  }, [router]);
 
-  // Animated styles
-  const headerAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: headerOpacity.value,
-      transform: [{ translateY: headerTranslateY.value }],
-    };
-  });
+  // Optimized animated styles
+  const headerAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: headerOpacity.value,
+    transform: [{ translateY: headerTranslateY.value }],
+  }));
 
-  const cardAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: cardOpacity.value,
-      transform: [{ translateY: cardTranslateY.value }],
-    };
-  });
-
-  const statsCardAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: statsCardScale.value }],
-    };
-  });
-
-  const actionCardAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: actionCardOpacity.value,
-    };
-  });
+  const cardAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: cardOpacity.value,
+    transform: [{ translateY: cardTranslateY.value }],
+  }));
 
   if (isLoading) {
     return (
@@ -172,9 +152,6 @@ export default function DashboardScreen() {
       </SafeAreaView>
     );
   }
-
-  const productivityScore = getProductivityScore();
-  const productivityColor = getProductivityColor(productivityScore);
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50 dark:bg-gray-900">
@@ -282,7 +259,7 @@ export default function DashboardScreen() {
             </View>
 
             {/* Productivity Score */}
-            <Animated.View style={statsCardAnimatedStyle} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+            <View className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
               <Text className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                 Productivity Score
               </Text>
@@ -294,11 +271,10 @@ export default function DashboardScreen() {
                   </Text>
                 </View>
                 <Text className="text-gray-600 dark:text-gray-300 text-center">
-                  {productivityScore >= 80 ? 'Excellent Progress!' : 
-                   productivityScore >= 60 ? 'Good Progress' : 'Keep Going!'}
+                  {productivityMessage}
                 </Text>
               </View>
-            </Animated.View>
+            </View>
 
             {/* Today's Summary */}
             <View className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
@@ -391,7 +367,7 @@ export default function DashboardScreen() {
             )}
 
             {/* Quick Actions */}
-            <Animated.View style={actionCardAnimatedStyle} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+            <View className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
               <Text className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                 Quick Actions
               </Text>
@@ -453,7 +429,7 @@ export default function DashboardScreen() {
                   <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                 </TouchableOpacity>
               </View>
-            </Animated.View>
+            </View>
           </Animated.View>
         </View>
       </ScrollView>

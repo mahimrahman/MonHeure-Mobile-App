@@ -17,8 +17,7 @@ import Animated, {
   useAnimatedStyle, 
   withSpring,
   withTiming,
-  Easing,
-  withDelay
+  Easing
 } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
@@ -36,7 +35,7 @@ export default function SettingsScreen() {
   const { isDarkMode, toggleTheme, setTheme } = useTheme();
   const router = useRouter();
 
-  // Animation values
+  // Optimized animation values
   const headerOpacity = useSharedValue(0);
   const headerTranslateY = useSharedValue(30);
   const cardOpacity = useSharedValue(0);
@@ -49,30 +48,30 @@ export default function SettingsScreen() {
     loadSettings();
   }, []);
 
-  // Start animations on mount
+  // Optimized animations
   useEffect(() => {
-    headerOpacity.value = withTiming(1, { duration: 600 });
+    headerOpacity.value = withTiming(1, { duration: 400 });
     headerTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
-    cardOpacity.value = withDelay(200, withTiming(1, { duration: 800 }));
-    cardTranslateY.value = withDelay(200, withSpring(0, { damping: 15, stiffness: 100 }));
+    cardOpacity.value = withTiming(1, { duration: 600 });
+    cardTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
   }, []);
 
-  const loadSettings = async () => {
+  const loadSettings = useCallback(async () => {
     try {
       const savedNotifications = await AsyncStorage.getItem('notifications');
       setNotifications(savedNotifications !== 'false');
     } catch (error) {
       console.error('Error loading settings:', error);
     }
-  };
+  }, []);
 
-  const saveSetting = async (key: string, value: any) => {
+  const saveSetting = useCallback(async (key: string, value: any) => {
     try {
       await AsyncStorage.setItem(key, String(value));
     } catch (error) {
       console.error('Error saving setting:', error);
     }
-  };
+  }, []);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -84,22 +83,22 @@ export default function SettingsScreen() {
     } finally {
       setRefreshing(false);
     }
-  }, [refreshTodayData]);
+  }, [refreshTodayData, loadSettings]);
 
-  const handleToggle = (key: string, value: boolean) => {
+  const handleToggle = useCallback((key: string, value: boolean) => {
     Haptics.selectionAsync();
     saveSetting(key, value);
     if (key === 'notifications') {
       setNotifications(value);
     }
-  };
+  }, [saveSetting]);
 
-  const handleThemeToggle = () => {
+  const handleThemeToggle = useCallback(() => {
     Haptics.selectionAsync();
     toggleTheme();
-  };
+  }, [toggleTheme]);
 
-  const handleClearData = () => {
+  const handleClearData = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Alert.alert(
       'Clear All Data',
@@ -122,9 +121,9 @@ export default function SettingsScreen() {
         },
       ]
     );
-  };
+  }, [refreshTodayData]);
 
-  const handleExportData = async () => {
+  const handleExportData = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
       await exportData();
@@ -133,9 +132,9 @@ export default function SettingsScreen() {
       console.error('Error exporting data:', error);
       Alert.alert('❌ Error', 'Failed to export data');
     }
-  };
+  }, []);
 
-  const handleImportData = async () => {
+  const handleImportData = useCallback(async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     try {
       await importData();
@@ -145,39 +144,35 @@ export default function SettingsScreen() {
       console.error('Error importing data:', error);
       Alert.alert('❌ Error', 'Failed to import data');
     }
-  };
+  }, [refreshTodayData]);
 
-  const handleShareApp = () => {
+  const handleShareApp = useCallback(() => {
     Haptics.selectionAsync();
     shareApp();
-  };
+  }, []);
 
-  const handleSendFeedback = () => {
+  const handleSendFeedback = useCallback(() => {
     Haptics.selectionAsync();
     Alert.alert(
       'Send Feedback',
       'Thank you for your feedback! You\'ll receive FREE SWAG for helping us improve.',
       [{ text: 'OK' }]
     );
-  };
+  }, []);
 
-  // Animated styles
-  const headerAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: headerOpacity.value,
-      transform: [{ translateY: headerTranslateY.value }],
-    };
-  });
+  // Optimized animated styles
+  const headerAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: headerOpacity.value,
+    transform: [{ translateY: headerTranslateY.value }],
+  }));
 
-  const cardAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: cardOpacity.value,
-      transform: [{ translateY: cardTranslateY.value }],
-    };
-  });
+  const cardAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: cardOpacity.value,
+    transform: [{ translateY: cardTranslateY.value }],
+  }));
 
   // iOS-style settings group component
-  const SettingsGroup = ({ title, children }: { title?: string; children: React.ReactNode }) => (
+  const SettingsGroup = React.memo(({ title, children }: { title?: string; children: React.ReactNode }) => (
     <View className="mb-6">
       {title && (
         <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 px-4">
@@ -188,10 +183,10 @@ export default function SettingsScreen() {
         {children}
       </View>
     </View>
-  );
+  ));
 
   // iOS-style settings row component
-  const SettingsRow = ({ 
+  const SettingsRow = React.memo(({ 
     icon, 
     title, 
     subtitle, 
@@ -243,7 +238,7 @@ export default function SettingsScreen() {
         />
       )}
     </TouchableOpacity>
-  );
+  ));
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50 dark:bg-gray-900">
@@ -278,6 +273,12 @@ export default function SettingsScreen() {
             onPress={() => router.push('/')}
           >
             <Ionicons name="time" size={24} color={isDarkMode ? '#9CA3AF' : '#6B7280'} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg justify-center items-center mx-2"
+            onPress={() => router.push('/dashboard')}
+          >
+            <Ionicons name="analytics" size={24} color={isDarkMode ? '#9CA3AF' : '#6B7280'} />
           </TouchableOpacity>
           <TouchableOpacity 
             className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg justify-center items-center mx-2"
