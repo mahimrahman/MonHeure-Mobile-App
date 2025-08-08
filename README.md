@@ -1,6 +1,6 @@
 # MonHeure - Time Tracking App
 
-A modern, intuitive time tracking application built with React Native and Expo. Track your work hours with precision, view detailed analytics, and manage your time efficiently with a beautiful, native iOS-style interface.
+A modern, intuitive time tracking application built with React Native and Expo. Track your work hours with precision, view detailed analytics, and manage your time efficiently with a beautiful, native iOS-style interface with optimized performance and smooth animations.
 
 ## ✨ Features
 
@@ -60,6 +60,14 @@ A modern, intuitive time tracking application built with React Native and Expo. 
 - **Pull to Refresh** on all data screens
 - **Professional PDF Design** for reports
 
+### ⚡ Performance Optimizations
+- **Optimized Animations** with reduced complexity and faster durations
+- **Memory Management** with memoized components and callbacks
+- **Smooth Scrolling** with optimized re-renders and better list performance
+- **Fast Navigation** with optimized handlers and consistent patterns
+- **Reduced CPU Usage** with simplified animation sequences
+- **Better Touch Response** with optimized haptic feedback timing
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -92,13 +100,12 @@ A modern, intuitive time tracking application built with React Native and Expo. 
 ## 📱 Screens
 
 ### Home Screen (UI Features)
-- **Enhanced animations** with bounce and rotation effects
-- **Multiple glow layers** for visual depth
-- **Haptic feedback** on all interactions
-- **Time editing** with validation
-- **24-hour time picker** for precise selection
-- **Real-time session timer** display
-- **Dashboard cards** showing today's hours, weekly hours, and total sessions
+- **Optimized animations** with reduced complexity and faster durations
+- **Enhanced button interactions** with smooth scale animations
+- **Real-time session timer** with optimized updates
+- **Memoized UI components** for better performance
+- **Simplified navigation** with 4-icon system
+- **Better loading states** with improved visual feedback
 
 ### Dashboard Screen (UI Features)
 - **Productivity Score** with dynamic calculation and color-coded feedback
@@ -106,16 +113,17 @@ A modern, intuitive time tracking application built with React Native and Expo. 
 - **Real-time status indicators** with dynamic play/pause icons
 - **Comprehensive analytics** with work days tracking
 - **Quick actions** with functional navigation to other screens
-- **Staggered animations** for different card sections
-- **Success/Error haptic feedback** on refresh
+- **Optimized animations** with simplified sequences
+- **Success/Error haptic feedback** on refresh operations
 - **Enhanced visual design** with improved shadows and spacing
 
 ### History Screen (UI Features)
-- **Time validation** ensuring data integrity
-- **Notes support** for entry context
-- **Inline editing** modal for quick changes
-- **Clean list design** with proper spacing
-- **Date formatting** with full day/month/year display
+- **Optimized list rendering** with better performance
+- **Smooth scrolling** with reduced re-renders
+- **Enhanced record cards** with improved visual hierarchy
+- **Fast editing modal** with optimized interactions
+- **Better touch feedback** with consistent haptic responses
+- **Improved loading states** with descriptive feedback
 
 ### Report Screen (UI Features)
 - **Date range picker** with custom selection
@@ -214,6 +222,16 @@ For detailed information about specific features, see:
 - **[REPORT_FEATURES.md](REPORT_FEATURES.md)** - Reporting and analytics features
 
 ## 🎯 Recent Updates
+
+### Performance Optimizations & Smoothness Improvements (Latest)
+- **Reduced Animation Complexity** with simplified sequences and faster durations (400-600ms)
+- **Memory Management** with memoized components using `React.memo` and `useCallback`
+- **Optimized Re-renders** with proper dependency arrays and memoized calculations
+- **Enhanced Touch Interactions** with optimized haptic feedback timing
+- **Smooth Scrolling** with reduced animation values and better list performance
+- **Fast Navigation** with optimized handlers and consistent 4-icon navigation
+- **Better Loading States** with improved visual feedback and descriptive text
+- **Reduced CPU Usage** by removing complex animation sequences and unnecessary calculations
 
 ### Enhanced Dashboard with Productivity Score (Latest)
 - **Dynamic Productivity Score** with color-coded feedback (Green ≥80%, Yellow ≥60%, Red <60%)
@@ -330,6 +348,12 @@ module.exports = {
    - Ensure `react-native-html-to-pdf` is properly installed
    - Check file permissions on device
 
+6. **Performance issues**
+   - Clear Metro cache: `npx expo start --clear`
+   - Restart development server
+   - Check for memory leaks in animations
+   - Verify all `useCallback` and `useMemo` dependencies
+
 ### Development Tips
 
 - Use Expo DevTools for debugging
@@ -337,6 +361,8 @@ module.exports = {
 - Use TypeScript strict mode for better code quality
 - Test on both iOS and Android regularly
 - Clear cache when experiencing unexpected behavior
+- Monitor performance with React DevTools Profiler
+- Use `console.log` sparingly in production builds
 
 ## 🎨 Design Philosophy
 
