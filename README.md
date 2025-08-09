@@ -1,5 +1,11 @@
 # MonHeure - Time Tracking App
 
+[![React Native](https://img.shields.io/badge/React%20Native-0.79.4-blue?style=for-the-badge&logo=react)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo-53.0.0-black?style=for-the-badge&logo=expo)](https://expo.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.1.3-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![NativeWind](https://img.shields.io/badge/NativeWind-2.0.11-green?style=for-the-badge)](https://www.nativewind.dev/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
 A modern, intuitive time tracking application built with React Native and Expo. Track your work hours with precision, view detailed analytics, and manage your time efficiently with a beautiful, native iOS-style interface with optimized performance and smooth animations.
 
 ## ✨ Features
@@ -71,9 +77,11 @@ A modern, intuitive time tracking application built with React Native and Expo. 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js (v16 or higher)
-- Expo CLI (`npm install -g @expo/cli`)
-- iOS Simulator or Android Emulator (optional)
+
+- **Node.js** (v16 or higher) - [Download here](https://nodejs.org/)
+- **Expo CLI** - Install globally: `npm install -g @expo/cli`
+- **Git** - [Download here](https://git-scm.com/)
+- **iOS Simulator** (macOS) or **Android Emulator** (optional)
 
 ### Installation
 
@@ -86,6 +94,8 @@ A modern, intuitive time tracking application built with React Native and Expo. 
 2. **Install dependencies**
    ```bash
    npm install
+   # or
+   yarn install
    ```
 
 3. **Start the development server**
@@ -94,8 +104,28 @@ A modern, intuitive time tracking application built with React Native and Expo. 
    ```
 
 4. **Run on your device**
-   - Scan the QR code with Expo Go app (iOS/Android)
-   - Or press `i` for iOS Simulator / `a` for Android Emulator
+   - **iOS**: Press `i` or scan QR code with Camera app
+   - **Android**: Press `a` or scan QR code with Expo Go app
+   - **Physical Device**: Install Expo Go app and scan QR code
+
+### Development Commands
+
+```bash
+# Start development server
+npm start
+
+# Run on iOS simulator
+npm run ios
+
+# Run on Android emulator
+npm run android
+
+# Run on web browser
+npm run web
+
+# Clear cache and restart
+npx expo start --clear
+```
 
 ## 📱 Screens
 
