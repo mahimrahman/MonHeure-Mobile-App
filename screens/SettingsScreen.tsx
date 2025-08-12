@@ -8,6 +8,9 @@ import {
   Alert,
   RefreshControl,
   Platform,
+  TextInput,
+  Modal,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
@@ -27,9 +30,40 @@ import { shareApp } from '../utils/shareUtils';
 import { useTheme } from '../utils/themeContext';
 import { useRouter } from 'expo-router';
 
+interface UserProfile {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  company: string;
+  position: string;
+  avatar: string;
+  timezone: string;
+  workHours: {
+    start: string;
+    end: string;
+  };
+}
+
 export default function SettingsScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [notifications, setNotifications] = useState(true);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [profile, setProfile] = useState<UserProfile>({
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john.doe@example.com',
+    phone: '+1 (555) 123-4567',
+    company: 'Tech Corp',
+    position: 'Software Developer',
+    avatar: '',
+    timezone: 'America/New_York',
+    workHours: {
+      start: '09:00',
+      end: '17:00'
+    }
+  });
 
   // Use global theme context
   const { isDarkMode, toggleTheme, setTheme } = useTheme();
@@ -40,12 +74,15 @@ export default function SettingsScreen() {
   const headerTranslateY = useSharedValue(30);
   const cardOpacity = useSharedValue(0);
   const cardTranslateY = useSharedValue(50);
+  const profileOpacity = useSharedValue(0);
+  const profileScale = useSharedValue(0.95);
 
   const { refreshTodayData } = usePunchActions();
 
-  // Load settings from AsyncStorage
+  // Load settings and profile from AsyncStorage
   useEffect(() => {
     loadSettings();
+    loadProfile();
   }, []);
 
   // Optimized animations
@@ -54,6 +91,8 @@ export default function SettingsScreen() {
     headerTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
     cardOpacity.value = withTiming(1, { duration: 600 });
     cardTranslateY.value = withSpring(0, { damping: 15, stiffness: 100 });
+    profileOpacity.value = withTiming(1, { duration: 500 });
+    profileScale.value = withSpring(1, { damping: 15, stiffness: 100 });
   }, []);
 
   const loadSettings = useCallback(async () => {
@@ -62,6 +101,28 @@ export default function SettingsScreen() {
       setNotifications(savedNotifications !== 'false');
     } catch (error) {
       console.error('Error loading settings:', error);
+    }
+  }, []);
+
+  const loadProfile = useCallback(async () => {
+    try {
+      const savedProfile = await AsyncStorage.getItem('userProfile');
+      if (savedProfile) {
+        setProfile(JSON.parse(savedProfile));
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    }
+  }, []);
+
+  const saveProfile = useCallback(async (updatedProfile: UserProfile) => {
+    try {
+      await AsyncStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+      setProfile(updatedProfile);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     }
   }, []);
 
@@ -78,12 +139,13 @@ export default function SettingsScreen() {
     try {
       await refreshTodayData();
       await loadSettings();
+      await loadProfile();
     } catch (error) {
       console.error('Error refreshing data:', error);
     } finally {
       setRefreshing(false);
     }
-  }, [refreshTodayData, loadSettings]);
+  }, [refreshTodayData, loadSettings, loadProfile]);
 
   const handleToggle = useCallback((key: string, value: boolean) => {
     Haptics.selectionAsync();
@@ -98,8 +160,24 @@ export default function SettingsScreen() {
     toggleTheme();
   }, [toggleTheme]);
 
+  const handleProfileEdit = useCallback(() => {
+    Haptics.selectionAsync();
+    setShowProfileModal(true);
+  }, []);
+
+  const handleAvatarEdit = useCallback(() => {
+    Haptics.selectionAsync();
+    setShowAvatarModal(true);
+  }, []);
+
+  const handleProfileSave = useCallback((updatedProfile: UserProfile) => {
+    saveProfile(updatedProfile);
+    setShowProfileModal(false);
+    Alert.alert('✅ Success', 'Profile updated successfully');
+  }, [saveProfile]);
+
   const handleClearData = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Haptics.impactAsync(Haptics.ImpactFeedbackType.Medium);
     Alert.alert(
       'Clear All Data',
       'Are you sure you want to permanently delete all your punch logs? This action cannot be undone.',
@@ -124,7 +202,7 @@ export default function SettingsScreen() {
   }, [refreshTodayData]);
 
   const handleExportData = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Haptics.impactAsync(Haptics.ImpactFeedbackType.Medium);
     try {
       await exportData();
       Alert.alert('✅ Success', 'Data exported successfully');
@@ -135,7 +213,7 @@ export default function SettingsScreen() {
   }, []);
 
   const handleImportData = useCallback(async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Haptics.impactAsync(Haptics.ImpactFeedbackType.Medium);
     try {
       await importData();
       await refreshTodayData();
@@ -169,6 +247,11 @@ export default function SettingsScreen() {
   const cardAnimatedStyle = useAnimatedStyle(() => ({
     opacity: cardOpacity.value,
     transform: [{ translateY: cardTranslateY.value }],
+  }));
+
+  const profileAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: profileOpacity.value,
+    transform: [{ scale: profileScale.value }],
   }));
 
   // iOS-style settings group component
@@ -240,6 +323,114 @@ export default function SettingsScreen() {
     </TouchableOpacity>
   ));
 
+  // Profile Modal Component
+  const ProfileModal = React.memo(() => {
+    const [editProfile, setEditProfile] = useState<UserProfile>(profile);
+
+    const handleSave = () => {
+      if (!editProfile.firstName.trim() || !editProfile.lastName.trim()) {
+        Alert.alert('❌ Error', 'First name and last name are required');
+        return;
+      }
+      handleProfileSave(editProfile);
+    };
+
+    return (
+      <Modal
+        visible={showProfileModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowProfileModal(false)}
+      >
+        <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
+          <View className="bg-white dark:bg-gray-800 rounded-xl p-6 m-4 w-80 max-h-96">
+            <Text className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+              Edit Profile
+            </Text>
+            
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View className="space-y-4">
+                <View>
+                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">First Name</Text>
+                  <TextInput
+                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white"
+                    value={editProfile.firstName}
+                    onChangeText={(text) => setEditProfile({...editProfile, firstName: text})}
+                    placeholder="First Name"
+                    placeholderTextColor={isDarkMode ? '#6B7280' : '#9CA3AF'}
+                  />
+                </View>
+
+                <View>
+                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">Last Name</Text>
+                  <TextInput
+                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white"
+                    value={editProfile.lastName}
+                    onChangeText={(text) => setEditProfile({...editProfile, lastName: text})}
+                    placeholder="Last Name"
+                    placeholderTextColor={isDarkMode ? '#6B7280' : '#9CA3AF'}
+                  />
+                </View>
+
+                <View>
+                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">Email</Text>
+                  <TextInput
+                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white"
+                    value={editProfile.email}
+                    onChangeText={(text) => setEditProfile({...editProfile, email: text})}
+                    placeholder="Email"
+                    placeholderTextColor={isDarkMode ? '#6B7280' : '#9CA3AF'}
+                    keyboardType="email-address"
+                  />
+                </View>
+
+                <View>
+                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">Company</Text>
+                  <TextInput
+                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white"
+                    value={editProfile.company}
+                    onChangeText={(text) => setEditProfile({...editProfile, company: text})}
+                    placeholder="Company"
+                    placeholderTextColor={isDarkMode ? '#6B7280' : '#9CA3AF'}
+                  />
+                </View>
+
+                <View>
+                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">Position</Text>
+                  <TextInput
+                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white"
+                    value={editProfile.position}
+                    onChangeText={(text) => setEditProfile({...editProfile, position: text})}
+                    placeholder="Position"
+                    placeholderTextColor={isDarkMode ? '#6B7280' : '#9CA3AF'}
+                  />
+                </View>
+              </View>
+            </ScrollView>
+            
+            <View className="flex-row justify-between mt-6">
+              <TouchableOpacity
+                onPress={() => setShowProfileModal(false)}
+                className="bg-gray-300 dark:bg-gray-600 py-3 px-6 rounded-lg flex-1 mr-2"
+                activeOpacity={0.7}
+              >
+                <Text className="text-gray-700 dark:text-gray-300 font-medium text-center">Cancel</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                onPress={handleSave}
+                className="bg-blue-500 py-3 px-6 rounded-lg flex-1 ml-2"
+                activeOpacity={0.7}
+              >
+                <Text className="text-white font-medium text-center">Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  });
+
   return (
     <SafeAreaView className="flex-1 bg-gray-50 dark:bg-gray-900">
       <ScrollView 
@@ -296,6 +487,39 @@ export default function SettingsScreen() {
 
         <View className="px-4 pb-8">
           <Animated.View style={cardAnimatedStyle}>
+            {/* Profile Section */}
+            <Animated.View style={profileAnimatedStyle}>
+              <SettingsGroup title="Profile">
+                <TouchableOpacity
+                  onPress={handleProfileEdit}
+                  className="flex-row items-center px-4 py-4 active:bg-gray-50 dark:active:bg-gray-700"
+                  activeOpacity={0.7}
+                >
+                  <View className="w-16 h-16 rounded-full bg-purple-500 justify-center items-center mr-4">
+                    {profile.avatar ? (
+                      <Image source={{ uri: profile.avatar }} className="w-16 h-16 rounded-full" />
+                    ) : (
+                      <Text className="text-white text-2xl font-bold">
+                        {profile.firstName.charAt(0)}{profile.lastName.charAt(0)}
+                      </Text>
+                    )}
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {profile.firstName} {profile.lastName}
+                    </Text>
+                    <Text className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      {profile.position} at {profile.company}
+                    </Text>
+                    <Text className="text-sm text-gray-500 dark:text-gray-400">
+                      {profile.email}
+                    </Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={16} color="#C7D2FE" />
+                </TouchableOpacity>
+              </SettingsGroup>
+            </Animated.View>
+
             {/* Appearance Section */}
             <SettingsGroup title="Appearance">
               <SettingsRow
@@ -394,6 +618,9 @@ export default function SettingsScreen() {
           </Animated.View>
         </View>
       </ScrollView>
+
+      {/* Profile Modal */}
+      <ProfileModal />
     </SafeAreaView>
   );
 } 
