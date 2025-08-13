@@ -304,7 +304,7 @@ export default function HistoryScreen() {
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
               <Ionicons name="time" size={24} color={isDarkMode ? '#8B5CF6' : '#6366F1'} />
-              <Text className="text-xl font-bold text-gray-900 dark:text-white ml-2">MonHeure</Text>
+              <Text className="text-2xl font-extrabold text-gray-900 dark:text-white ml-2">MonHeure</Text>
             </View>
             <TouchableOpacity onPress={toggleTheme}>
               <Ionicons 
@@ -347,7 +347,7 @@ export default function HistoryScreen() {
         <View className="px-6 pb-8">
           {/* History Title and Statistics */}
           <View className="mb-6">
-            <Text className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-4">
+            <Text className="text-4xl font-black text-gray-900 dark:text-white text-center mb-4">
               Time History
             </Text>
             
@@ -382,7 +382,7 @@ export default function HistoryScreen() {
               <View className="flex-row items-center">
                 <Ionicons name="search" size={20} color={isDarkMode ? '#9CA3AF' : '#6B7280'} />
                 <TextInput
-                  className="flex-1 ml-3 text-gray-900 dark:text-white text-base"
+                  className="flex-1 ml-3 text-gray-900 dark:text-white text-base font-medium"
                   placeholder="Search records..."
                   placeholderTextColor={isDarkMode ? '#6B7280' : '#9CA3AF'}
                   value={searchQuery}
@@ -438,7 +438,7 @@ export default function HistoryScreen() {
               <View className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg border border-gray-200 dark:border-gray-700">
                 <View className="items-center">
                   <Ionicons name="time-outline" size={64} color={isDarkMode ? '#6B7280' : '#9CA3AF'} />
-                  <Text className="text-gray-600 dark:text-gray-300 text-lg font-medium mt-4 text-center">
+                  <Text className="text-gray-600 dark:text-gray-300 text-lg font-semibold mt-4 text-center">
                     {searchQuery || filterType !== 'all' ? 'No matching records' : 'No time records yet'}
                   </Text>
                   <Text className="text-gray-500 dark:text-gray-400 text-sm mt-2 text-center">
@@ -547,7 +547,7 @@ export default function HistoryScreen() {
             <ScrollView showsVerticalScrollIndicator={false}>
               <View className="space-y-4">
                 <View>
-                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">Start Time</Text>
+                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-semibold">Start Time</Text>
                   <TouchableOpacity 
                     className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600"
                     onPress={() => setShowStartTimePicker(true)}
@@ -559,7 +559,7 @@ export default function HistoryScreen() {
                 </View>
 
                 <View>
-                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">End Time</Text>
+                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-semibold">End Time</Text>
                   <TouchableOpacity 
                     className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600"
                     onPress={() => setShowEndTimePicker(true)}
@@ -571,16 +571,16 @@ export default function HistoryScreen() {
                 </View>
 
                 <View>
-                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">Notes</Text>
-                  <TextInput
-                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white"
-                    value={editNotes}
-                    onChangeText={setEditNotes}
-                    placeholder="Add notes..."
-                    placeholderTextColor={isDarkMode ? '#6B7280' : '#9CA3AF'}
-                    multiline
-                    numberOfLines={3}
-                  />
+                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-semibold">Notes</Text>
+                                      <TextInput
+                      className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-medium"
+                      value={editNotes}
+                      onChangeText={setEditNotes}
+                      placeholder="Add notes..."
+                      placeholderTextColor={isDarkMode ? '#6B7280' : '#9CA3AF'}
+                      multiline
+                      numberOfLines={3}
+                    />
                 </View>
               </View>
             </ScrollView>
@@ -591,7 +591,7 @@ export default function HistoryScreen() {
                 className="bg-gray-300 dark:bg-gray-600 py-3 px-6 rounded-lg flex-1 mr-2"
                 activeOpacity={0.7}
               >
-                <Text className="text-gray-700 dark:text-gray-300 font-medium text-center">Cancel</Text>
+                <Text className="text-gray-700 dark:text-gray-300 font-semibold text-center">Cancel</Text>
               </TouchableOpacity>
               
               <TouchableOpacity
@@ -599,7 +599,7 @@ export default function HistoryScreen() {
                 className="bg-blue-500 py-3 px-6 rounded-lg flex-1 ml-2"
                 activeOpacity={0.7}
               >
-                <Text className="text-white font-medium text-center">Save</Text>
+                <Text className="text-white font-bold text-center">Save</Text>
               </TouchableOpacity>
             </View>
           </View>

@@ -253,9 +253,9 @@ export default function HomeScreen() {
                   <View className="w-10 h-10 bg-green-500 rounded-lg justify-center items-center mr-3">
                     <Ionicons name="time" size={20} color="white" />
                   </View>
-                  <Text className="text-gray-900 dark:text-white font-medium">Today's Hours</Text>
+                  <Text className="text-gray-900 dark:text-white font-semibold">Today's Hours</Text>
                 </View>
-                <Text className="text-gray-600 dark:text-gray-300 font-semibold">8h 30m</Text>
+                <Text className="text-gray-600 dark:text-gray-300 font-bold">8h 30m</Text>
               </View>
 
               <View className="flex-row items-center justify-between">
@@ -263,9 +263,9 @@ export default function HomeScreen() {
                   <View className="w-10 h-10 bg-blue-500 rounded-lg justify-center items-center mr-3">
                     <Ionicons name="calendar" size={20} color="white" />
                   </View>
-                  <Text className="text-gray-900 dark:text-white font-medium">This Week</Text>
+                  <Text className="text-gray-900 dark:text-white font-semibold">This Week</Text>
                 </View>
-                <Text className="text-gray-600 dark:text-gray-300 font-semibold">42h 15m</Text>
+                <Text className="text-gray-600 dark:text-gray-300 font-bold">42h 15m</Text>
               </View>
 
               <View className="flex-row items-center justify-between">
@@ -273,9 +273,9 @@ export default function HomeScreen() {
                   <View className="w-10 h-10 bg-purple-500 rounded-lg justify-center items-center mr-3">
                     <Ionicons name="list" size={20} color="white" />
                   </View>
-                  <Text className="text-gray-900 dark:text-white font-medium">Total Sessions</Text>
+                  <Text className="text-gray-900 dark:text-white font-semibold">Total Sessions</Text>
                 </View>
-                <Text className="text-gray-600 dark:text-gray-300 font-semibold">12</Text>
+                <Text className="text-gray-600 dark:text-gray-300 font-bold">12</Text>
               </View>
             </View>
           </View>
@@ -286,7 +286,7 @@ export default function HomeScreen() {
             className="mt-6 bg-gray-200 dark:bg-gray-700 py-3 px-6 rounded-lg"
             activeOpacity={0.7}
           >
-            <Text className="text-gray-700 dark:text-gray-300 text-center font-medium">
+            <Text className="text-gray-700 dark:text-gray-300 text-center font-semibold">
               Reset Today
             </Text>
           </TouchableOpacity>
@@ -302,7 +302,7 @@ export default function HomeScreen() {
       >
         <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
           <View className="bg-white dark:bg-gray-800 rounded-xl p-6 m-4 w-80">
-            <Text className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+            <Text className="text-2xl font-bold text-gray-900 dark:text-white mb-4 text-center">
               Edit {editingTime === 'start' ? 'Start' : 'End'} Time
             </Text>
             
@@ -320,7 +320,7 @@ export default function HomeScreen() {
                 className="bg-gray-300 dark:bg-gray-600 py-2 px-4 rounded-lg"
                 activeOpacity={0.7}
               >
-                <Text className="text-gray-700 dark:text-gray-300 font-medium">Cancel</Text>
+                <Text className="text-gray-700 dark:text-gray-300 font-semibold">Cancel</Text>
               </TouchableOpacity>
               
               <TouchableOpacity
@@ -328,7 +328,7 @@ export default function HomeScreen() {
                 className="bg-blue-500 py-2 px-4 rounded-lg"
                 activeOpacity={0.7}
               >
-                <Text className="text-white font-medium">Save</Text>
+                <Text className="text-white font-bold">Save</Text>
               </TouchableOpacity>
             </View>
           </View>

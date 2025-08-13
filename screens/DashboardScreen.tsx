@@ -167,7 +167,7 @@ export default function DashboardScreen() {
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
               <Ionicons name="time" size={24} color={isDarkMode ? '#8B5CF6' : '#6366F1'} />
-              <Text className="text-xl font-bold text-gray-900 dark:text-white ml-2">MonHeure</Text>
+              <Text className="text-2xl font-extrabold text-gray-900 dark:text-white ml-2">MonHeure</Text>
             </View>
             <TouchableOpacity onPress={toggleTheme}>
               <Ionicons 
@@ -209,9 +209,9 @@ export default function DashboardScreen() {
 
         <View className="px-6 pb-8">
           {/* Dashboard Title */}
-          <Text className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-8">
-            Dashboard
-          </Text>
+                      <Text className="text-4xl font-black text-gray-900 dark:text-white text-center mb-8">
+              Dashboard
+            </Text>
 
           <Animated.View style={cardAnimatedStyle} className="space-y-6">
             {/* Current Status */}
@@ -382,7 +382,7 @@ export default function DashboardScreen() {
                     <View className="w-10 h-10 bg-blue-500 rounded-lg justify-center items-center mr-3">
                       <Ionicons name="download" size={20} color="white" />
                     </View>
-                    <Text className="text-gray-900 dark:text-white font-medium">Export Report</Text>
+                    <Text className="text-gray-900 dark:text-white font-semibold">Export Report</Text>
                   </View>
                   <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                 </TouchableOpacity>
@@ -396,7 +396,7 @@ export default function DashboardScreen() {
                     <View className="w-10 h-10 bg-green-500 rounded-lg justify-center items-center mr-3">
                       <Ionicons name="list" size={20} color="white" />
                     </View>
-                    <Text className="text-gray-900 dark:text-white font-medium">View History</Text>
+                    <Text className="text-gray-900 dark:text-white font-semibold">View History</Text>
                   </View>
                   <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                 </TouchableOpacity>
@@ -410,7 +410,7 @@ export default function DashboardScreen() {
                     <View className="w-10 h-10 bg-purple-500 rounded-lg justify-center items-center mr-3">
                       <Ionicons name="share" size={20} color="white" />
                     </View>
-                    <Text className="text-gray-900 dark:text-white font-medium">Share Progress</Text>
+                    <Text className="text-gray-900 dark:text-white font-semibold">Share Progress</Text>
                   </View>
                   <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                 </TouchableOpacity>
@@ -424,7 +424,7 @@ export default function DashboardScreen() {
                     <View className="w-10 h-10 bg-orange-500 rounded-lg justify-center items-center mr-3">
                       <Ionicons name="settings" size={20} color="white" />
                     </View>
-                    <Text className="text-gray-900 dark:text-white font-medium">View Settings</Text>
+                    <Text className="text-gray-900 dark:text-white font-semibold">View Settings</Text>
                   </View>
                   <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
                 </TouchableOpacity>
