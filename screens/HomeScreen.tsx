@@ -174,7 +174,7 @@ export default function HomeScreen() {
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center">
             <Ionicons name="time" size={24} color={isDarkMode ? '#8B5CF6' : '#6366F1'} />
-            <Text className="text-xl font-bold text-gray-900 dark:text-white ml-2">MonHeure</Text>
+                          <Text className="text-2xl font-extrabold text-gray-900 dark:text-white ml-2">MonHeure</Text>
           </View>
           <TouchableOpacity onPress={toggleTheme}>
             <Ionicons 
@@ -226,7 +226,7 @@ export default function HomeScreen() {
             >
               <Animated.View style={buttonAnimatedStyle} className="items-center">
                 <Ionicons name={buttonIcon} size={48} color="white" />
-                <Text className="text-white text-lg font-semibold mt-2">{buttonText}</Text>
+                <Text className="text-white text-lg font-bold mt-2">{buttonText}</Text>
               </Animated.View>
             </TouchableOpacity>
           </View>
@@ -235,15 +235,15 @@ export default function HomeScreen() {
           {isPunchedIn && sessionTimer > 0 && (
             <View className="items-center mb-6">
               <Text className="text-gray-600 dark:text-gray-300 text-sm mb-2">Current Session</Text>
-              <Text className="text-2xl font-bold text-gray-900 dark:text-white">
-                {formatDuration(sessionTimer)}
-              </Text>
+                              <Text className="text-3xl font-black text-gray-900 dark:text-white">
+                  {formatDuration(sessionTimer)}
+                </Text>
             </View>
           )}
 
           {/* Dashboard Section */}
           <View className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-            <Text className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+            <Text className="text-2xl font-bold text-gray-900 dark:text-white mb-4 text-center">
               Today's Overview
             </Text>
             

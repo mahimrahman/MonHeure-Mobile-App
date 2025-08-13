@@ -387,7 +387,7 @@ export default function SettingsScreen() {
                 <View>
                   <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-semibold">Company</Text>
                   <TextInput
-                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white"
+                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-medium"
                     value={editProfile.company}
                     onChangeText={(text) => setEditProfile({...editProfile, company: text})}
                     placeholder="Company"
@@ -398,7 +398,7 @@ export default function SettingsScreen() {
                 <View>
                   <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-semibold">Position</Text>
                   <TextInput
-                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white"
+                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-medium"
                     value={editProfile.position}
                     onChangeText={(text) => setEditProfile({...editProfile, position: text})}
                     placeholder="Position"
