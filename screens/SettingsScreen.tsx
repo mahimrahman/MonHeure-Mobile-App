@@ -258,9 +258,9 @@ export default function SettingsScreen() {
   const SettingsGroup = React.memo(({ title, children }: { title?: string; children: React.ReactNode }) => (
     <View className="mb-6">
       {title && (
-        <Text className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 px-4">
-          {title}
-        </Text>
+                    <Text className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 px-4">
+              {title}
+            </Text>
       )}
       <View className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
         {children}
@@ -299,11 +299,11 @@ export default function SettingsScreen() {
         />
       </View>
       <View className="flex-1">
-        <Text className={`text-base font-medium ${isDestructive ? 'text-red-500' : 'text-gray-900 dark:text-white'}`}>
+        <Text className={`text-base font-semibold ${isDestructive ? 'text-red-500' : 'text-gray-900 dark:text-white'}`}>
           {title}
         </Text>
         {subtitle && (
-          <Text className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          <Text className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-0.5">
             {subtitle}
           </Text>
         )}
@@ -344,16 +344,16 @@ export default function SettingsScreen() {
       >
         <View className="flex-1 bg-black bg-opacity-50 justify-center items-center">
           <View className="bg-white dark:bg-gray-800 rounded-xl p-6 m-4 w-80 max-h-96">
-            <Text className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+            <Text className="text-2xl font-bold text-gray-900 dark:text-white mb-4 text-center">
               Edit Profile
             </Text>
             
             <ScrollView showsVerticalScrollIndicator={false}>
               <View className="space-y-4">
                 <View>
-                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">First Name</Text>
+                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-semibold">First Name</Text>
                   <TextInput
-                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white"
+                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-medium"
                     value={editProfile.firstName}
                     onChangeText={(text) => setEditProfile({...editProfile, firstName: text})}
                     placeholder="First Name"
@@ -362,9 +362,9 @@ export default function SettingsScreen() {
                 </View>
 
                 <View>
-                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">Last Name</Text>
+                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-semibold">Last Name</Text>
                   <TextInput
-                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white"
+                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-medium"
                     value={editProfile.lastName}
                     onChangeText={(text) => setEditProfile({...editProfile, lastName: text})}
                     placeholder="Last Name"
@@ -373,9 +373,9 @@ export default function SettingsScreen() {
                 </View>
 
                 <View>
-                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">Email</Text>
+                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-semibold">Email</Text>
                   <TextInput
-                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white"
+                    className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-medium"
                     value={editProfile.email}
                     onChangeText={(text) => setEditProfile({...editProfile, email: text})}
                     placeholder="Email"
@@ -385,7 +385,7 @@ export default function SettingsScreen() {
                 </View>
 
                 <View>
-                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">Company</Text>
+                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-semibold">Company</Text>
                   <TextInput
                     className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white"
                     value={editProfile.company}
@@ -396,7 +396,7 @@ export default function SettingsScreen() {
                 </View>
 
                 <View>
-                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-medium">Position</Text>
+                  <Text className="text-gray-700 dark:text-gray-300 text-sm mb-2 font-semibold">Position</Text>
                   <TextInput
                     className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white"
                     value={editProfile.position}
@@ -414,7 +414,7 @@ export default function SettingsScreen() {
                 className="bg-gray-300 dark:bg-gray-600 py-3 px-6 rounded-lg flex-1 mr-2"
                 activeOpacity={0.7}
               >
-                <Text className="text-gray-700 dark:text-gray-300 font-medium text-center">Cancel</Text>
+                <Text className="text-gray-700 dark:text-gray-300 font-semibold text-center">Cancel</Text>
               </TouchableOpacity>
               
               <TouchableOpacity
@@ -422,7 +422,7 @@ export default function SettingsScreen() {
                 className="bg-blue-500 py-3 px-6 rounded-lg flex-1 ml-2"
                 activeOpacity={0.7}
               >
-                <Text className="text-white font-medium text-center">Save</Text>
+                <Text className="text-white font-bold text-center">Save</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -445,7 +445,7 @@ export default function SettingsScreen() {
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
               <Ionicons name="time" size={24} color={isDarkMode ? '#8B5CF6' : '#6366F1'} />
-              <Text className="text-xl font-bold text-gray-900 dark:text-white ml-2">MonHeure</Text>
+              <Text className="text-2xl font-extrabold text-gray-900 dark:text-white ml-2">MonHeure</Text>
             </View>
             <TouchableOpacity onPress={toggleTheme}>
               <Ionicons 
@@ -499,19 +499,19 @@ export default function SettingsScreen() {
                     {profile.avatar ? (
                       <Image source={{ uri: profile.avatar }} className="w-16 h-16 rounded-full" />
                     ) : (
-                      <Text className="text-white text-2xl font-bold">
+                      <Text className="text-white text-2xl font-black">
                         {profile.firstName.charAt(0)}{profile.lastName.charAt(0)}
                       </Text>
                     )}
                   </View>
                   <View className="flex-1">
-                    <Text className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <Text className="text-lg font-bold text-gray-900 dark:text-white">
                       {profile.firstName} {profile.lastName}
                     </Text>
-                    <Text className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <Text className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">
                       {profile.position} at {profile.company}
                     </Text>
-                    <Text className="text-sm text-gray-500 dark:text-gray-400">
+                    <Text className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       {profile.email}
                     </Text>
                   </View>
@@ -605,13 +605,13 @@ export default function SettingsScreen() {
               <View className="w-16 h-16 bg-purple-500 rounded-2xl justify-center items-center mb-4">
                 <Ionicons name="time" size={32} color="white" />
               </View>
-              <Text className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+              <Text className="text-xl font-bold text-gray-900 dark:text-white mb-1">
                 MonHeure
               </Text>
-              <Text className="text-sm text-gray-500 dark:text-gray-400">
+              <Text className="text-sm font-medium text-gray-500 dark:text-gray-400">
                 Time tracking made simple
               </Text>
-              <Text className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+              <Text className="text-xs font-medium text-gray-400 dark:text-gray-500 mt-2">
                 Version 1.0.0
               </Text>
             </View>
