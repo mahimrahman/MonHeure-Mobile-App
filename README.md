@@ -50,20 +50,37 @@ A modern, intuitive time tracking application built with React Native and Expo. 
 - **Holiday Detection** for accurate reporting
 - **Interactive Charts** and data visualization
 
-### ⚙️ iPhone-Style Settings
+### 👤 Profile Management System
+- **User Profile Information** with editable personal details
+- **Profile Fields**: First Name, Last Name, Email, Company, Position
+- **Avatar Management** with initials fallback and custom image support
+- **Profile Editing Modal** with smooth animations and form validation
+- **Data Persistence** using AsyncStorage for profile information
+- **Real-time Updates** with immediate UI reflection
+- **Form Validation** ensuring required fields are completed
+- **Professional Profile Display** with organized information layout
+
+### ⚙️ iPhone-Style Settings & Profile Management
 - **Native iOS Design** with proper grouping and hierarchy
-- **Settings Groups**: Appearance, Data Management, Support, About
+- **Settings Groups**: Profile, Appearance, Data Management, Support, About
 - **iOS-Style Settings Rows** with icons, titles, and subtitles
+- **Comprehensive Profile Management** with editable user information
+- **User Profile Fields**: First Name, Last Name, Email, Company, Position
+- **Profile Avatar Support** with initials fallback and custom image support
 - **Theme Toggle** with switch component
 - **Data Management** (Export, Import, Clear Data)
 - **Support Options** (Share App, Send Feedback)
 - **About Section** with app version and legal info
 
-### 🎨 Modern UI Design
+### 🎨 Modern UI Design & Enhanced Typography
 - **Smooth Animations** powered by `react-native-reanimated`
 - **Haptic Feedback** for enhanced user experience
 - **Consistent Design Language** across all screens
-- **Professional Typography** and spacing
+- **Professional Typography** with optimized font weights and sizes
+- **Enhanced Font Hierarchy**: font-black for main titles, font-bold for headers, font-semibold for labels
+- **Improved Readability** with better contrast and visual hierarchy
+- **Brand Consistency** with unified typography across all screens
+- **Optimized Text Sizes** for better mobile experience
 
 ### 🔧 Advanced Features
 - **Smart Search & Filtering** with real-time search through records and advanced filtering options
@@ -72,6 +89,9 @@ A modern, intuitive time tracking application built with React Native and Expo. 
 - **Database Statistics** tracking total entries and hours worked
 - **Pull to Refresh** on all data screens
 - **Professional PDF Design** for reports
+- **Profile Data Management** with persistent user information storage
+- **Form Validation** with required field checking and user feedback
+- **Profile Modal System** with smooth animations and responsive design
 
 ### ⚡ Performance Optimizations
 - **Optimized Animations** with reduced complexity and faster durations
@@ -81,6 +101,8 @@ A modern, intuitive time tracking application built with React Native and Expo. 
 - **Fast Navigation** with optimized handlers and consistent patterns
 - **Reduced CPU Usage** with simplified animation sequences
 - **Better Touch Response** with optimized haptic feedback timing
+- **Profile Data Persistence** with efficient AsyncStorage management
+- **Optimized Form Handling** with memoized profile editing components
 
 ## 🚀 Quick Start
 
@@ -180,9 +202,31 @@ npx expo start --clear
 - **Weekend/weekday tracking** with visual indicators
 - **Holiday detection** for accurate reporting
 
+### Profile Management (New Feature)
+- **User Profile Display** with avatar, name, position, and company information
+- **Profile Avatar System** with initials fallback and custom image support
+- **Editable Profile Fields**: First Name, Last Name, Email, Company, Position
+- **Profile Editing Modal** with smooth animations and professional form design
+- **Form Validation** ensuring required fields are completed
+- **Data Persistence** using AsyncStorage for profile information
+- **Real-time Updates** with immediate UI reflection
+- **Professional Layout** with organized information hierarchy
+
+### Enhanced Typography & Visual Design (Latest)
+- **Professional Typography System** with optimized font weights and sizes across all screens
+- **Enhanced Font Hierarchy**: font-black for main titles, font-bold for headers, font-semibold for labels
+- **Improved Readability** with better contrast and visual hierarchy throughout the app
+- **Brand Consistency** with unified typography using font-extrabold for MonHeure branding
+- **Optimized Text Sizes** for better mobile experience and accessibility
+- **Enhanced Form Labels** with semibold weight for better visual distinction
+- **Improved Button Text** with appropriate font weights for better user interaction
+
 ### Settings Screen (UI Features)
 - **iPhone-style design** with native iOS appearance
-- **Settings groups** with proper organization
+- **Profile Management** with editable user information and avatar display
+- **Profile Section** prominently displayed at the top with user details
+- **Profile Editing Modal** with comprehensive form and validation
+- **Settings groups** with proper organization (Profile, Appearance, Data Management, Support, About)
 - **iOS-style settings rows** with icons and subtitles
 - **Theme toggle** with switch component
 - **Data management** options (Export, Import, Clear)
@@ -269,7 +313,26 @@ For detailed information about specific features, see:
 
 ## 🎯 Recent Updates
 
-### Enhanced History Screen with Advanced Features (Latest)
+### Enhanced Profile Management & Settings (Latest)
+- **Comprehensive Profile Management** with editable user information and avatar support
+- **Profile Fields**: First Name, Last Name, Email, Company, Position with form validation
+- **Profile Avatar System** with initials fallback and custom image support
+- **Profile Editing Modal** with smooth animations, scrollable content, and professional form design
+- **Data Persistence** using AsyncStorage for profile information with real-time UI updates
+- **Form Validation** ensuring required fields are completed with user-friendly error messages
+- **Professional Profile Display** with organized information layout and visual hierarchy
+- **Enhanced Settings Organization** with Profile section prominently displayed at the top
+
+### Enhanced Typography & Visual Design (Latest)
+- **Professional Typography System** with optimized font weights and sizes across all screens
+- **Enhanced Font Hierarchy**: font-black for main titles, font-bold for headers, font-semibold for labels
+- **Improved Readability** with better contrast and visual hierarchy throughout the app
+- **Brand Consistency** with unified typography using font-extrabold for MonHeure branding
+- **Optimized Text Sizes** for better mobile experience and accessibility
+- **Enhanced Form Labels** with semibold weight for better visual distinction
+- **Improved Button Text** with appropriate font weights for better user interaction
+
+### Enhanced History Screen with Advanced Features
 - **Smart Search & Filtering System** with real-time search through notes and dates
 - **Advanced Filtering Options** with All, Today, Week, and Month tabs for quick data access
 - **Statistics Dashboard** showing total records and hours with beautiful visual cards and real-time updates
